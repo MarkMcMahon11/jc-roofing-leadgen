@@ -18,13 +18,13 @@ export default function Admin() {
 
   async function load(e?: React.FormEvent) {
     e?.preventDefault();
-    const r = await fetch("/api/admin", { headers: { "x-admin-password": pw } });
+    const r = await fetch("/api/admin", { headers: { "x-admin-password": pw.trim() } });
     if (!r.ok) return setMsg(r.status === 429 ? "Too many wrong passwords. Please wait 10 minutes." : "Wrong password");
     setMsg("");
     setData(await r.json());
   }
   async function put(body: object): Promise<boolean> {
-    const r = await fetch("/api/admin", { method: "PUT", headers: { "x-admin-password": pw, "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    const r = await fetch("/api/admin", { method: "PUT", headers: { "x-admin-password": pw.trim(), "Content-Type": "application/json" }, body: JSON.stringify(body) });
     if (!r.ok) {
       setSaved(`Not saved: ${(await r.json().catch(() => ({}))).error ?? "please try again"}`);
       return false;

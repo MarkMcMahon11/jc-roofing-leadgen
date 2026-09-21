@@ -12,8 +12,9 @@ const sha = (s: string) => createHash("sha256").update(s).digest();
 function auth(req: Request): "ok" | "no" | "locked" {
   const fail = `admin:fail:${clientIp(req)}`;
   if (isBlocked(fail, 10, 10 * 60_000)) return "locked";
-  const pw = process.env.ADMIN_PASSWORD;
-  const given = req.headers.get("x-admin-password") ?? "";
+  // Trim both sides: a space or newline pasted along with the password must not lock the owner out.
+  const pw = process.env.ADMIN_PASSWORD?.trim();
+  const given = (req.headers.get("x-admin-password") ?? "").trim();
   if (pw && timingSafeEqual(sha(given), sha(pw))) return "ok";
   limited(fail, 10, 10 * 60_000);
   return "no";
