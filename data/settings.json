@@ -71,5 +71,18 @@
       "ratePerM2": 95,
       "m2PerCrewDay": 20
     }
-  ]
+  ],
+  "quickJobWeeks": 3,
+  "prices": {
+    "repairMin": 180,
+    "flatRatePerM2": 115,
+    "flatMin": 900,
+    "gutterCleanFrom": 90,
+    "gutterReplacePerM": 42,
+    "fasciaPerM": 38,
+    "chimneyEach": 1100,
+    "chimneyFullExtra": 600,
+    "chimneyAccess": 450,
+    "solarPerKw": 1500
+  }
 }

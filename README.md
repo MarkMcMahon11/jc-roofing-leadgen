@@ -35,6 +35,21 @@ Set these in the host's environment (see `.env.example`). No code changes:
 Before going live also: replace JSON storage with a managed database, use a commercial-allowed host,
 add real authentication to `/admin`, and have JC Roofing approve the privacy notice and trust claims.
 
+## Permanent storage (Supabase, free plan is enough to start)
+1. Create a free project at supabase.com. Choose a region close to the UK (London or Ireland).
+2. In the project open **SQL Editor**, paste the contents of `docs/supabase.sql`, and **Run**.
+3. In **Project Settings -> API** copy the **Project URL** and the **secret / service_role key**.
+4. On the host (e.g. Vercel -> Settings -> Environment Variables) add `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`, then redeploy.
+5. Open `/admin`: it shows "Database connected". Without these two variables the owner page warns that storage is temporary.
+
+Keep the secret key private: it only goes in server environment variables, never in the browser or in git.
+Note: Supabase free projects pause after about a week without use; upgrade or keep the site active for live use.
+
+## Jobs the quote form handles
+New roofs (slate/tile, measured or estimated roof size), repairs, flat roofs (GRP), gutters and fascias, chimney removal,
+solar panels, and "something else" (no price, the owner calls). Every price except new roofs is editable on `/admin`
+under "Other jobs"; new-roof prices are per material. All shipped numbers are placeholders until the owner confirms them.
+
 ## Testing
 `scripts/agent-server.sh <port>` starts an isolated production server (own data folder, fake address data,
 admin password `testpw`). Run `npm run build` first. Stop it with `kill $(lsof -tiTCP:<port> -sTCP:LISTEN)`.

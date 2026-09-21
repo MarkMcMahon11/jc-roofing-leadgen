@@ -12,11 +12,20 @@ const HORIZON_DAYS = 90;
 
 // Slots already taken (no personal data) so the picker can grey them out.
 export async function GET() {
-  const taken = (await getLeads()).map((l) => l.inspectionBooked).filter((v): v is string => typeof v === "string");
+  const taken = (await getLeads().catch(() => [])).map((l) => l.inspectionBooked).filter((v): v is string => typeof v === "string");
   return Response.json({ taken });
 }
 
 export async function POST(req: Request) {
+  try {
+    return await book(req);
+  } catch (e) {
+    console.error("[book] failed:", (e as Error).message);
+    return bad("We couldn't save your booking just now. Please try again in a moment, or call us.", 503);
+  }
+}
+
+async function book(req: Request) {
   if (limited(`book:ip:${clientIp(req)}`, 20, 10 * 60_000)) return bad("Too many attempts. Please try again in a few minutes.", 429);
   const body = await readJson(req);
   if (!body.ok) return body.res;

@@ -1,12 +1,12 @@
 import type { QuoteInput, Settings } from "./types";
 import { formatPostcode, normalisePhone, UK_POSTCODE, validEmail } from "./format";
 import { isObj } from "./http";
+import { OPTIONS, SERVICE_IDS, type ServiceId } from "./services";
 
 export const ENUMS = {
   homeAge: ["pre-1919", "1919-1960", "1960-2000", "newer"],
   propertyType: ["tenement", "semi", "detached", "bungalow"],
   listed: ["yes", "no", "unsure"],
-  jobType: ["full", "repair", "unsure"],
   urgency: ["urgent", "3-months", "pricing"],
 } as const;
 
@@ -50,14 +50,40 @@ export function parseQuote(raw: unknown, s: Settings): Ok | Fail {
   if (!propertyType) return f("propertyType", "Please choose the property type.");
   const listed = oneOf("listed", ENUMS.listed);
   if (!listed) return f("listed", "Please say whether the property is listed.");
-  const jobType = oneOf("jobType", ENUMS.jobType);
-  if (!jobType) return f("jobType", "Please choose what you need done.");
   const urgency = oneOf("urgency", ENUMS.urgency);
   if (!urgency) return f("urgency", "Please tell us how soon you need it.");
 
-  const mat = s.materials.find((m) => m.id === raw.material);
-  if (!mat) return f("material", "Please choose a roof material.");
-  const colour = typeof raw.colour === "string" && mat.colours.includes(raw.colour) ? raw.colour : mat.colours[0];
+  // Which job, and only the details that job needs (everything else is ignored).
+  const service: ServiceId = raw.service === undefined ? "roof" : ((SERVICE_IDS as readonly string[]).includes(raw.service as string) ? (raw.service as ServiceId) : ("" as ServiceId));
+  if (!service) return f("service", "Please choose what you need.");
+  const pick = (k: string, list: readonly (readonly [string, string])[], msg: string): string | Fail => {
+    const v = raw[k];
+    return typeof v === "string" && list.some(([x]) => x === v) ? v : f(k, msg);
+  };
+  const detail: Partial<QuoteInput> = {};
+  const need = (k: keyof typeof OPTIONS, msg: string): Fail | null => {
+    const v = pick(k, OPTIONS[k], msg);
+    if (typeof v !== "string") return v;
+    (detail as Record<string, string>)[k] = v;
+    return null;
+  };
+  let err: Fail | null = null;
+  if (service === "roof") {
+    const mat = s.materials.find((m) => m.id === raw.material);
+    if (!mat) return f("material", "Please choose a roof material.");
+    detail.material = mat.id;
+    detail.colour = typeof raw.colour === "string" && mat.colours.includes(raw.colour) ? raw.colour : mat.colours[0];
+  } else if (service === "repair") err = need("repairIssue", "Please tell us what the problem is.");
+  else if (service === "flat") err = need("flatSize", "Please choose the size of the flat roof.");
+  else if (service === "gutters") err = need("gutterWork", "Please choose the gutter work you need.");
+  else if (service === "chimney") err = need("chimneys", "Please choose how many chimneys.") ?? need("chimneyScope", "Please choose how much to remove.");
+  else if (service === "solar") err = need("solarSize", "Please choose a system size.");
+  else {
+    const notes = clean(raw.notes, 300);
+    if (!notes || notes.length < 5 || notes.length > 300) return f("notes", "Please tell us a little about the job (at least a few words).");
+    detail.notes = notes;
+  }
+  if (err) return err;
 
   // Coordinates only if both are real numbers inside the UK; otherwise ignore them (the server looks up the postcode instead).
   const lat = raw.lat, lng = raw.lng;
@@ -67,8 +93,8 @@ export function parseQuote(raw: unknown, s: Settings): Ok | Fail {
   return {
     ok: true,
     value: {
-      name, phone, email, consent: true, address, postcode, homeAge, propertyType, listed, jobType, urgency,
-      material: mat.id, colour, currentMaterial: "unknown",
+      name, phone, email, consent: true, address, postcode, homeAge, propertyType, listed, urgency,
+      service, jobType: service === "repair" ? "repair" : "full", currentMaterial: "unknown", ...detail,
       ...(geoOk ? { lat: lat as number, lng: lng as number } : {}),
       ...(placeId ? { placeId } : {}),
     },
@@ -99,6 +125,20 @@ export function parseSettings(raw: unknown, current: Settings): { ok: true; valu
     }
   }
 
+  const quickJobWeeks = raw.quickJobWeeks === undefined ? current.quickJobWeeks : num(raw.quickJobWeeks, 0, 104);
+  if (quickJobWeeks === null) return e("Weeks until crew is free for small jobs must be between 0 and 104");
+  let prices = current.prices;
+  if (raw.prices !== undefined) {
+    if (!isObj(raw.prices)) return e("Prices are invalid");
+    prices = { ...current.prices };
+    for (const k of Object.keys(current.prices) as (keyof Settings["prices"])[]) {
+      if (raw.prices[k] === undefined) continue;
+      const v = num(raw.prices[k], 1, 100000);
+      if (v === null) return e("Every price must be between £1 and £100,000");
+      prices[k] = v;
+    }
+  }
+
   let earliestStartManual = current.earliestStartManual;
   if (raw.earliestStartManual !== undefined) {
     if (typeof raw.earliestStartManual !== "string" || (raw.earliestStartManual !== "" && !/^\d{4}-\d{2}-\d{2}$/.test(raw.earliestStartManual)))
@@ -125,5 +165,5 @@ export function parseSettings(raw: unknown, current: Settings): { ok: true; valu
     }
     materials = out;
   }
-  return { ok: true, value: { ...current, paused, weeksBacklog, minJobValue, serviceAreaPrefixes, earliestStartManual, ownerPhone, ownerEmail, materials } };
+  return { ok: true, value: { ...current, paused, weeksBacklog, quickJobWeeks, prices, minJobValue, serviceAreaPrefixes, earliestStartManual, ownerPhone, ownerEmail, materials } };
 }

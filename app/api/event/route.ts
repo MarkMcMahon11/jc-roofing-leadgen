@@ -3,7 +3,7 @@ import { isObj, readJson } from "@/lib/http";
 import { clientIp, limited } from "@/lib/limits";
 
 // Funnel steps: what the visitor has just finished/reached. No personal data is ever sent here.
-const OK = new Set(["start", "address", "home", "roof", "timing", "price", "booked"]);
+const OK = new Set(["start", "address", "service", "home", "details", "timing", "price", "booked"]);
 
 export async function POST(req: Request) {
   if (limited(`event:ip:${clientIp(req)}`, 200, 60_000)) return Response.json({ ok: true });

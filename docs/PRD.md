@@ -4,7 +4,7 @@
 |---|---|
 | **Client** | JC Roofing Dumfries (28 Auchenkeld Avenue, Heathhall, Dumfries DG1 3QX) |
 | **Owner / decision maker** | JC Roofing business owner **[assumed: Jamie, per the contact email on the website; confirm]** |
-| **Status** | Draft v1 · 2026-09-21 · MVP built, in preview |
+| **Status** | Draft v1 · 2026-09-21 · MVP built and hardened; demo deployed; database support added |
 | **Product lead** | Mark |
 | **Repo** | `~/Desktop/jc-roofing-app` · preview at `localhost:3000` and `/preview.html` |
 
@@ -54,7 +54,8 @@ This product is a mobile-first web app, branded to JC Roofing, that takes a pros
 ## 5. Scope
 
 ### In scope for v1
-- Customer flow (5 questions + result + booking).
+- Customer flow (6 short steps + result + booking): address, what you need, your home, job details, timing, contact.
+- Jobs handled: new roofs (slate/tile), roof repairs, flat roofs (GRP), gutters and fascias, chimney removal, solar panel installation, and "something else" (no price; owner calls). Each has its own questions and price rules, and every price except new roofs is editable on the owner page.
 - Instant price range and start window.
 - Lead qualification (hot / warm / not-a-fit) and routing.
 - Owner alerts, owner settings page, simple lead list.
@@ -66,7 +67,6 @@ This product is a mobile-first web app, branded to JC Roofing, that takes a pros
 - Photo upload to speed inspections.
 - Calendar-driven start dates (reads job calendar).
 - Roof measurement from satellite data (Google Solar) or OSM building footprints.
-- Support for services beyond re-roofing (see Open Questions).
 - Reactivation follow-ups for unbooked leads.
 
 ## 6. Customer journey and requirements
@@ -163,7 +163,7 @@ Instrumentation: log each step reached and drop-off point (no personal data in a
 | SMS | Logged to console | Twilio (or similar) with UK sender registration | Requires consent capture (already built) |
 | Email | Logged to console | Resend or equivalent | Verified sending domain needed |
 | Hosting | Local | Production host | Vercel's free Hobby plan is **non-commercial only** [verified]; a commercial deployment needs a paid plan or another host |
-| Database | JSON files (dev only) | Managed Postgres (e.g. Supabase) | JSON storage does not work on serverless hosts |
+| Database | JSON files (dev only); temporary storage on Vercel | Supabase (free plan to start), built in: set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` | Every server copy shares it; writes are checked and retried so nothing is overwritten. See README |
 | Calendar (phase 2) | Manual "weeks free" | Google Calendar read-only access | Separate read-only OAuth scope |
 
 Budget owner: to be confirmed. Recommend the owner approve a monthly ceiling before licensing.
@@ -213,7 +213,7 @@ Budget owner: to be confirmed. Recommend the owner approve a monthly ceiling bef
 ## 14. Open questions
 
 1. **Real rates.** What does JC Roofing charge per m² by material, and what is the true minimum job value?
-2. **Services.** The website also lists GRP flat roofs, gutters and fascias, leadwork, rooflights and drone surveys. Should the app offer an "Other work" route straight to a call or booking?
+2. **Services.** *Resolved:* repairs, flat roofs, gutters and fascias, chimney removal and solar panels are now in the form, plus a "something else" route. Still open: leadwork, rooflights and drone surveys (currently "something else"), and the real prices for every job.
 3. **Coverage.** Is `DG` the correct and complete service area, or are there exceptions and adjacent areas?
 4. **Capacity.** How many crews, and how many m² per day per material? Is a manual "weeks until free" figure acceptable at launch?
 5. **Booking tool.** Is the owner already on Calendly, Google Calendar or nothing? Which will be licensed?

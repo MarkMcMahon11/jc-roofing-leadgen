@@ -5,23 +5,24 @@ import Link from "next/link";
 import { InlineWidget } from "react-calendly";
 import AddressField, { type Place } from "./AddressField";
 import BookingPicker from "./BookingPicker";
-import { Field, Ghost, Label, Opt, Primary, Seg, StickyBar, Swatches } from "./ui";
+import { Field, Ghost, inputCls, Label, Opt, Primary, Seg, StickyBar, Swatches } from "./ui";
+import { OPTIONS, SERVICE_IDS, SERVICE_INFO, type ServiceId } from "@/lib/services";
 import { BUSINESS, telHref } from "@/lib/config";
 import { fmtMonth, fmtSlot } from "@/lib/dates";
 import { normalisePhone, UK_POSTCODE, validEmail } from "@/lib/format";
 
 type Mat = { id: string; label: string; blurb: string; colours: string[] };
 type Cfg = { businessName: string; paused: boolean; placesEnabled: boolean; materials: Mat[] };
-type Result = { id: string; inArea: boolean; score: string; low?: number; high?: number; roofAreaM2?: number; earliestStart?: string; waitlist?: boolean };
+type Result = { id: string; inArea: boolean; score: string; service?: ServiceId; low?: number; high?: number; basis?: string; noPrice?: boolean; earliestStart?: string; waitlist?: boolean };
 type D = Record<string, string | number | boolean | undefined>;
 
 const gbp = (n: number) => `£${n.toLocaleString("en-GB")}`;
-const STEPS = 5;
-const TITLES = ["", "Address", "Your home", "Roof", "Timing", "Your details", "Your estimate"];
+const STEPS = 6;
+const TITLES = ["", "Address", "What you need", "Your home", "Job details", "Timing", "Your details", "Your estimate"];
 // Anonymous funnel event fired when each step is reached (no personal data).
-const EVENTS = ["", "start", "address", "home", "roof", "timing", "price"];
-const TIME_LEFT = ["", "About 90 seconds left", "About 75 seconds left", "About 45 seconds left", "About 30 seconds left", "Last step"];
-const STORE_KEY = "jc-quote-v1";
+const EVENTS = ["", "start", "address", "service", "home", "details", "timing", "price"];
+const TIME_LEFT = ["", "About 100 seconds left", "About 90 seconds left", "About 70 seconds left", "About 50 seconds left", "About 30 seconds left", "Last step"];
+const STORE_KEY = "jc-quote-v2";
 const pcClean = (v: unknown) => String(v ?? "").replace(/\s+/g, " ").trim();
 
 type Saved = { d: D; step: number; result: Result | null; booked: string; manual: boolean; key: string };
@@ -153,6 +154,22 @@ export default function QuoteWizard() {
   if (!cfg) return <p role="status" className="p-8 text-center text-mute">Loading…</p>;
   const mat = cfg.materials.find((m) => m.id === d.material);
   const calendly = process.env.NEXT_PUBLIC_CALENDLY_URL;
+  const svc = d.service as ServiceId | undefined;
+  const filled = (k: string) => typeof d[k] === "string" && (d[k] as string).length > 0;
+  const detailsReady =
+    svc === "roof" ? filled("material") :
+    svc === "repair" ? filled("repairIssue") :
+    svc === "flat" ? filled("flatSize") :
+    svc === "gutters" ? filled("gutterWork") :
+    svc === "chimney" ? filled("chimneys") && filled("chimneyScope") :
+    svc === "solar" ? filled("solarSize") :
+    svc === "other" ? String(d.notes ?? "").trim().length >= 5 : false;
+  // A group of single-choice rows for one of the job questions.
+  const choices = (k: keyof typeof OPTIONS, labelId: string) => (
+    <div role="group" aria-labelledby={labelId} className="space-y-2">
+      {(OPTIONS[k] as readonly (readonly [string, string])[]).map(([v, l]) => <Opt radio key={v} label={l} on={d[k] === v} onClick={() => set(k, v)} />)}
+    </div>
+  );
 
   return (
     <>
@@ -210,8 +227,22 @@ export default function QuoteWizard() {
           </section>
         )}
 
-        {/* 2 · Home */}
+        {/* 2 · What do you need */}
         {step === 2 && (
+          <section>
+            <Label first id="q-svc">What do you need?</Label>
+            <div role="group" aria-labelledby="q-svc" className="space-y-2">
+              {SERVICE_IDS.map((id) => <Opt radio key={id} label={SERVICE_INFO[id].label} sub={SERVICE_INFO[id].blurb} on={d.service === id} onClick={() => set("service", id)} />)}
+            </div>
+            <StickyBar>
+              <Ghost onClick={() => go(1)}>Back</Ghost>
+              <Primary disabled={!d.service} onClick={() => go(3)}>Next</Primary>
+            </StickyBar>
+          </section>
+        )}
+
+        {/* 3 · Home */}
+        {step === 3 && (
           <section>
             <Label first id="q-prop">What type of property?</Label>
             <div role="group" aria-labelledby="q-prop" className="grid grid-cols-2 gap-2">
@@ -224,36 +255,56 @@ export default function QuoteWizard() {
             <Label id="q-listed" hint="This can affect the type of work allowed.">Listed or in a conservation area?</Label>
             <Seg labelledBy="q-listed" value={d.listed as string} onChange={(v) => set("listed", v)} options={[["yes", "Yes"], ["no", "No"], ["unsure", "Not sure"]]} />
             <StickyBar>
-              <Ghost onClick={() => go(1)}>Back</Ghost>
-              <Primary disabled={!d.propertyType || !d.homeAge || !d.listed} onClick={() => go(3)}>Next</Primary>
+              <Ghost onClick={() => go(2)}>Back</Ghost>
+              <Primary disabled={!d.propertyType || !d.homeAge || !d.listed} onClick={() => go(4)}>Next</Primary>
             </StickyBar>
           </section>
         )}
 
-        {/* 3 · Roof */}
-        {step === 3 && (
+        {/* 4 · Job details (depends on the job) */}
+        {step === 4 && (
           <section>
-            <Label first id="q-job">What do you need done?</Label>
-            <Seg labelledBy="q-job" value={d.jobType as string} onChange={(v) => set("jobType", v)} options={[["full", "New roof"], ["repair", "A repair"], ["unsure", "Not sure"]]} />
-            <Label id="q-mat" hint="Pick the look you'd like. We'll confirm at the inspection.">Which material?</Label>
-            <div role="group" aria-labelledby="q-mat" className="space-y-2">
-              {cfg.materials.map((m) => <Opt radio key={m.id} label={m.label} sub={m.blurb} on={d.material === m.id} onClick={() => { set("material", m.id); set("colour", m.colours[0]); }} />)}
-            </div>
-            {mat && (
+            {svc === "roof" && (
               <>
-                <Label id="q-col">Colour</Label>
-                <Swatches labelledBy="q-col" colours={mat.colours} value={d.colour as string} onChange={(c) => set("colour", c)} />
+                <Label first id="q-mat" hint="Pick the look you'd like. We'll confirm at the inspection.">Which material?</Label>
+                <div role="group" aria-labelledby="q-mat" className="space-y-2">
+                  {cfg.materials.map((m) => <Opt radio key={m.id} label={m.label} sub={m.blurb} on={d.material === m.id} onClick={() => { set("material", m.id); set("colour", m.colours[0]); }} />)}
+                </div>
+                {mat && (
+                  <>
+                    <Label id="q-col">Colour</Label>
+                    <Swatches labelledBy="q-col" colours={mat.colours} value={d.colour as string} onChange={(c) => set("colour", c)} />
+                  </>
+                )}
+              </>
+            )}
+            {svc === "repair" && (<><Label first id="q-rep" hint="Repairs vary a lot, so we'll give you a wide range and confirm after a look.">What&apos;s the problem?</Label>{choices("repairIssue", "q-rep")}</>)}
+            {svc === "flat" && (<><Label first id="q-flat" hint="Roughly is fine.">How big is the flat roof?</Label>{choices("flatSize", "q-flat")}</>)}
+            {svc === "gutters" && (<><Label first id="q-gut">What do you need?</Label>{choices("gutterWork", "q-gut")}</>)}
+            {svc === "chimney" && (
+              <>
+                <Label first id="q-chim">How many chimneys?</Label>{choices("chimneys", "q-chim")}
+                <Label id="q-scope" hint="Chimneys shared with a neighbour usually need their agreement.">How much should come out?</Label>{choices("chimneyScope", "q-scope")}
+              </>
+            )}
+            {svc === "solar" && (<><Label first id="q-sol" hint="We'll confirm the right system after a roof survey.">What size system?</Label>{choices("solarSize", "q-sol")}</>)}
+            {svc === "other" && (
+              <>
+                <Label first id="q-notes" hint="A few words is fine. We'll call to talk it through.">Tell us about the job</Label>
+                <label htmlFor="f-notes" className="sr-only">Job details</label>
+                <textarea id="f-notes" rows={4} maxLength={300} className={inputCls} value={(d.notes as string) ?? ""} onChange={(e) => set("notes", e.target.value)} />
+                <p className="mt-1 text-right text-[0.75rem] text-mute">{String(d.notes ?? "").length}/300</p>
               </>
             )}
             <StickyBar>
-              <Ghost onClick={() => go(2)}>Back</Ghost>
-              <Primary disabled={!d.jobType || !d.material} onClick={() => go(4)}>Next</Primary>
+              <Ghost onClick={() => go(3)}>Back</Ghost>
+              <Primary disabled={!detailsReady} onClick={() => go(5)}>Next</Primary>
             </StickyBar>
           </section>
         )}
 
-        {/* 4 · Timing */}
-        {step === 4 && (
+        {/* 5 · Timing */}
+        {step === 5 && (
           <section>
             <Label first id="q-time">How soon do you need it?</Label>
             <div role="group" aria-labelledby="q-time" className="space-y-2">
@@ -262,14 +313,14 @@ export default function QuoteWizard() {
               ))}
             </div>
             <StickyBar>
-              <Ghost onClick={() => go(3)}>Back</Ghost>
-              <Primary disabled={!d.urgency} onClick={() => go(5)}>Next</Primary>
+              <Ghost onClick={() => go(4)}>Back</Ghost>
+              <Primary disabled={!d.urgency} onClick={() => go(6)}>Next</Primary>
             </StickyBar>
           </section>
         )}
 
-        {/* 5 · Contact */}
-        {step === 5 && (
+        {/* 6 · Contact */}
+        {step === 6 && (
           <section>
             <Label first hint="We'll text and email your price straight away.">Where should we send your price?</Label>
             <div className="space-y-2.5">
@@ -292,7 +343,7 @@ export default function QuoteWizard() {
               </div>
             )}
             <StickyBar>
-              <Ghost onClick={() => go(4)}>Back</Ghost>
+              <Ghost onClick={() => go(5)}>Back</Ghost>
               <Primary disabled={busy} onClick={submit}>{busy ? "Measuring your roof…" : "Show my price"}</Primary>
             </StickyBar>
           </section>
@@ -314,11 +365,18 @@ export default function QuoteWizard() {
                     Active leak? Call us now on {BUSINESS.phone}. We&apos;ve flagged your enquiry as urgent.
                   </a>
                 )}
-                <div className="rounded-xl bg-brand px-4 py-3.5 text-white">
-                  <p className="text-[0.8125rem] opacity-90">Estimated price · {mat?.label.toLowerCase()} roof · about {result.roofAreaM2} m²</p>
-                  <p className="text-[1.75rem] font-bold leading-tight">{gbp(result.low ?? 0)} – {gbp(result.high ?? 0)}</p>
-                  <p className="text-[0.8125rem] opacity-90">Final price confirmed at a free inspection.</p>
-                </div>
+                {result.noPrice ? (
+                  <div className="rounded-xl bg-white px-4 py-3.5 ring-1 ring-line">
+                    <p className="font-semibold">Thanks, we&apos;ll be in touch</p>
+                    <p className="mt-0.5 text-[0.875rem] text-mute">We&apos;ll look at what you need and come back to you with a price. You can also book a free inspection below.</p>
+                  </div>
+                ) : (
+                  <div className="rounded-xl bg-brand px-4 py-3.5 text-white">
+                    <p className="text-[0.8125rem] opacity-90">Estimated price · {svc === "roof" && mat ? `${mat.label.toLowerCase()} roof` : SERVICE_INFO[svc ?? "roof"].label.toLowerCase()} · {result.basis}</p>
+                    <p className="text-[1.75rem] font-bold leading-tight">{gbp(result.low ?? 0)} – {gbp(result.high ?? 0)}</p>
+                    <p className="text-[0.8125rem] opacity-90">Final price confirmed at a free {svc === "solar" ? "survey" : "inspection"}.</p>
+                  </div>
+                )}
                 {result.waitlist ? (
                   <div className="rounded-xl bg-white px-3.5 py-3 ring-1 ring-line">
                     <p className="text-[0.875rem] leading-snug"><b className="font-semibold">You&apos;re on our waiting list</b><br /><span className="text-mute">We&apos;re fully booked at the moment. We&apos;ll be in touch as soon as we have space. We&apos;ve texted and emailed you a copy of this estimate.</span></p>

@@ -2,7 +2,7 @@ import { randomUUID } from "crypto";
 import { after } from "next/server";
 import { addLead, getSettings, purgeExpired } from "@/lib/store";
 import { getRoofArea } from "@/lib/roof";
-import { earliestStart, inServiceArea, jobDays, priceRange, scoreLead } from "@/lib/pricing";
+import { earliestStart, estimate, inServiceArea, scoreLead, weeksFor } from "@/lib/pricing";
 import { notify } from "@/lib/notify";
 import { lookupPostcode, placesEnabled } from "@/lib/places";
 import { parseQuote } from "@/lib/validate";
@@ -47,25 +47,34 @@ export async function POST(req: Request) {
   const geo = pc !== "unknown" && typeof input.lat !== "number" ? { lat: pc.lat, lng: pc.lng } : {};
 
   const inArea = inServiceArea(input.postcode, s);
-  const { area, source } = await getRoofArea({ ...input, ...geo });
-  const { low, high } = priceRange(input, area, s);
+  // Only new roofs need a measured roof size; everything else is priced from the customer's answers.
+  const { area, source } = input.service === "roof" ? await getRoofArea({ ...input, ...geo }) : { area: 0, source: "estimate" as const };
+  const est = estimate(input, s, area, source);
+  const now = new Date().toISOString();
   const lead: Lead = {
     ...input,
     ...geo,
     id: randomUUID(),
-    createdAt: new Date().toISOString(),
-    consentAt: new Date().toISOString(),
+    createdAt: now,
+    consentAt: now,
     consentVersion: CONSENT_VERSION,
     roofAreaM2: area,
     roofSource: source,
-    low,
-    high,
-    earliestStart: earliestStart(s, jobDays(area, input, s)),
-    score: scoreLead(input, area, s), // out of area stays "not-a-fit" even when paused
+    low: est?.low ?? 0,
+    high: est?.high ?? 0,
+    basis: est?.basis ?? "needs a call or inspection",
+    ...(est ? {} : { noPrice: true }),
+    earliestStart: earliestStart(s, weeksFor(input.service, s)),
+    score: scoreLead(input, s), // out of area stays "not-a-fit" even when paused
     ...(s.paused && inArea ? { waitlist: true } : {}),
     status: "new",
   };
-  await addLead(lead);
+  try {
+    await addLead(lead);
+  } catch (e) {
+    console.error("[quote] could not save enquiry:", (e as Error).message);
+    return bad(`We couldn't save your enquiry just now. Please call us on ${BUSINESS.phone} and we'll help straight away.`, 503);
+  }
   // Runs after the response is sent, but the host waits for it (so alerts aren't lost on serverless hosts).
   after(() => notify(lead, s));
   after(() => purgeExpired().catch(console.error));
@@ -75,9 +84,11 @@ export async function POST(req: Request) {
     id: lead.id,
     inArea: true,
     score: lead.score,
-    low,
-    high,
-    roofAreaM2: area,
+    service: lead.service,
+    low: lead.low,
+    high: lead.high,
+    basis: lead.basis,
+    noPrice: !!lead.noPrice,
     earliestStart: lead.earliestStart,
     waitlist: !!lead.waitlist,
   });

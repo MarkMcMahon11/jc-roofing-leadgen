@@ -4,10 +4,11 @@ import Image from "next/image";
 import type { Lead, Settings } from "@/lib/types";
 import type { Message } from "@/lib/store";
 import { fmtSlot } from "@/lib/dates";
+import { detailsText, PRICE_LABELS, SERVICE_INFO } from "@/lib/services";
 
-type Data = { settings: Settings; leads: Lead[]; outbox: Message[]; funnel: Record<string, number> };
+type Data = { settings: Settings; leads: Lead[]; outbox: Message[]; funnel: Record<string, number>; storage: "database" | "files" | "temporary" };
 const STATUSES = ["new", "contacted", "quoted", "won", "lost"];
-const FUNNEL: [string, string][] = [["start", "Opened the form"], ["address", "Confirmed address"], ["home", "Described their home"], ["roof", "Chose a roof"], ["timing", "Gave timing"], ["price", "Saw their price"], ["booked", "Booked inspection"]];
+const FUNNEL: [string, string][] = [["start", "Opened the form"], ["address", "Confirmed address"], ["service", "Chose what they need"], ["home", "Described their home"], ["details", "Gave job details"], ["timing", "Gave timing"], ["price", "Saw their price"], ["booked", "Booked inspection"]];
 const input = "rounded-lg border-[1.5px] border-line bg-white px-2.5 py-2 text-base focus:border-ink";
 
 export default function Admin() {
@@ -19,7 +20,7 @@ export default function Admin() {
   async function load(e?: React.FormEvent) {
     e?.preventDefault();
     const r = await fetch("/api/admin", { headers: { "x-admin-password": pw.trim() } });
-    if (!r.ok) return setMsg(r.status === 429 ? "Too many wrong passwords. Please wait 10 minutes." : "Wrong password");
+    if (!r.ok) return setMsg(r.status === 429 ? "Too many wrong passwords. Please wait 10 minutes." : r.status === 503 ? ((await r.json().catch(() => ({}))).error ?? "The database isn't responding.") : "Wrong password");
     setMsg("");
     setData(await r.json());
   }
@@ -34,8 +35,8 @@ export default function Admin() {
   }
   async function save(s: Settings) {
     setSaved("");
-    const nums = [s.weeksBacklog, s.minJobValue, ...s.materials.map((m) => m.ratePerM2)];
-    if (nums.some((n) => typeof n !== "number" || !Number.isFinite(n) || n <= 0 && n !== s.weeksBacklog)) return setSaved("Not saved: please fill in every price and number.");
+    const nums = [s.weeksBacklog, s.quickJobWeeks, s.minJobValue, ...s.materials.map((m) => m.ratePerM2), ...Object.values(s.prices)];
+    if (nums.some((n) => typeof n !== "number" || !Number.isFinite(n) || n <= 0 && n !== s.weeksBacklog && n !== s.quickJobWeeks)) return setSaved("Not saved: please fill in every price and number.");
     if (await put({ settings: s })) setSaved("Saved ✓");
   }
   function exportLead(l: Lead) {
@@ -68,12 +69,15 @@ export default function Admin() {
   return (
     <main className="mx-auto max-w-2xl space-y-6 p-4">
       <div className="flex items-center gap-3"><Image src="/logo.png" alt="JC Roofing" width={512} height={198} className="h-11 w-auto" /><h1 className="text-xl font-bold">Owner page</h1></div>
+      {data.storage === "temporary" && <p role="alert" className="rounded-xl border-[1.5px] border-brand bg-brand-tint p-3 text-sm text-brand"><b>Demo storage:</b> leads, messages and settings are kept in temporary storage and can disappear or differ between visits. Connect the database (see the README) before real customers use this.</p>}
+      {data.storage === "database" && <p className="text-sm font-semibold text-green-800">Database connected ✓ Your leads and settings are saved permanently.</p>}
 
       <section className="space-y-3 rounded-2xl border border-line bg-white p-4" aria-labelledby="h-settings">
         <h2 id="h-settings" className="text-lg font-semibold">Settings</h2>
         <label className="flex items-center gap-2"><input type="checkbox" className="h-5 w-5 accent-[#b11017]" checked={s.paused} onChange={(e) => upd({ paused: e.target.checked })} /> Pause: we&apos;re not taking new work (new enquiries join a waiting list)</label>
         <div className="flex flex-wrap gap-x-6 gap-y-3">
           <label className="block text-[0.8125rem] font-semibold">Weeks until crew is free<br /><input type="number" min={0} className={num} value={Number.isNaN(s.weeksBacklog) ? "" : s.weeksBacklog} onChange={(e) => upd({ weeksBacklog: e.target.value === "" ? NaN : +e.target.value })} /></label>
+          <label className="block text-[0.8125rem] font-semibold">Weeks until free for small jobs<br /><input type="number" min={0} className={num} value={Number.isNaN(s.quickJobWeeks) ? "" : s.quickJobWeeks} onChange={(e) => upd({ quickJobWeeks: e.target.value === "" ? NaN : +e.target.value })} /></label>
           <label className="block text-[0.8125rem] font-semibold">Or a fixed earliest start date<br /><input type="date" className={`${input} w-44`} value={s.earliestStartManual} onChange={(e) => upd({ earliestStartManual: e.target.value })} /></label>
           <label className="block text-[0.8125rem] font-semibold">Minimum job value (£)<br /><input type="number" min={100} className={num} value={Number.isNaN(s.minJobValue) ? "" : s.minJobValue} onChange={(e) => upd({ minJobValue: e.target.value === "" ? NaN : +e.target.value })} /></label>
         </div>
@@ -84,6 +88,12 @@ export default function Admin() {
         {s.materials.map((m, i) => (
           <label key={m.id} className="flex items-center justify-between gap-3">{m.label}
             <input type="number" min={1} className={num} value={Number.isNaN(m.ratePerM2) ? "" : m.ratePerM2} onChange={(e) => upd({ materials: s.materials.map((x, j) => (j === i ? { ...x, ratePerM2: e.target.value === "" ? NaN : +e.target.value } : x)) })} />
+          </label>
+        ))}
+        <h3 className="font-semibold">Other jobs (repairs, flat roofs, gutters, chimneys, solar)</h3>
+        {(Object.keys(s.prices) as (keyof Settings["prices"])[]).map((k) => (
+          <label key={k} className="flex items-center justify-between gap-3">{PRICE_LABELS[k] ?? k}
+            <input type="number" min={1} className={num} value={Number.isNaN(s.prices[k]) ? "" : s.prices[k]} onChange={(e) => upd({ prices: { ...s.prices, [k]: e.target.value === "" ? NaN : +e.target.value } })} />
           </label>
         ))}
         <div className="flex items-center gap-3">
@@ -115,8 +125,10 @@ export default function Admin() {
           {data.leads.map((l) => (
             <li key={l.id} className="rounded-2xl border border-line bg-white p-4">
               <div className="flex justify-between"><b>{l.name}</b><span className={l.score === "hot" ? "font-semibold text-brand" : "text-mute"}>{l.score}{l.waitlist ? " · waiting list" : ""}</span></div>
-              <p className="text-sm">{l.address.replace(/, (UK|United Kingdom)$/, "")}{l.address.includes(l.postcode) ? "" : `, ${l.postcode}`} · {s.materials.find((m) => m.id === l.material)?.label ?? l.material} · {l.roofAreaM2}m² ({l.roofSource === "solar-api" ? "measured" : "estimate"})</p>
-              <p className="text-sm">£{l.low.toLocaleString()}–£{l.high.toLocaleString()} · {l.urgency} · <a className="underline" href={`tel:${l.phone}`}>{l.phone}</a> · {l.email}</p>
+              <p className="text-sm">{l.address.replace(/, (UK|United Kingdom)$/, "")}{l.address.includes(l.postcode) ? "" : `, ${l.postcode}`}</p>
+              <p className="text-sm"><b>{SERVICE_INFO[l.service ?? "roof"].label}</b>{detailsText(l, s.materials.find((m) => m.id === l.material)?.label) ? `: ${detailsText(l, s.materials.find((m) => m.id === l.material)?.label)}` : ""}{l.basis ? ` · ${l.basis}` : ""}</p>
+              {l.notes && <p className="text-sm italic">&quot;{l.notes}&quot;</p>}
+              <p className="text-sm">{l.noPrice ? "No price given" : `£${l.low.toLocaleString()}–£${l.high.toLocaleString()}`} · {l.urgency} · <a className="underline" href={`tel:${l.phone}`}>{l.phone}</a> · {l.email}</p>
               {l.inspectionBooked && <p className="text-sm font-semibold text-green-800">Inspection: {fmtSlot(l.inspectionBooked)}</p>}
               <p className="text-xs text-mute">Consent given {new Date(l.consentAt ?? l.createdAt).toLocaleString("en-GB")} (wording {l.consentVersion ?? "v1"}) · {l.placeId ? "address checked" : "address typed by customer, please check"}</p>
               <div className="mt-2 flex flex-wrap items-center gap-3">
