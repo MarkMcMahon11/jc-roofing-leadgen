@@ -19,7 +19,8 @@ function Choice({ label, sub, on, onClick }: { label: string; sub?: string; on?:
     <button
       type="button"
       onClick={onClick}
-      className={`w-full rounded-2xl border-2 border-sand bg-white p-4 text-left text-lg transition ${on ? "border-brand bg-brand-tint" : "border-sand bg-white hover:border-ink"}`}
+      className={`w-full rounded-2xl border-2 p-4 text-left text-lg transition ${on ? "border-brand bg-brand-tint" : "border-sand bg-white hover:border-ink"}`}
+      aria-pressed={!!on}
     >
       <span className="font-semibold">{label}</span>
       {sub && <span className="block text-sm text-mute">{sub}</span>}
