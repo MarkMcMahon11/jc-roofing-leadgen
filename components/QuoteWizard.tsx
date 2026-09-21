@@ -5,105 +5,192 @@ import Link from "next/link";
 import { InlineWidget } from "react-calendly";
 import AddressField, { type Place } from "./AddressField";
 import BookingPicker from "./BookingPicker";
-import { Ghost, inputCls, Label, Opt, Primary, Seg, StickyBar, Swatches } from "./ui";
+import { Field, Ghost, Label, Opt, Primary, Seg, StickyBar, Swatches } from "./ui";
+import { BUSINESS, telHref } from "@/lib/config";
+import { fmtMonth, fmtSlot } from "@/lib/dates";
+import { normalisePhone, UK_POSTCODE, validEmail } from "@/lib/format";
 
 type Mat = { id: string; label: string; blurb: string; colours: string[] };
 type Cfg = { businessName: string; paused: boolean; placesEnabled: boolean; materials: Mat[] };
-type Result = { id: string; inArea: boolean; score: string; low: number; high: number; roofAreaM2: number; earliestStart: string; paused: boolean };
+type Result = { id: string; inArea: boolean; score: string; low?: number; high?: number; roofAreaM2?: number; earliestStart?: string; waitlist?: boolean };
+type D = Record<string, string | number | boolean | undefined>;
 
 const gbp = (n: number) => `£${n.toLocaleString("en-GB")}`;
 const STEPS = 5;
-const PHONE = "07808 528293";
-const tel = `tel:${PHONE.replace(/\s/g, "")}`;
+const TITLES = ["", "Address", "Your home", "Roof", "Timing", "Your details", "Your estimate"];
+// Anonymous funnel event fired when each step is reached (no personal data).
+const EVENTS = ["", "start", "address", "home", "roof", "timing", "price"];
 const TIME_LEFT = ["", "About 90 seconds left", "About 75 seconds left", "About 45 seconds left", "About 30 seconds left", "Last step"];
-const POSTCODE = /^[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}$/i;
+const STORE_KEY = "jc-quote-v1";
+const pcClean = (v: unknown) => String(v ?? "").replace(/\s+/g, " ").trim();
+
+type Saved = { d: D; step: number; result: Result | null; booked: string; manual: boolean; key: string };
+// Progress survives refresh and the browser Back button (kept only in this browser tab, never sent anywhere).
+function loadSaved(): Saved | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const v = JSON.parse(sessionStorage.getItem(STORE_KEY) ?? "null") as Saved | null;
+    if (!v || typeof v.step !== "number" || v.step < 1 || v.step > STEPS + 1) return null;
+    if (v.step === STEPS + 1 && !v.result) v.step = STEPS;
+    return v;
+  } catch {
+    return null;
+  }
+}
 
 export default function QuoteWizard() {
+  const [saved] = useState(loadSaved);
   const [cfg, setCfg] = useState<Cfg | null>(null);
-  const [step, setStep] = useState(1);
-  const [d, setD] = useState<Record<string, string | number | boolean | undefined>>({ consent: false });
-  const [result, setResult] = useState<Result | null>(null);
+  const [step, setStep] = useState(saved?.step ?? 1);
+  const [d, setD] = useState<D>({ consent: false, ...(saved?.d ?? {}) });
+  const [result, setResult] = useState<Result | null>(saved?.result ?? null);
+  const [booked, setBooked] = useState(saved?.booked ?? "");
+  const [manual, setManual] = useState(saved?.manual ?? false);
+  const [submittedKey, setSubmittedKey] = useState(saved?.key ?? "");
   const [busy, setBusy] = useState(false);
-  const [err, setErr] = useState("");
-  const [manual, setManual] = useState(false);
-  const [booked, setBooked] = useState("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitErr, setSubmitErr] = useState<{ msg: string; field?: string } | null>(null);
+  const busyRef = useRef(false);
   const sid = useRef("");
-  const topRef = useRef<HTMLDivElement>(null);
+  const topRef = useRef<HTMLElement>(null);
+  const firstRender = useRef(true);
+  const seen = useRef(new Set<string>());
 
   const place: Place | null = d.placeId ? { placeId: d.placeId as string, address: d.address as string, postcode: d.postcode as string, lat: d.lat as number, lng: d.lng as number } : null;
-  const pcOk = POSTCODE.test(((d.postcode as string) ?? "").trim());
+  const pcOk = UK_POSTCODE.test(pcClean(d.postcode));
 
   useEffect(() => {
     sid.current = crypto.randomUUID();
-    fetch("/api/quote").then((r) => r.json()).then(setCfg);
+    fetch("/api/quote").then((r) => r.json()).then(setCfg).catch(() => {});
+    window.history.replaceState({ step }, "");
+    const onPop = (e: PopStateEvent) => { setErrors({}); setSubmitErr(null); setStep(typeof e.state?.step === "number" ? e.state.step : 1); };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Anonymous funnel logging: random session id + step name only.
-  const seen = useRef(new Set<string>());
+  // Keep progress in this tab so a refresh doesn't wipe everything.
+  useEffect(() => {
+    try {
+      const { consent: _c, website: _w, ...rest } = d; // never keep consent or the spam-trap field
+      void _c; void _w;
+      sessionStorage.setItem(STORE_KEY, JSON.stringify({ d: rest, step, result, booked, manual, key: submittedKey } satisfies Saved));
+    } catch { /* private mode: fine */ }
+  }, [d, step, result, booked, manual, submittedKey]);
+
   const track = (name: string) => {
-    if (!sid.current || seen.current.has(name)) return;
+    if (!name || !sid.current || seen.current.has(name)) return;
     seen.current.add(name);
     fetch("/api/event", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sid: sid.current, step: name }), keepalive: true }).catch(() => {});
   };
+
+  // On every step change: tell screen readers, update the tab title, move focus to the new step's heading, log the funnel step.
   useEffect(() => {
+    document.title = `${TITLES[step] ?? "Quote"}${step <= STEPS ? `, step ${step} of ${STEPS}` : ""} – ${BUSINESS.name}`;
     if (!cfg) return;
-    track(["", "start", "home", "roof", "timing", "contact", "price"][step] ?? "price");
-    if (step === 2) track("address");
-  });
-  // New step: bring the top of the form into view instead of leaving the user mid-page.
-  useEffect(() => { if (step > 1) topRef.current?.scrollIntoView({ block: "start" }); }, [step]);
+    track(EVENTS[step]);
+    if (firstRender.current) { firstRender.current = false; return; }
+    document.querySelector<HTMLElement>("[data-step-heading]")?.focus({ preventScroll: true });
+    topRef.current?.scrollIntoView({ block: "start" });
+  }, [step, cfg]);
 
   const set = (k: string, v: string | number | boolean | undefined) => setD((p) => ({ ...p, [k]: v }));
-  const go = (n: number) => { setErr(""); setStep(n); };
+  const go = (n: number) => {
+    setErrors({});
+    setSubmitErr(null);
+    if (n !== step) window.history.pushState({ step: n }, "");
+    setStep(n);
+  };
 
   async function submit() {
-    if (!d.name || !d.phone || !d.email) return setErr("Please fill in your name, mobile and email.");
-    if (!d.consent) return setErr("Please tick the box so we can contact you.");
+    if (busyRef.current) return; // a second tap while sending does nothing
+    const errs: Record<string, string> = {};
+    if (String(d.name ?? "").trim().length < 2) errs.name = "Please enter your name.";
+    if (!normalisePhone(d.phone)) errs.phone = "Please enter a UK phone number, for example 07700 900123.";
+    if (!validEmail(String(d.email ?? "").trim())) errs.email = "Please enter a valid email address.";
+    if (!d.consent) errs.consent = "Please tick the box so we can contact you.";
+    setErrors(errs);
+    const bad = ["name", "phone", "email", "consent"].find((k) => errs[k]);
+    if (bad) { document.getElementById(`f-${bad}`)?.focus(); return; }
+
+    // Nothing changed since the last successful send (e.g. they pressed Back then Next): reuse the result, don't create another lead.
+    const { consent: _c, website: _w, ...rest } = d;
+    void _c; void _w;
+    const key = JSON.stringify(rest);
+    if (result && key === submittedKey) { go(STEPS + 1); return; }
+
+    busyRef.current = true;
     setBusy(true);
-    const res = await fetch("/api/quote", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(d) });
-    setBusy(false);
-    if (!res.ok) return setErr(((await res.json().catch(() => ({}))) as { error?: string }).error ?? "Something went wrong. Please try again.");
-    setResult(await res.json());
-    go(STEPS + 1);
+    setSubmitErr(null);
+    try {
+      const res = await fetch("/api/quote", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(d) });
+      const j = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setSubmitErr({ msg: j.error ?? "Something went wrong. Please try again.", field: j.field });
+        if (["name", "phone", "email"].includes(j.field)) setErrors({ [j.field]: j.error });
+        return;
+      }
+      setResult(j as Result);
+      setSubmittedKey(key);
+      setBooked("");
+      go(STEPS + 1);
+    } catch {
+      setSubmitErr({ msg: `We couldn't reach our server. Please check your connection and try again, or call us on ${BUSINESS.phone}.` });
+    } finally {
+      busyRef.current = false;
+      setBusy(false);
+    }
   }
 
-  if (!cfg) return <p className="p-8 text-center text-mute">Loading…</p>;
+  function startAgain() {
+    try { sessionStorage.removeItem(STORE_KEY); } catch { /* ignore */ }
+    setD({ consent: false }); setResult(null); setBooked(""); setManual(false); setSubmittedKey(""); setErrors({}); setSubmitErr(null);
+    seen.current = new Set(["start"]);
+    window.history.pushState({ step: 1 }, "");
+    setStep(1);
+  }
+
+  if (!cfg) return <p role="status" className="p-8 text-center text-mute">Loading…</p>;
   const mat = cfg.materials.find((m) => m.id === d.material);
   const calendly = process.env.NEXT_PUBLIC_CALENDLY_URL;
 
   return (
-    <main className="mx-auto w-full max-w-lg pb-6">
-      <header className="sticky top-0 z-20 flex items-center justify-between border-b border-sand bg-white px-4 py-1.5">
-        <Image src="/logo.png" alt={cfg.businessName} width={512} height={198} priority className="h-9 w-auto" />
-        <a href={tel} className="rounded-full border border-ink/70 px-3 py-1.5 text-[13px] font-semibold">Call {PHONE}</a>
+    <>
+      <header className="sticky top-0 z-20 border-b border-sand bg-white">
+        <div className="mx-auto flex max-w-lg items-center justify-between px-4 py-1.5">
+          <Image src="/logo.png" alt={cfg.businessName} width={512} height={198} priority className="h-9 w-auto" />
+          <a href={telHref} className="inline-flex min-h-10 items-center rounded-full border border-ink/70 px-3.5 text-[0.8125rem] font-semibold">Call {BUSINESS.phone}</a>
+        </div>
       </header>
 
-      <div className="px-4 pt-4" ref={topRef} style={{ scrollMarginTop: 56 }}>
+      <main ref={topRef} className="mx-auto w-full max-w-lg flex-1 px-4 pb-4 pt-4" style={{ scrollMarginTop: 56 }}>
+        <p role="status" className="sr-only">{step <= STEPS ? `Step ${step} of ${STEPS}: ${TITLES[step]}` : TITLES[step]}</p>
+
         {step === 1 && (
           <div className="mb-4">
-            <h1 className="text-[22px] font-bold leading-tight tracking-tight">Get your roof price in 2 minutes</h1>
-            <p className="mt-1 text-[15px] leading-snug text-mute">Local, fully certified roofers in Dumfries &amp; Galloway. No phone call needed.</p>
-            <p className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[12px] font-medium text-ink/80">
-              <span><span className="text-[#b07a00]">★★★★★</span> 50+ reviews</span><span aria-hidden className="text-sand">|</span><span>Trusted Trader</span><span aria-hidden className="text-sand">|</span><span>250+ customers</span>
+            <h1 className="text-[1.375rem] font-bold leading-tight tracking-tight">Get your roof price in 2 minutes</h1>
+            <p className="mt-1 text-[0.9375rem] leading-snug text-mute">Local, fully certified roofers in Dumfries &amp; Galloway. No phone call needed.</p>
+            <p className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[0.75rem] font-medium text-ink/80">
+              <span><span aria-hidden className="text-[#b07a00]">★★★★★</span><span className="sr-only">Rated five stars, </span> 50+ reviews</span><span aria-hidden className="text-sand">|</span><span>Trusted Trader</span><span aria-hidden className="text-sand">|</span><span>250+ customers</span>
             </p>
           </div>
         )}
 
         {step <= STEPS && (
-          <div className="mb-4">
-            <div className="mb-1 flex justify-between text-[12px] text-mute"><span>Step {step} of {STEPS}</span><span>{TIME_LEFT[step]}</span></div>
+          <div className="mb-4" aria-hidden>
+            <div className="mb-1 flex justify-between text-[0.75rem] text-mute"><span>Step {step} of {STEPS}</span><span>{TIME_LEFT[step]}</span></div>
             <div className="h-1.5 rounded-full bg-sand"><div className="h-1.5 rounded-full bg-brand transition-all duration-300" style={{ width: `${(step / STEPS) * 100}%` }} /></div>
           </div>
         )}
 
         {cfg.paused && step === 1 && (
-          <p className="mb-4 rounded-xl bg-amber-50 p-3 text-[14px] text-amber-900">We&apos;re very busy right now, but you can still get a price and join the waiting list.</p>
+          <p className="mb-4 rounded-xl bg-amber-50 p-3 text-[0.875rem] text-amber-900">We&apos;re very busy right now, but you can still get a price and join our waiting list.</p>
         )}
 
         {/* 1 · Address */}
         {step === 1 && (
           <section>
-            <Label>What&apos;s the address of the property?</Label>
+            <Label first id="q-addr">What&apos;s the address of the property?</Label>
             {cfg.placesEnabled && !manual ? (
               <AddressField
                 selected={place}
@@ -112,11 +199,11 @@ export default function QuoteWizard() {
                 onManual={() => { setD((x) => ({ ...x, placeId: undefined, lat: undefined, lng: undefined })); setManual(true); }}
               />
             ) : (
-              <div className="space-y-2">
-                <input className={inputCls} placeholder="House number and street" autoComplete="street-address" value={(d.address as string) ?? ""} onChange={(e) => set("address", e.target.value)} />
-                <input className={`${inputCls} uppercase`} placeholder="Postcode, e.g. DG1 3QX" autoComplete="postal-code" value={(d.postcode as string) ?? ""} onChange={(e) => set("postcode", e.target.value)} />
-                {d.postcode && !pcOk && <p className="text-[13px] text-brand">That doesn&apos;t look like a UK postcode. Please check it.</p>}
-                {cfg.placesEnabled && <button type="button" className="text-[14px] text-mute underline" onClick={() => { setD((x) => ({ ...x, address: undefined, postcode: undefined })); setManual(false); }}>Search for my address instead</button>}
+              <div className="space-y-2.5">
+                <Field id="f-address" label="House number and street" autoComplete="street-address" value={(d.address as string) ?? ""} onChange={(e) => set("address", e.target.value)} />
+                <Field id="f-postcode" label="Postcode" placeholder="e.g. DG1 3QX" autoComplete="postal-code" className="uppercase" value={(d.postcode as string) ?? ""} onChange={(e) => set("postcode", e.target.value)}
+                  error={d.postcode && !pcOk ? "That doesn't look like a UK postcode. Please check it." : undefined} />
+                {cfg.placesEnabled && <button type="button" className="min-h-11 text-[0.875rem] text-mute underline" onClick={() => { setD((x) => ({ ...x, address: undefined, postcode: undefined })); setManual(false); }}>Search for my address instead</button>}
               </div>
             )}
             <StickyBar><Primary disabled={!d.address || !d.postcode || !pcOk} onClick={() => go(2)}>Next</Primary></StickyBar>
@@ -126,16 +213,16 @@ export default function QuoteWizard() {
         {/* 2 · Home */}
         {step === 2 && (
           <section>
-            <Label>What type of property?</Label>
-            <div className="grid grid-cols-2 gap-2">
+            <Label first id="q-prop">What type of property?</Label>
+            <div role="group" aria-labelledby="q-prop" className="grid grid-cols-2 gap-2">
               {[["tenement", "Tenement / flat"], ["semi", "Semi or terraced"], ["detached", "Detached house"], ["bungalow", "Bungalow"]].map(([v, l]) => <Opt key={v} label={l} on={d.propertyType === v} onClick={() => set("propertyType", v)} />)}
             </div>
-            <Label>How old is the home?</Label>
-            <div className="grid grid-cols-2 gap-2">
+            <Label id="q-age">How old is the home?</Label>
+            <div role="group" aria-labelledby="q-age" className="grid grid-cols-2 gap-2">
               {[["pre-1919", "Before 1919"], ["1919-1960", "1919 – 1960"], ["1960-2000", "1960 – 2000"], ["newer", "After 2000"]].map(([v, l]) => <Opt key={v} label={l} on={d.homeAge === v} onClick={() => set("homeAge", v)} />)}
             </div>
-            <Label hint="This can affect the type of work allowed.">Listed or in a conservation area?</Label>
-            <Seg value={d.listed as string} onChange={(v) => set("listed", v)} options={[["yes", "Yes"], ["no", "No"], ["unsure", "Not sure"]]} />
+            <Label id="q-listed" hint="This can affect the type of work allowed.">Listed or in a conservation area?</Label>
+            <Seg labelledBy="q-listed" value={d.listed as string} onChange={(v) => set("listed", v)} options={[["yes", "Yes"], ["no", "No"], ["unsure", "Not sure"]]} />
             <StickyBar>
               <Ghost onClick={() => go(1)}>Back</Ghost>
               <Primary disabled={!d.propertyType || !d.homeAge || !d.listed} onClick={() => go(3)}>Next</Primary>
@@ -146,21 +233,21 @@ export default function QuoteWizard() {
         {/* 3 · Roof */}
         {step === 3 && (
           <section>
-            <Label>What do you need done?</Label>
-            <Seg value={d.jobType as string} onChange={(v) => set("jobType", v)} options={[["full", "New roof"], ["repair", "A repair"], ["unsure", "Not sure"]]} />
-            <Label hint="Pick the look you'd like. We'll confirm at the inspection.">Which material?</Label>
-            <div className="space-y-2">
+            <Label first id="q-job">What do you need done?</Label>
+            <Seg labelledBy="q-job" value={d.jobType as string} onChange={(v) => set("jobType", v)} options={[["full", "New roof"], ["repair", "A repair"], ["unsure", "Not sure"]]} />
+            <Label id="q-mat" hint="Pick the look you'd like. We'll confirm at the inspection.">Which material?</Label>
+            <div role="group" aria-labelledby="q-mat" className="space-y-2">
               {cfg.materials.map((m) => <Opt radio key={m.id} label={m.label} sub={m.blurb} on={d.material === m.id} onClick={() => { set("material", m.id); set("colour", m.colours[0]); }} />)}
             </div>
             {mat && (
               <>
-                <Label>Colour</Label>
-                <Swatches colours={mat.colours} value={d.colour as string} onChange={(c) => set("colour", c)} />
+                <Label id="q-col">Colour</Label>
+                <Swatches labelledBy="q-col" colours={mat.colours} value={d.colour as string} onChange={(c) => set("colour", c)} />
               </>
             )}
             <StickyBar>
               <Ghost onClick={() => go(2)}>Back</Ghost>
-              <Primary disabled={!d.jobType || !d.material} onClick={() => { set("currentMaterial", "unknown"); go(4); }}>Next</Primary>
+              <Primary disabled={!d.jobType || !d.material} onClick={() => go(4)}>Next</Primary>
             </StickyBar>
           </section>
         )}
@@ -168,31 +255,42 @@ export default function QuoteWizard() {
         {/* 4 · Timing */}
         {step === 4 && (
           <section>
-            <Label>How soon do you need it?</Label>
-            <div className="space-y-2">
+            <Label first id="q-time">How soon do you need it?</Label>
+            <div role="group" aria-labelledby="q-time" className="space-y-2">
               {[["urgent", "Urgent – it's leaking", "We'll flag this so you hear from us quickly"], ["3-months", "Within the next 3 months", ""], ["pricing", "Just getting a price for now", ""]].map(([v, l, s]) => (
-                <Opt radio key={v} label={l} sub={s || undefined} on={d.urgency === v} onClick={() => { set("urgency", v); setTimeout(() => go(5), 180); }} />
+                <Opt radio key={v} label={l} sub={s || undefined} on={d.urgency === v} onClick={() => set("urgency", v)} />
               ))}
             </div>
-            <StickyBar><Ghost onClick={() => go(3)}>Back</Ghost></StickyBar>
+            <StickyBar>
+              <Ghost onClick={() => go(3)}>Back</Ghost>
+              <Primary disabled={!d.urgency} onClick={() => go(5)}>Next</Primary>
+            </StickyBar>
           </section>
         )}
 
         {/* 5 · Contact */}
         {step === 5 && (
           <section>
-            <Label hint="We'll text and email your price straight away.">Where should we send your price?</Label>
-            <div className="space-y-2">
-              <input className={inputCls} placeholder="Your name" autoComplete="name" value={(d.name as string) ?? ""} onChange={(e) => set("name", e.target.value)} />
-              <input className={inputCls} placeholder="Mobile number" inputMode="tel" autoComplete="tel" value={(d.phone as string) ?? ""} onChange={(e) => set("phone", e.target.value)} />
-              <input className={inputCls} placeholder="Email" inputMode="email" autoComplete="email" value={(d.email as string) ?? ""} onChange={(e) => set("email", e.target.value)} />
-              <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 opacity-0" value={(d.website as string) ?? ""} onChange={(e) => set("website", e.target.value)} />
+            <Label first hint="We'll text and email your price straight away.">Where should we send your price?</Label>
+            <div className="space-y-2.5">
+              <Field id="f-name" label="Your name" autoComplete="name" value={(d.name as string) ?? ""} onChange={(e) => set("name", e.target.value)} error={errors.name} />
+              <Field id="f-phone" label="Mobile number" type="tel" inputMode="tel" autoComplete="tel" value={(d.phone as string) ?? ""} onChange={(e) => set("phone", e.target.value)} error={errors.phone} />
+              <Field id="f-email" label="Email" type="email" inputMode="email" autoComplete="email" autoCapitalize="none" spellCheck={false} value={(d.email as string) ?? ""} onChange={(e) => set("email", e.target.value)} error={errors.email} />
+              <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
+                <input type="text" name="website" tabIndex={-1} autoComplete="off" value={(d.website as string) ?? ""} onChange={(e) => set("website", e.target.value)} />
+              </div>
             </div>
-            <label className="mt-3 flex gap-2.5 text-[13px] leading-snug text-mute">
-              <input type="checkbox" className="mt-0.5 h-[18px] w-[18px] flex-none accent-[#b11017]" checked={!!d.consent} onChange={(e) => set("consent", e.target.checked)} />
-              <span>I agree to {cfg.businessName} contacting me about this enquiry by text, email or phone, and storing my details for that purpose. <Link href="/privacy" target="_blank" className="underline">Privacy notice</Link></span>
+            <label className="mt-3 flex gap-2.5 text-[0.8125rem] leading-snug text-mute">
+              <input id="f-consent" type="checkbox" className="mt-0.5 h-[18px] w-[18px] flex-none accent-[#b11017]" checked={!!d.consent} onChange={(e) => set("consent", e.target.checked)} aria-invalid={!!errors.consent} aria-describedby={errors.consent ? "f-consent-err" : undefined} />
+              <span>I agree to {cfg.businessName} contacting me about this enquiry by text, email or phone, and storing my details for that purpose. <Link href="/privacy" target="_blank" className="underline">Privacy notice<span className="sr-only"> (opens in a new tab)</span></Link></span>
             </label>
-            {err && <p role="alert" className="mt-2 text-[14px] text-brand">{err}</p>}
+            {errors.consent && <p id="f-consent-err" className="mt-1 text-[0.8125rem] text-brand">{errors.consent}</p>}
+            {submitErr && (
+              <div role="alert" className="mt-3 rounded-xl border-[1.5px] border-brand bg-brand-tint px-3.5 py-2.5 text-[0.875rem] text-brand">
+                <p>{submitErr.msg}</p>
+                {submitErr.field === "postcode" && <button type="button" className="mt-1 min-h-11 font-semibold underline" onClick={() => { setManual(true); go(1); }}>Change address</button>}
+              </div>
+            )}
             <StickyBar>
               <Ghost onClick={() => go(4)}>Back</Ghost>
               <Primary disabled={busy} onClick={submit}>{busy ? "Measuring your roof…" : "Show my price"}</Primary>
@@ -204,53 +302,65 @@ export default function QuoteWizard() {
         {step === STEPS + 1 && result && (
           <section className="space-y-3">
             {!result.inArea ? (
-              <div className="rounded-xl bg-white p-4 ring-1 ring-sand">
-                <h2 className="text-[17px] font-semibold">Sorry, we only cover Dumfries &amp; Galloway</h2>
-                <p className="mt-1 text-[14px] text-mute">We&apos;ve kept your details and will let you know if that changes.</p>
+              <div className="rounded-xl bg-white p-4 ring-1 ring-line">
+                <h2 tabIndex={-1} data-step-heading className="text-[1.0625rem] font-semibold outline-none">Sorry, we only cover Dumfries &amp; Galloway</h2>
+                <p className="mt-1 text-[0.875rem] text-mute">We&apos;ve kept your details and will let you know if that changes.</p>
               </div>
             ) : (
               <>
+                <h2 tabIndex={-1} data-step-heading className="text-[1.0625rem] font-semibold outline-none">Your estimate</h2>
                 {d.urgency === "urgent" && (
-                  <a href={tel} className="block rounded-xl border-[1.5px] border-brand bg-brand-tint px-3.5 py-3 text-[14px] font-semibold text-brand">
-                    Active leak? Call us now on {PHONE}. We&apos;ve flagged your enquiry as urgent.
+                  <a href={telHref} className="block rounded-xl border-[1.5px] border-brand bg-brand-tint px-3.5 py-3 text-[0.875rem] font-semibold text-brand">
+                    Active leak? Call us now on {BUSINESS.phone}. We&apos;ve flagged your enquiry as urgent.
                   </a>
                 )}
                 <div className="rounded-xl bg-brand px-4 py-3.5 text-white">
-                  <p className="text-[13px] opacity-85">Estimated price · {mat?.label.toLowerCase()} roof · about {result.roofAreaM2} m²</p>
-                  <p className="text-[28px] font-bold leading-tight">{gbp(result.low)} – {gbp(result.high)}</p>
-                  <p className="text-[13px] opacity-85">Final price confirmed at a free inspection.</p>
+                  <p className="text-[0.8125rem] opacity-90">Estimated price · {mat?.label.toLowerCase()} roof · about {result.roofAreaM2} m²</p>
+                  <p className="text-[1.75rem] font-bold leading-tight">{gbp(result.low ?? 0)} – {gbp(result.high ?? 0)}</p>
+                  <p className="text-[0.8125rem] opacity-90">Final price confirmed at a free inspection.</p>
                 </div>
-                <div className="rounded-xl bg-white px-3.5 py-3 ring-1 ring-sand">
-                  <p className="text-[14px] leading-snug"><b className="font-semibold">Earliest start: around {new Date(result.earliestStart).toLocaleDateString("en-GB", { month: "long", year: "numeric" })}</b><br /><span className="text-mute">Estimate only. Depends on our work queue and the weather.</span></p>
-                </div>
-                {booked ? (
-                  <div className="rounded-xl border-[1.5px] border-green-700 bg-green-50 px-4 py-4 text-center">
-                    <h2 className="text-[17px] font-bold text-green-800">Inspection booked ✓</h2>
-                    <p className="mt-0.5 font-semibold">{new Date(booked).toLocaleString("en-GB", { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" })}</p>
-                    <p className="text-[14px] text-mute">{d.address as string}</p>
-                    <p className="mt-2 text-[13px] text-mute">We&apos;ve texted and emailed your confirmation. If you can, have your loft hatch and any old roof paperwork to hand.</p>
+                {result.waitlist ? (
+                  <div className="rounded-xl bg-white px-3.5 py-3 ring-1 ring-line">
+                    <p className="text-[0.875rem] leading-snug"><b className="font-semibold">You&apos;re on our waiting list</b><br /><span className="text-mute">We&apos;re fully booked at the moment. We&apos;ll be in touch as soon as we have space. We&apos;ve texted and emailed you a copy of this estimate.</span></p>
                   </div>
                 ) : (
                   <>
-                    <Label>Book your free inspection</Label>
-                    {calendly ? (
-                      <InlineWidget url={calendly} prefill={{ name: d.name as string, email: d.email as string, customAnswers: { a1: `${d.address}` } }} styles={{ height: "680px" }} />
+                    <div className="rounded-xl bg-white px-3.5 py-3 ring-1 ring-line">
+                      <p className="text-[0.875rem] leading-snug"><b className="font-semibold">Earliest start: around {fmtMonth(result.earliestStart ?? "")}</b><br /><span className="text-mute">Estimate only. Depends on our work queue and the weather.</span></p>
+                    </div>
+                    {booked ? (
+                      <div role="status" className="rounded-xl border-[1.5px] border-green-700 bg-green-50 px-4 py-4 text-center">
+                        <h3 className="text-[1.0625rem] font-bold text-green-800">Inspection booked ✓</h3>
+                        <p className="mt-0.5 font-semibold">{fmtSlot(booked)}</p>
+                        <p className="text-[0.875rem] text-mute">{d.address as string}</p>
+                        <p className="mt-2 text-[0.8125rem] text-mute">We&apos;ve texted and emailed your confirmation. If you can, have your loft hatch and any old roof paperwork to hand.</p>
+                      </div>
                     ) : (
-                      <BookingPicker leadId={result.id} onBooked={(w) => { setBooked(w); track("booked"); }} />
+                      <>
+                        <Label id="q-book">Book your free inspection</Label>
+                        {calendly ? (
+                          <InlineWidget url={calendly} prefill={{ name: d.name as string, email: d.email as string, customAnswers: { a1: `${d.address}` } }} styles={{ height: "680px" }} />
+                        ) : (
+                          <BookingPicker leadId={result.id} onBooked={(w) => { setBooked(w); track("booked"); }} />
+                        )}
+                      </>
                     )}
                   </>
                 )}
               </>
             )}
-            <p className="pt-1 text-center text-[14px] text-mute">Prefer to talk? <a className="font-semibold text-brand underline" href={tel}>{PHONE}</a></p>
+            <p className="pt-1 text-center text-[0.875rem] text-mute">Prefer to talk? <a className="inline-block px-1 py-2.5 font-semibold text-brand underline" href={telHref}>{BUSINESS.phone}</a></p>
+            <p className="text-center"><button type="button" className="min-h-11 px-3 text-[0.8125rem] text-mute underline" onClick={startAgain}>Start a new quote</button></p>
           </section>
         )}
+      </main>
 
-        <footer className="mt-6 border-t border-sand pt-3 text-center text-[11px] leading-relaxed text-mute">
-          JC Roofing Dumfries · 28 Auchenkeld Avenue, Heathhall, Dumfries DG1 3QX<br />
-          Your details are only used for this enquiry. <Link href="/privacy" className="underline">Privacy</Link>
-        </footer>
-      </div>
-    </main>
+      <footer className="mx-auto w-full max-w-lg px-4 pb-6">
+        <div className="border-t border-sand pt-3 text-center text-[0.75rem] leading-relaxed text-mute">
+          {BUSINESS.name} · {BUSINESS.address}<br />
+          Your details are only used for this enquiry. <Link href="/privacy" className="inline-block px-1 py-2.5 underline">Privacy</Link>
+        </div>
+      </footer>
+    </>
   );
 }

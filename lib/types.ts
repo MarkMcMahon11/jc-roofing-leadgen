@@ -54,4 +54,7 @@ export interface Lead extends QuoteInput {
   score: Score;
   status: "new" | "contacted" | "quoted" | "won" | "lost";
   inspectionBooked?: string;
+  waitlist?: boolean; // taken while intake was paused
+  consentAt: string; // when the customer ticked the consent box
+  consentVersion: string; // which consent wording they saw
 }

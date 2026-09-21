@@ -88,26 +88,21 @@ export async function placeDetails(placeId: string, sessionToken: string): Promi
   };
 }
 
-// Tiny per-IP limiter so the public proxy can't be used to burn the Google quota.
-const hits = new Map<string, { n: number; t: number }>();
-export function rateLimited(ip: string, max = 90, windowMs = 60_000) {
-  const now = Date.now();
-  const h = hits.get(ip);
-  if (!h || now - h.t > windowMs) return hits.set(ip, { n: 1, t: now }), false;
-  return ++h.n > max;
-}
-
-export const UK_POSTCODE = /^[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}$/i;
-export function formatPostcode(pc: string) {
-  const c = pc.replace(/\s+/g, "").toUpperCase();
-  return c.length > 3 ? `${c.slice(0, -3)} ${c.slice(-3)}` : c;
-}
+export { UK_POSTCODE, formatPostcode } from "./format";
 
 // ---------- Free provider: Photon (OpenStreetMap) + Postcodes.io (open data) ----------
 type Packed = { a: string; pc: string; lat: number; lng: number; partial: boolean };
 const pack = (p: Packed) => Buffer.from(JSON.stringify(p)).toString("base64url");
 const unpack = (id: string): Packed | null => {
-  try { return JSON.parse(Buffer.from(id, "base64url").toString()); } catch { return null; }
+  try {
+    const p = JSON.parse(Buffer.from(id, "base64url").toString());
+    const ok = p && typeof p === "object" && typeof p.a === "string" && p.a.length > 0 && p.a.length <= 200 && typeof p.pc === "string" && p.pc.length <= 12 &&
+      typeof p.lat === "number" && typeof p.lng === "number" && Number.isFinite(p.lat) && Number.isFinite(p.lng) &&
+      p.lat > 49 && p.lat < 61 && p.lng > -9 && p.lng < 2.5 && typeof p.partial === "boolean";
+    return ok ? (p as Packed) : null;
+  } catch {
+    return null;
+  }
 };
 
 const cache = new Map<string, { t: number; v: Suggestion[] }>();
@@ -156,13 +151,23 @@ async function photonSearch(input: string): Promise<Suggestion[]> {
   return out;
 }
 
+const pcCache = new Map<string, { t: number; v: { lat: number; lng: number; district: string } | null }>();
+const PC_TTL = 24 * 60 * 60_000;
+
+/** Postcodes.io lookup, cached for a day so repeat postcodes never re-hit the free service. */
 export async function lookupPostcode(pc: string): Promise<{ lat: number; lng: number; district: string } | null | "unknown"> {
+  const key = pc.replace(/\s+/g, "").toUpperCase();
+  const hit = pcCache.get(key);
+  if (hit && Date.now() - hit.t < PC_TTL) return hit.v;
   try {
-    const r = await fetch(`https://api.postcodes.io/postcodes/${encodeURIComponent(pc.replace(/\s+/g, ""))}`, { signal: AbortSignal.timeout(5000) });
-    if (r.status === 404) return null; // definitely not a real postcode
+    const r = await fetch(`https://api.postcodes.io/postcodes/${encodeURIComponent(key)}`, { signal: AbortSignal.timeout(5000) });
+    if (r.status === 404) { pcCache.set(key, { t: Date.now(), v: null }); return null; } // definitely not a real postcode
     if (!r.ok) return "unknown"; // service problem: don't block the customer
     const { result } = await r.json();
-    return { lat: result.latitude, lng: result.longitude, district: result.admin_district };
+    const v = { lat: result.latitude, lng: result.longitude, district: result.admin_district };
+    if (pcCache.size > 2000) pcCache.clear();
+    pcCache.set(key, { t: Date.now(), v });
+    return v;
   } catch {
     return "unknown";
   }

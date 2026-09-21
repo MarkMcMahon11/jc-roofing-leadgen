@@ -13,10 +13,17 @@
   --color-brand-tint: #fbeeee;
   --color-ink: #34342b;
   --color-mute: #5f5f57;
-  --color-sand: #d6d4c7;
+  --color-sand: #d6d4c7; /* decorative dividers only */
+  --color-line: #8a877a; /* borders of controls: 3:1 or better against white and cream */
   --color-cream: #f4f4eb;
   --color-gold: #ffb507;
   --font-sans: var(--font-inter);
+}
+
+html {
+  /* Keep focused fields clear of the sticky header and the sticky Back/Next bar. */
+  scroll-padding-top: 4.5rem;
+  scroll-padding-bottom: 6.5rem;
 }
 
 body {
@@ -27,7 +34,16 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+::placeholder {
+  color: #757570; /* 4.6:1 on white */
+  opacity: 1;
+}
+
+/* Dark focus ring: 12:1 on white and cream (the old gold ring was 1.8:1). */
 :focus-visible {
-  outline: 3px solid var(--color-gold);
+  outline: 3px solid var(--color-ink);
   outline-offset: 2px;
+}
+.sr-only-focusable:focus {
+  position: static;
 }

@@ -42,3 +42,6 @@ next-env.d.ts
 data/leads.json
 data/outbox.json
 data/events.json
+
+# the template with no secrets in it should be committed
+!.env.example
