@@ -24,6 +24,9 @@ export interface Settings {
 export interface QuoteInput {
   address: string;
   postcode: string;
+  placeId?: string; // set when the customer picked a Google-verified address
+  lat?: number;
+  lng?: number;
   homeAge: "pre-1919" | "1919-1960" | "1960-2000" | "newer";
   propertyType: "tenement" | "semi" | "detached" | "bungalow";
   listed: "yes" | "no" | "unsure";

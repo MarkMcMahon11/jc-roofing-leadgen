@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JC Roofing – App Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--blue:#b11017;--blue-d:#8f0d13;--blue-l:#fbeeee;--ink:#34342b;--mute:#5f5f57;--line:#d6d4c7;--bg:#f4f4eb;--ok:#15803d;--warn:#b45309;--gold:#ffb507}
+  *{box-sizing:border-box;margin:0}
+  body{font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh}
+  .top{max-width:1100px;margin:0 auto;padding:20px 16px 0}
+  .top h1{font-size:20px}.top p{color:var(--mute);font-size:14px;margin-top:2px}
+  .tabs{display:flex;gap:8px;margin:14px 0;flex-wrap:wrap}
+  .tabs button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 16px;font-size:14px;cursor:pointer}
+  .tabs button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .stage{max-width:1100px;margin:0 auto;padding:0 16px 40px;display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start}
+  .phone{width:375px;max-width:100%;background:#fff;border-radius:32px;border:10px solid #34342b;box-shadow:0 20px 50px rgba(52,52,43,.25);overflow:hidden}
+  .screen{height:720px;overflow-y:auto;padding:20px 16px}
+  h2{font-size:20px;margin:0 0 12px}
+  h3{font-size:18px;margin:18px 0 10px}
+  .brand{font-size:22px;font-weight:700}
+  .hdr{display:flex;align-items:center;justify-content:space-between;margin:-20px -16px 16px;padding:10px 16px;border-bottom:1px solid var(--line);background:#fff;position:sticky;top:-20px;z-index:2}
+  .hdr img{height:44px;display:block}.hdr a{color:var(--ink);font-weight:600;font-size:14px;text-decoration:none;border:1.5px solid var(--ink);border-radius:999px;padding:6px 12px}
+  .hero{margin:0 0 14px}.hero h1{font-size:26px;line-height:1.15;font-weight:800;letter-spacing:-.02em}.hero p{color:var(--mute);margin-top:6px;font-size:15px}
+  .trust{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 16px}.trust span{font-size:12px;font-weight:600;background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:5px 10px;color:var(--ink)}.trust .st{color:#b07a00}
+  .ac{position:relative}.ac ul{list-style:none;padding:0;position:absolute;z-index:5;left:0;right:0;top:100%;margin-top:-4px;background:#fff;border:2px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 10px 24px rgba(52,52,43,.18)}
+  .ac li{padding:12px 14px;border-bottom:1px solid var(--line);cursor:pointer}.ac li b{display:block}.ac li small{color:var(--mute);font-size:13px}.ac li.hi,.ac li:hover{background:var(--blue-l)}.ac li.pw{background:var(--bg);text-align:right;font-size:11px;color:var(--mute);cursor:default;padding:5px 14px}
+  .ok-card{border:2px solid var(--ok);background:#f0fdf4;border-radius:16px;padding:14px;margin-bottom:10px}.ok-card small{color:var(--ok);font-weight:600}.ok-card p{font-size:18px;font-weight:600;margin:4px 0}
+  .lnk{background:none;border:0;color:var(--mute);text-decoration:underline;cursor:pointer;font-size:15px;padding:0;margin:2px 0 10px}
+  .foot{margin-top:18px;padding-top:12px;border-top:1px solid var(--line);font-size:12px;color:var(--mute);text-align:center;line-height:1.5}.sub{color:var(--mute);margin:2px 0 14px;font-size:15px}
+  .bar{height:8px;border-radius:99px;background:var(--line);margin-bottom:18px}.bar i{display:block;height:8px;border-radius:99px;background:linear-gradient(90deg,var(--blue),var(--blue-d));transition:width .3s}
+  input[type=text],input[type=tel],input[type=email],input[type=password],input[type=number],select{width:100%;padding:14px;font-size:17px;border:2px solid var(--line);border-radius:12px;margin-bottom:10px;background:#fff}
+  .opt:focus-visible,.cta:focus-visible,.slot:focus-visible,.day:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  input:focus,select:focus{border-color:var(--ink)}
+  .cta:hover{background:var(--blue-d)}.opt:hover{border-color:var(--ink)}
+  .opt{display:block;width:100%;text-align:left;padding:14px;margin-bottom:10px;border:2px solid var(--line);border-radius:16px;background:#fff;font-size:17px;cursor:pointer}
+  .opt b{display:block}.opt small{color:var(--mute);font-size:13px}
+  .opt.on{border-color:var(--blue);background:var(--blue-l)}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .sw{display:inline-block;width:14px;height:14px;border-radius:50%;margin-right:8px;vertical-align:-2px;border:1px solid #0003}
+  .cta{width:100%;padding:16px;font-size:18px;font-weight:600;color:#fff;background:var(--blue);border:0;border-radius:16px;cursor:pointer;margin-top:4px}
+  .cta:disabled{opacity:.4;cursor:not-allowed}
+  .back{background:none;border:0;color:var(--mute);text-decoration:underline;margin-top:12px;cursor:pointer;font-size:15px}
+  .price{background:var(--blue);color:#fff;border-radius:16px;padding:18px;margin-bottom:12px}
+  .price small{opacity:.85}.price .n{font-size:30px;font-weight:700;margin:4px 0}
+  .card{border:2px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px}
+  .card small{color:var(--mute)}
+  .cal{border:2px solid var(--line);border-radius:16px;padding:12px}
+  .days{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
+  .day{border:2px solid var(--line);border-radius:12px;padding:8px 2px;text-align:center;font-size:13px;cursor:pointer;background:#fff}
+  .day.on{border-color:var(--blue);background:var(--blue-l)}
+  .slots{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+  .slot{border:2px solid var(--blue);color:var(--blue);border-radius:10px;padding:10px 0;text-align:center;font-weight:600;cursor:pointer;background:#fff}
+  .slot.on{background:var(--blue);color:#fff}
+  .consent{display:flex;gap:10px;font-size:13px;color:var(--mute);margin:4px 0 12px}.consent input{width:22px;height:22px;flex:none}
+  .err{color:#dc2626;margin-bottom:8px}
+  .notes{flex:1;min-width:260px;max-width:460px}
+  .notes .box{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px;font-size:14px;line-height:1.5}
+  .notes h4{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--mute);margin-bottom:6px}
+  .sms{background:#e5e7eb;border-radius:18px 18px 18px 4px;padding:12px 14px;font-size:15px;line-height:1.4;max-width:320px}
+  .sms.own{background:#dbeafe}
+  .pill{display:inline-block;padding:2px 10px;border-radius:99px;font-size:12px;font-weight:600}
+  .hot{background:#fee2e2;color:#b91c1c}.warm{background:#fef3c7;color:#b45309}.nofit{background:#e2e8f0;color:#475569}
+  .lead{border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px;font-size:14px}
+  .lead .r{display:flex;justify-content:space-between;align-items:center}
+  .row{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px;font-size:15px}.row input{width:96px;margin:0;padding:8px}
+  .hide{display:none}
+  table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:6px 4px;border-bottom:1px solid var(--line);text-align:left}
+</style>
+</head>
+<body>
+<div class="top">
+  <h1>JC Roofing quote app – branded preview</h1>
+  <p>All data is fake and lives in this page only. Nothing is sent anywhere.</p>
+  <div class="tabs">
+    <button class="on" data-tab="cust">1 · Customer (phone)</button>
+    <button data-tab="alert">2 · Owner alert (text)</button>
+    <button data-tab="admin">3 · Owner page (phone)</button>
+  </div>
+</div>
+
+<div class="stage">
+  <!-- CUSTOMER -->
+  <div id="cust" class="phone"><div class="screen" id="c"></div></div>
+  <!-- OWNER ALERT -->
+  <div id="alert" class="phone hide"><div class="screen" id="a"></div></div>
+  <!-- ADMIN -->
+  <div id="admin" class="phone hide"><div class="screen" id="m"></div></div>
+
+  <aside class="notes" id="notes"></aside>
+</div>
+
+<script>
+const S = { // owner settings (editable in tab 3)
+  paused:false, backlog:8, minJob:1500, areas:['DG'],
+  mats:[
+    {id:'natural-slate',label:'Natural slate',blurb:'Traditional, lasts 100+ years',rate:165,cols:[['Blue-grey','#64748b'],['Charcoal','#374151'],['Heather','#7c6b8a']]},
+    {id:'welsh-slate',label:'Welsh slate',blurb:'Premium heritage look',rate:210,cols:[['Blue-grey','#64748b'],['Purple','#6b4f7a'],['Green','#4b6b58']]},
+    {id:'fibre-cement-slate',label:'Fibre-cement slate',blurb:'Slate look, lower cost',rate:105,cols:[['Blue-black','#1e293b'],['Natural grey','#94a3b8'],['Brown','#78573b']]},
+    {id:'clay-tile',label:'Clay tile',blurb:'Classic terracotta look',rate:145,cols:[['Terracotta','#c2643a'],['Brown','#78573b'],['Slate blue','#5b7186']]},
+    {id:'concrete-tile',label:'Concrete tile',blurb:'Durable and value-priced',rate:95,cols:[['Grey','#9ca3af'],['Brown','#78573b'],['Red','#b4442f'],['Black','#111827']]}
+  ]
+};
+const PLACES=[['12 English Street','Dumfries DG1 2BX','DG1 2BX'],['21 English Street','Dumfries DG1 2DE','DG1 2DE'],['28 Auchenkeld Avenue','Heathhall, Dumfries DG1 3QX','DG1 3QX'],['4 Castle Douglas Road','Dumfries DG2 7NP','DG2 7NP'],['9 St Cuthbert Street','Kirkcudbright DG6 4DJ','DG6 4DJ'],['12 Byres Road','Glasgow G12 8AA','G12 8AA']];
+let acQ='',acHi=-1,manual=false;
+const AREA={tenement:90,semi:85,detached:130,bungalow:140};
+const gbp=n=>'£'+n.toLocaleString('en-GB');
+let leads=[
+  {name:'Fiona MacLeod',where:'Georgetown, DG1',mat:'Natural slate',range:'£16,900–£22,500',score:'hot',when:'Inspection Thu 10:00',st:'contacted'},
+  {name:'Craig Bell',where:'Kirkcudbright, DG6',mat:'Concrete tile',range:'£7,300–£9,700',score:'warm',when:'Not booked yet',st:'new'},
+  {name:'Glasgow enquiry',where:'G12',mat:'Clay tile',range:'—',score:'nofit',when:'Out of area · no owner time used',st:'lost'}
+];
+let step=1,d={},res=null,slot=null,dayI=0,err='';
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function calc(){
+  const m=S.mats.find(x=>x.id===d.material);
+  let area=AREA[d.propertyType]||90, b=area*m.rate;
+  if(d.jobType==='repair') b=Math.max(b*.25,S.minJob*.5);
+  if(d.propertyType==='tenement') b*=1.15;
+  if(d.homeAge==='pre-1919') b*=1.1;
+  if(d.listed==='yes') b*=1.15;
+  b=Math.max(b,S.minJob);
+  const r=n=>Math.round(n/100)*100;
+  const letters=(d.postcode||'').trim().toUpperCase().match(/^[A-Z]+/);
+  const inArea=letters&&S.areas.includes(letters[0]);
+  const st=new Date();st.setDate(st.getDate()+S.backlog*7);
+  const score=!inArea?'nofit':(d.urgency==='pricing'&&d.jobType==='unsure')?'warm':d.urgency==='pricing'?'warm':'hot';
+  return {area,low:r(b*.9),high:r(b*1.2),inArea,start:st,score,m};
+}
+
+function opt(label,sub,k,v,extra=''){return `<button class="opt ${d[k]===v?'on':''}" onclick="setv('${k}','${v}'${extra})"><b>${label}</b>${sub?`<small>${sub}</small>`:''}</button>`}
+function setv(k,v,auto){d[k]=v;if(auto){step++}render()}
+function pickMat(id){d.material=id;d.colour=S.mats.find(x=>x.id===id).cols[0][0];render()}
+function go(n){err='';step=n;render()}
+
+function renderCust(){
+  const paused=S.paused&&step===1?`<div class="card" style="background:#fffbeb;border-color:#fde68a;color:#92400e">We're very busy right now, but you can still get a price and join the waiting list.</div>`:'';
+  let h=`<div class="hdr"><img src="/logo.png" alt="JC Roofing"><a href="tel:07808528293">Call 07808 528293</a></div>`;
+  if(step===1) h+=`<div class="hero"><h1>Get your roof price in 2 minutes</h1><p>Trusted, local and fully certified roofers in Dumfries &amp; Galloway. No phone call needed.</p></div><div class="trust"><span>Trusted Trader</span><span><b class="st">★★★★★</b> 50+ reviews</span><span>250+ customers</span></div>`;
+  if(step<=5) h+=`<div style="display:flex;justify-content:space-between;font-size:13px;color:var(--mute);margin-bottom:6px"><span>Step ${step} of 5</span><span>${['','About 90 seconds left','About 75 seconds left','About 45 seconds left','About 30 seconds left','Last step'][step]}</span></div><div class="bar"><i style="width:${step*20}%"></i></div>`+paused;
+  if(step===1){
+    h+=`<h2>What's the address of the property?</h2>`;
+    if(d.verified){
+      h+=`<div class="ok-card"><small>✓ Address confirmed</small><p>${esc(d.address)}</p><button class="lnk" onclick="d.verified=false;d.address='';d.postcode='';acQ='';render()">Change address</button></div>`;
+    } else if(manual){
+      h+=`<input type="text" placeholder="House number and street" value="${esc(d.address||'')}" oninput="d.address=this.value;chk()">
+      <input type="text" id="pc" placeholder="Postcode e.g. DG1 3QX" style="text-transform:uppercase" value="${esc(d.postcode||'')}" oninput="d.postcode=this.value;chk()">
+      <button class="lnk" onclick="manual=false;d.address='';d.postcode='';render()">Search for my address instead</button>`;
+    } else {
+      h+=`<div class="ac"><input type="text" id="acin" role="combobox" autocomplete="off" placeholder="Start typing your address or postcode" value="${esc(acQ)}" oninput="acType(this.value)" onkeydown="acKey(event)"><ul id="aclist" class="hide"></ul></div>
+      <button class="lnk" onclick="manual=true;render()">I can't find my address</button>`;
+    }
+    h+=`<button class="cta" id="n1" ${d.address&&d.postcode&&(d.verified||PC.test(d.postcode.trim()))?'':'disabled'} onclick="go(2)">Next</button>
+    <p class="sub" style="margin-top:12px;font-size:13px">Demo: type “english” (Dumfries) or “byres” (Glasgow, out of area).</p>`;
+  }
+  if(step===2){
+    h+=`<h2>What type of property?</h2>`+
+      opt('Tenement / flat','','propertyType','tenement')+opt('Semi-detached or terraced','','propertyType','semi')+opt('Detached house','','propertyType','detached')+opt('Bungalow','','propertyType','bungalow')+
+      `<h3>How old is the home?</h3>`+
+      `<div class="grid">${opt('Before 1919','','homeAge','pre-1919')}${opt('1919 – 1960','','homeAge','1919-1960')}${opt('1960 – 2000','','homeAge','1960-2000')}${opt('After 2000','','homeAge','newer')}</div>`+
+      `<h3>Listed or in a conservation area?</h3><div class="grid3">${opt('Yes','','listed','yes')}${opt('No','','listed','no')}${opt('Not sure','','listed','unsure')}</div>
+      <button class="cta" ${d.propertyType&&d.homeAge&&d.listed?'':'disabled'} onclick="go(3)">Next</button>`;
+  }
+  if(step===3){
+    const m=S.mats.find(x=>x.id===d.material);
+    h+=`<h2>What do you need done?</h2>`+opt('Full new roof','','jobType','full')+opt('A repair','','jobType','repair')+opt('Not sure yet','','jobType','unsure')+
+      `<h3>Which material?</h3>`+S.mats.map(x=>`<button class="opt ${d.material===x.id?'on':''}" onclick="pickMat('${x.id}')"><b>${x.label}</b><small>${x.blurb}</small></button>`).join('');
+    if(m) h+=`<h3>Colour</h3><div class="grid">${m.cols.map(c=>`<button class="opt ${d.colour===c[0]?'on':''}" onclick="setv('colour','${c[0]}')"><span class="sw" style="background:${c[1]}"></span>${c[0]}</button>`).join('')}</div>`;
+    h+=`<button class="cta" ${d.jobType&&d.material?'':'disabled'} onclick="go(4)">Next</button>`;
+  }
+  if(step===4){
+    h+=`<h2>How soon do you need it?</h2>`+opt("Urgent – it's leaking",'','urgency','urgent',',true')+opt('Within the next 3 months','','urgency','3-months',',true')+opt('Just getting a price for now','','urgency','pricing',',true');
+  }
+  if(step===5){
+    h+=`<h2>Where should we send your price?</h2>
+    <input type="text" placeholder="Your name" value="${esc(d.name||'')}" oninput="d.name=this.value">
+    <input type="tel" placeholder="Mobile number" value="${esc(d.phone||'')}" oninput="d.phone=this.value">
+    <input type="email" placeholder="Email" value="${esc(d.email||'')}" oninput="d.email=this.value">
+    <label class="consent"><input type="checkbox" ${d.consent?'checked':''} onchange="d.consent=this.checked"> I agree to JC Roofing contacting me about this enquiry by text, email or phone and storing my details for that purpose.</label>
+    ${err?`<div class="err">${err}</div>`:''}
+    <button class="cta" onclick="submit()">Show my price</button>`;
+  }
+  if(step===6){
+    res=calc();
+    if(!res.inArea){
+      h+=`<div class="card" style="background:#f1f5f9"><h2>Sorry, we only cover Dumfries &amp; Galloway</h2><p class="sub">We've kept your details and will let you know if that changes. (No call needed from the owner.)</p></div>`;
+    } else {
+      const days=[...Array(8)].map((_,i)=>{const x=new Date();x.setDate(x.getDate()+2+i);return x}).filter(x=>x.getDay()>0&&x.getDay()<6).slice(0,4);
+      const dd=days[dayI]||days[0];
+      h+=`<div class="price"><small>Estimated price for your ${res.m.label.toLowerCase()} roof (about ${res.area} m²)</small><div class="n">${gbp(res.low)} – ${gbp(res.high)}</div><small>Final price confirmed at a free inspection.</small></div>
+      <div class="card"><b>Earliest start: around ${res.start.toLocaleDateString('en-GB',{month:'long',year:'numeric'})}</b><br><small>Estimate only – depends on our current work queue and the weather.</small></div>
+      <h3>Book your free inspection</h3>
+      <div class="cal"><div class="days">${days.map((x,i)=>`<div class="day ${i===dayI?'on':''}" onclick="dayI=${i};slot=null;render()">${x.toLocaleDateString('en-GB',{weekday:'short'})}<br><b>${x.getDate()}</b></div>`).join('')}</div>
+      <div class="slots">${['09:00','10:30','13:00','14:30','16:00'].map(t=>`<div class="slot ${slot===t?'on':''}" onclick="slot='${t}';render()">${t}</div>`).join('')}</div>
+      ${slot?`<button class="cta" onclick="book('${dd.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})}')">Confirm ${slot}</button>`:''}
+      <p class="sub" style="font-size:12px;margin-top:8px">(Calendly goes here in the real app, prefilled with your details.)</p></div><p class="sub" style="margin-top:14px;text-align:center">Prefer to talk? <a href="tel:07808528293" style="color:var(--blue);font-weight:600">07808 528293</a></p>`;
+    }
+    h+=`<button class="back" onclick="reset()">Start again</button>`;
+  }
+  if(step===7){
+    h+=`<div class="card" style="text-align:center;border-color:#86efac;background:#f0fdf4"><h2 style="color:var(--ok)">Inspection booked ✓</h2><p>${esc(d.booked)} at ${slot}</p><p class="sub">${esc(d.address)}, ${esc(d.postcode.toUpperCase())}</p><p class="sub">We've texted and emailed your confirmation. Optional: upload 2–3 photos of your roof to speed things up.</p></div><button class="back" onclick="reset()">Start again</button>`;
+  }
+  if(step>1&&step<=5) h+=`<button class="back" onclick="go(${step-1})">Back</button>`;
+  h+=`<div class="foot">JC Roofing Dumfries · 28 Auchenkeld Avenue, Heathhall, Dumfries DG1 3QX<br>Your details are only used for this enquiry.</div>`;
+  $('c').innerHTML=h;
+}
+const PC=/^[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}$/i;
+function chk(){const b=$('n1');if(b)b.disabled=!(d.address&&d.postcode&&PC.test(d.postcode.trim()))}
+function acList(){return acQ.replace(/\s/g,'').length<3?[]:PLACES.filter(p=>(p[0]+p[1]).toLowerCase().replace(/\s/g,'').includes(acQ.toLowerCase().replace(/\s/g,''))).slice(0,5)}
+function acDraw(){const u=$('aclist');if(!u)return;const l=acList();u.classList.toggle('hide',!l.length);
+  u.innerHTML=l.map((p,i)=>`<li class="${i===acHi?'hi':''}" onmousedown="acPick(${PLACES.indexOf(p)})"><b>${p[0]}</b><small>${p[1]}, UK</small></li>`).join('')+'<li class="pw">Powered by Google</li>'}
+function acType(v){acQ=v;acHi=-1;acDraw()}
+function acKey(e){const l=acList();if(!l.length)return;
+  if(e.key==='ArrowDown'){e.preventDefault();acHi=(acHi+1)%l.length;acDraw()}
+  else if(e.key==='ArrowUp'){e.preventDefault();acHi=acHi<=0?l.length-1:acHi-1;acDraw()}
+  else if(e.key==='Enter'&&acHi>=0){e.preventDefault();acPick(PLACES.indexOf(l[acHi]))}
+  else if(e.key==='Escape'){$('aclist').classList.add('hide')}}
+function acPick(i){const p=PLACES[i];d.address=p[0]+', '+p[1];d.postcode=p[2];d.verified=true;render()}
+function submit(){
+  if(!d.name||!d.phone||!d.email){err='Please fill in your name, mobile and email.';return render()}
+  if(!d.consent){err='Please tick the box so we can contact you.';return render()}
+  const r=calc();
+  leads.unshift({name:d.name,where:(d.address||'')+', '+(d.postcode||'').toUpperCase(),mat:r.m.label,range:r.inArea?gbp(r.low)+'–'+gbp(r.high):'—',score:r.score,when:r.inArea?'Not booked yet':'Out of area · no owner time used',st:'new'});
+  step=6;dayI=0;slot=null;render();
+}
+function book(day){d.booked=day;leads[0].when='Inspection '+day+' '+slot;step=7;render()}
+function reset(){d={};acQ='';manual=false;step=1;res=null;slot=null;render()}
+
+function renderAlert(){
+  const l=leads[0],isNew=l&&l.st==='new'||(l&&l.when.startsWith('Inspection'));
+  $('a').innerHTML=`<div class="brand" style="font-size:16px;color:var(--mute)">Messages · JC Roofing quote app</div><br>
+  ${leads.filter(x=>x.score!=='nofit').slice(0,3).map(x=>`<div class="sms own" style="margin-bottom:6px"><b>${x.score.toUpperCase()} lead</b>: ${esc(x.name)}, ${esc(x.where)}.<br>${esc(x.mat)} · ${esc(x.range)}<br>${esc(x.when)}<br><span style="color:var(--blue)">Open lead ›</span></div>`).join('')}
+  <p class="sub" style="margin-top:16px;font-size:13px">Sent within seconds of the customer seeing their price. Out-of-area enquiries send the owner nothing. Fill in the customer flow (tab 1) and a new alert appears here.</p>`;
+}
+function renderAdmin(){
+  $('m').innerHTML=`<div class="brand">Owner page</div><div class="sub">JC Roofing</div>
+  <div class="card"><h3 style="margin-top:0">Settings</h3>
+    <label class="row"><span>Pause: not taking new work</span><input type="checkbox" style="width:22px;height:22px" ${S.paused?'checked':''} onchange="S.paused=this.checked;renderNotes()"></label>
+    <label class="row"><span>Weeks until crew free</span><input type="number" value="${S.backlog}" onchange="S.backlog=+this.value"></label>
+    <label class="row"><span>Minimum job (£)</span><input type="number" value="${S.minJob}" onchange="S.minJob=+this.value"></label>
+    <div class="sub" style="margin:10px 0 4px"><b>Price per m² (fitted)</b></div>
+    ${S.mats.map((m,i)=>`<label class="row"><span>${m.label}</span><input type="number" value="${m.rate}" onchange="S.mats[${i}].rate=+this.value"></label>`).join('')}
+    <div class="sub" style="font-size:12px">Changes apply to the next quote in tab 1.</div></div>
+  <h3>Leads (${leads.length})</h3>
+  ${leads.map((l,i)=>`<div class="lead"><div class="r"><b>${esc(l.name)}</b><span class="pill ${l.score}">${l.score==='nofit'?'not a fit':l.score}</span></div>${esc(l.where)} · ${esc(l.mat)}<br>${esc(l.range)}<br><small style="color:var(--ok)">${esc(l.when)}</small><br>
+  <select style="margin:8px 0 0;padding:6px;font-size:14px" onchange="leads[${i}].st=this.value">${['new','contacted','quoted','won','lost'].map(s=>`<option ${l.st===s?'selected':''}>${s}</option>`).join('')}</select></div>`).join('')}`;
+}
+
+const NOTES={
+ cust:`<div class="box"><h4>What this shows</h4>The customer flow: 5 questions, then price range, start window and a booking calendar. Try it end to end.</div>
+ <div class="box"><h4>Design rules</h4>• One question per screen, big tap targets<br>• Choices instead of typing<br>• Contact details asked <i>before</i> the price appears<br>• Range, never a fixed price<br>• Start date shown as a month, not a promise</div>
+ <div class="box"><h4>Behind the scenes (real app)</h4>Roof size comes from satellite data for the address; age can be looked up from the Scottish EPC register.</div>`,
+ alert:`<div class="box"><h4>What this shows</h4>The instant text the owner gets for each qualified lead. Includes name, area, material, price range and any inspection booked.</div><div class="box"><h4>Why it matters</h4>Replying within 5 minutes makes a lead many times more likely to convert; here the customer already has a price and a booking before the owner even reads the text.</div>`,
+ admin:`<div class="box"><h4>What this shows</h4>The owner's one page: rates, backlog weeks, pause switch, and the lead list with hot / warm / not-a-fit.</div><div class="box"><h4>Try it</h4>Change a price, then run a new quote in tab 1. Or tick <b>Pause</b> to see the "we're very busy" banner appear.</div>`
+};
+let tab='cust';
+function renderNotes(){$('notes').innerHTML=NOTES[tab]}
+function render(){renderCust();renderAlert();renderAdmin();renderNotes()}
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{
+  tab=b.dataset.tab;
+  document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x===b));
+  ['cust','alert','admin'].forEach(id=>$(id).classList.toggle('hide',id!==tab));
+  render();
+});
+render();
+</script>
+</body>
+</html>

@@ -2,16 +2,74 @@
   "businessName": "JC Roofing",
   "paused": false,
   "minJobValue": 1500,
-  "serviceAreaPrefixes": ["G", "EH", "FK", "ML", "KA", "PA", "DD", "KY"],
+  "serviceAreaPrefixes": [
+    "DG"
+  ],
   "earliestStartManual": "",
   "weeksBacklog": 8,
   "ownerPhone": "",
   "ownerEmail": "",
   "materials": [
-    { "id": "natural-slate", "label": "Natural slate (Scottish/Spanish)", "blurb": "Traditional, lasts 100+ years", "colours": ["Blue-grey", "Charcoal", "Heather"], "ratePerM2": 165, "m2PerCrewDay": 12 },
-    { "id": "welsh-slate", "label": "Welsh slate", "blurb": "Premium heritage look", "colours": ["Blue-grey", "Purple", "Green"], "ratePerM2": 210, "m2PerCrewDay": 10 },
-    { "id": "fibre-cement-slate", "label": "Fibre-cement slate", "blurb": "Slate look, lower cost", "colours": ["Blue-black", "Natural grey", "Brown"], "ratePerM2": 105, "m2PerCrewDay": 18 },
-    { "id": "clay-tile", "label": "Clay tile", "blurb": "Classic terracotta look", "colours": ["Terracotta", "Brown", "Slate blue"], "ratePerM2": 145, "m2PerCrewDay": 14 },
-    { "id": "concrete-tile", "label": "Concrete tile", "blurb": "Durable and value-priced", "colours": ["Grey", "Brown", "Red", "Black"], "ratePerM2": 95, "m2PerCrewDay": 20 }
+    {
+      "id": "natural-slate",
+      "label": "Natural slate",
+      "blurb": "Scottish or Spanish. Traditional, lasts 100+ years",
+      "colours": [
+        "Blue-grey",
+        "Charcoal",
+        "Heather"
+      ],
+      "ratePerM2": 165,
+      "m2PerCrewDay": 12
+    },
+    {
+      "id": "welsh-slate",
+      "label": "Welsh slate",
+      "blurb": "Premium heritage look",
+      "colours": [
+        "Blue-grey",
+        "Purple",
+        "Green"
+      ],
+      "ratePerM2": 210,
+      "m2PerCrewDay": 10
+    },
+    {
+      "id": "fibre-cement-slate",
+      "label": "Fibre-cement slate",
+      "blurb": "Slate look, lower cost",
+      "colours": [
+        "Blue-black",
+        "Natural grey",
+        "Brown"
+      ],
+      "ratePerM2": 105,
+      "m2PerCrewDay": 18
+    },
+    {
+      "id": "clay-tile",
+      "label": "Clay tile",
+      "blurb": "Classic terracotta look",
+      "colours": [
+        "Terracotta",
+        "Brown",
+        "Slate blue"
+      ],
+      "ratePerM2": 145,
+      "m2PerCrewDay": 14
+    },
+    {
+      "id": "concrete-tile",
+      "label": "Concrete tile",
+      "blurb": "Durable and value-priced",
+      "colours": [
+        "Grey",
+        "Brown",
+        "Red",
+        "Black"
+      ],
+      "ratePerM2": 95,
+      "m2PerCrewDay": 20
+    }
   ]
 }

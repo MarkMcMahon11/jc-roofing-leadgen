@@ -10,17 +10,20 @@ const FALLBACK_M2: Record<QuoteInput["propertyType"], number> = {
 
 /** Roof area from Google Solar API when a key is set, else a property-type estimate. */
 export async function getRoofArea(
-  input: Pick<QuoteInput, "propertyType" | "address" | "postcode">
+  input: Pick<QuoteInput, "propertyType" | "address" | "postcode" | "lat" | "lng">
 ): Promise<{ area: number; source: "solar-api" | "estimate" }> {
   const key = process.env.GOOGLE_MAPS_API_KEY;
   if (key) {
     try {
-      const geo = await fetch(
-        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
-          `${input.address}, ${input.postcode}, UK`
-        )}&key=${key}`
-      ).then((r) => r.json());
-      const loc = geo.results?.[0]?.geometry?.location;
+      let loc = typeof input.lat === "number" && typeof input.lng === "number" ? { lat: input.lat, lng: input.lng } : undefined;
+      if (!loc) {
+        const geo = await fetch(
+          `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
+            `${input.address}, ${input.postcode}, UK`
+          )}&key=${key}`
+        ).then((r) => r.json());
+        loc = geo.results?.[0]?.geometry?.location;
+      }
       if (loc) {
         const solar = await fetch(
           `https://solar.googleapis.com/v1/buildingInsights:findClosest?location.latitude=${loc.lat}&location.longitude=${loc.lng}&requiredQuality=LOW&key=${key}`
