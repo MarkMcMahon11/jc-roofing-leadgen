@@ -41,12 +41,12 @@ export default function BookingPicker({ leadId, onBooked }: { leadId: string; on
   }
 
   return (
-    <div className="rounded-2xl border-2 border-sand bg-white p-3">
-      <div role="radiogroup" aria-label="Choose a day" className="mb-3 grid grid-cols-4 gap-1.5">
+    <div className="min-w-0 rounded-xl bg-white p-3 ring-1 ring-sand">
+      <div role="radiogroup" aria-label="Choose a day" className="-mx-1 mb-3 flex snap-x gap-1.5 overflow-x-auto px-1 pb-1">
         {days.map((d) => (
           <button key={iso(d)} type="button" role="radio" aria-checked={day === iso(d)} onClick={() => { setDay(iso(d)); setTime(""); }}
-            className={`rounded-xl border-2 py-2 text-center text-sm ${day === iso(d) ? "border-brand bg-brand-tint" : "border-sand"}`}>
-            {d.toLocaleDateString("en-GB", { weekday: "short" })}<br /><b className="text-base">{d.getDate()}</b>
+            className={`w-[58px] flex-none snap-start rounded-xl border-[1.5px] py-1.5 text-center text-[13px] leading-tight ${day === iso(d) ? "border-brand bg-brand-tint" : "border-sand"}`}>
+            {d.toLocaleDateString("en-GB", { weekday: "short" })}<br /><b className="text-[17px]">{d.getDate()}</b>
             <span className="block text-[11px] text-mute">{d.toLocaleDateString("en-GB", { month: "short" })}</span>
           </button>
         ))}
@@ -56,19 +56,19 @@ export default function BookingPicker({ leadId, onBooked }: { leadId: string; on
           const gone = taken.includes(`${day}T${t}:00`);
           return (
             <button key={t} type="button" role="radio" aria-checked={time === t} disabled={gone} onClick={() => setTime(t)}
-              className={`rounded-xl border-2 py-2.5 text-center font-semibold ${gone ? "border-sand text-sand line-through" : time === t ? "border-brand bg-brand text-white" : "border-brand text-brand"}`}>
+              className={`rounded-xl border-[1.5px] py-2 text-center text-[15px] font-semibold ${gone ? "border-sand text-sand line-through" : time === t ? "border-brand bg-brand text-white" : "border-sand text-ink hover:border-brand"}`}>
               {t}
             </button>
           );
         })}
       </div>
-      <p aria-live="polite" className="mt-2 min-h-5 text-sm text-brand">{err}</p>
+      <p aria-live="polite" className="mt-1.5 min-h-4 text-[13px] text-brand">{err}</p>
       {time && (
-        <button type="button" disabled={busy} onClick={confirm} className="w-full rounded-2xl bg-brand p-3.5 text-lg font-semibold text-white hover:bg-brand-dark disabled:opacity-40">
+        <button type="button" disabled={busy} onClick={confirm} className="w-full rounded-xl bg-brand px-4 py-3 text-base font-semibold text-white hover:bg-brand-dark disabled:opacity-40">
           {busy ? "Booking…" : `Confirm ${new Date(`${day}T12:00`).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })} at ${time}`}
         </button>
       )}
-      <p className="mt-2 text-xs text-mute">Free, no obligation. About 30 minutes on site.</p>
+      <p className="mt-2 text-[12px] text-mute">Free, no obligation. About 30 minutes on site.</p>
     </div>
   );
 }

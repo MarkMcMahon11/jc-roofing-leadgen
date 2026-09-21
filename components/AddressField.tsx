@@ -4,7 +4,7 @@ import { useEffect, useId, useRef, useState } from "react";
 export type Place = { placeId: string; address: string; postcode: string; lat: number; lng: number; partial?: boolean };
 type Sug = { placeId: string; main: string; secondary: string };
 
-const field = "w-full rounded-xl border-2 border-sand bg-white p-4 text-lg focus:border-ink";
+const field = "w-full rounded-xl border-[1.5px] border-sand bg-white px-3.5 py-3 text-base focus:border-ink";
 
 export default function AddressField({
   selected,
@@ -103,29 +103,29 @@ export default function AddressField({
 
   if (selected)
     return (
-      <div className="rounded-2xl border-2 border-green-700 bg-green-50 p-4">
-        <p className="text-sm font-semibold text-green-800">✓ Address confirmed</p>
-        <p className="mt-1 text-lg font-semibold">{selected.address.replace(/, (UK|United Kingdom)$/, "")}</p>
-        <button type="button" className="mt-2 text-mute underline" onClick={() => { onClear(); setBase(null); setQ(""); }}>Change address</button>
+      <div className="rounded-xl border-[1.5px] border-green-700 bg-green-50 px-3.5 py-3">
+        <p className="text-[13px] font-semibold text-green-800">✓ Address confirmed</p>
+        <p className="mt-0.5 text-base font-semibold leading-snug">{selected.address.replace(/, (UK|United Kingdom)$/, "")}</p>
+        <button type="button" className="mt-1 text-[14px] text-mute underline" onClick={() => { onClear(); setBase(null); setQ(""); }}>Change address</button>
       </div>
     );
 
   if (base) {
     const ok = houseNo.trim().length > 0 && /^[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}$/i.test(pc.trim());
     return (
-      <div className="space-y-3 rounded-2xl border-2 border-sand bg-white p-4">
-        <p className="text-lg font-semibold">{base.address}</p>
-        <label className="block text-sm font-semibold">House number, name or flat
+      <div className="space-y-2.5 rounded-xl border-[1.5px] border-sand bg-white p-3.5">
+        <p className="text-base font-semibold leading-snug">{base.address}</p>
+        <label className="block text-[13px] font-semibold">House number, name or flat
           <input className={`${field} mt-1`} placeholder="e.g. 12 or Flat 2/1" autoComplete="off" value={houseNo} onChange={(e) => setHouseNo(e.target.value)} />
         </label>
-        <label className="block text-sm font-semibold">Postcode
+        <label className="block text-[13px] font-semibold">Postcode
           <input className={`${field} mt-1 uppercase`} placeholder="e.g. DG1 3QX" autoComplete="postal-code" value={pc} onChange={(e) => setPc(e.target.value)} />
         </label>
-        <button type="button" disabled={!ok} className="w-full rounded-2xl bg-brand p-3 text-lg font-semibold text-white hover:bg-brand-dark disabled:opacity-40"
+        <button type="button" disabled={!ok} className="w-full rounded-xl bg-brand px-4 py-3 text-base font-semibold text-white hover:bg-brand-dark disabled:opacity-40"
           onClick={() => onSelect({ ...base, partial: false, address: `${houseNo.trim()} ${base.address} ${pc.trim().toUpperCase()}`, postcode: pc.trim().toUpperCase() })}>
           Confirm address
         </button>
-        <button type="button" className="text-mute underline" onClick={() => setBase(null)}>Back to search</button>
+        <button type="button" className="text-[14px] text-mute underline" onClick={() => setBase(null)}>Back to search</button>
       </div>
     );
   }
@@ -149,9 +149,9 @@ export default function AddressField({
         onBlur={() => setTimeout(() => setOpen(false), 150)}
         onFocus={() => shown.length && setOpen(true)}
       />
-      {loading && <span className="absolute right-4 top-5 h-5 w-5 animate-spin rounded-full border-2 border-sand border-t-brand" aria-label="Searching" />}
+      {loading && <span className="absolute right-3.5 top-3.5 h-5 w-5 animate-spin rounded-full border-2 border-sand border-t-brand" aria-label="Searching" />}
       {open && shown.length > 0 && (
-        <ul id={listId} role="listbox" className="absolute z-20 mt-1 w-full overflow-hidden rounded-2xl border-2 border-sand bg-white shadow-lg">
+        <ul id={listId} role="listbox" className="absolute z-20 mt-1 w-full overflow-hidden rounded-xl border-[1.5px] border-sand bg-white shadow-lg">
           {shown.map((s, i) => (
             <li
               key={s.placeId}
@@ -160,17 +160,17 @@ export default function AddressField({
               aria-selected={i === hi}
               onMouseDown={(e) => { e.preventDefault(); choose(s); }}
               onMouseEnter={() => setHi(i)}
-              className={`cursor-pointer border-b border-sand px-4 py-3 last:border-b-0 ${i === hi ? "bg-brand-tint" : ""}`}
+              className={`cursor-pointer border-b border-sand px-3.5 py-2.5 last:border-b-0 ${i === hi ? "bg-brand-tint" : ""}`}
             >
-              <span className="block font-semibold">{s.main}</span>
-              <span className="block text-sm text-mute">{s.secondary}</span>
+              <span className="block text-[15px] font-medium leading-snug">{s.main}</span>
+              <span className="block text-[13px] leading-snug text-mute">{s.secondary}</span>
             </li>
           ))}
-          <li className="bg-cream px-4 py-1.5 text-right text-[11px] text-mute" aria-hidden>{credit}</li>
+          <li className="bg-cream px-3.5 py-1 text-right text-[11px] text-mute" aria-hidden>{credit}</li>
         </ul>
       )}
-      <p aria-live="polite" className="mt-2 min-h-5 text-sm text-mute">{active ? note : ""}</p>
-      <button type="button" className="mt-1 text-mute underline" onClick={onManual}>I can&apos;t find my address</button>
+      <p aria-live="polite" className="mt-1.5 min-h-4 text-[13px] text-mute">{active ? note : ""}</p>
+      <button type="button" className="mt-0.5 text-[14px] text-mute underline" onClick={onManual}>I can&apos;t find my address</button>
     </div>
   );
 }
