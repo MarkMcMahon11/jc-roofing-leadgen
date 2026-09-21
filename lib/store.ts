@@ -1,9 +1,14 @@
 import { promises as fs } from "fs";
 import path from "path";
+import os from "os";
 import type { Lead, Settings } from "./types";
+import defaultSettings from "../data/settings.json";
 
-// Preview storage: JSON files in /data. Swap for a managed Postgres before deploying to a serverless host.
-const dir = path.join(process.cwd(), "data");
+// Preview storage: JSON files. Locally in /data. On Vercel the project folder is read-only, so use the
+// temp folder instead: fine for a demo, but it is per-server and gets wiped, so it is NOT real storage.
+// Replace with a managed Postgres before going live (see docs/PRD.md section 9).
+export const DEMO_STORAGE = !!process.env.VERCEL;
+const dir = DEMO_STORAGE ? path.join(os.tmpdir(), "jc-roofing-data") : path.join(process.cwd(), "data");
 const file = (n: string) => path.join(dir, n);
 
 async function read<T>(name: string, fallback: T): Promise<T> {
@@ -29,7 +34,8 @@ function locked<T>(name: string, fn: () => Promise<T>): Promise<T> {
   return run;
 }
 
-export const getSettings = () => read<Settings>("settings.json", undefined as unknown as Settings);
+// Falls back to the settings bundled with the build, so a fresh server (or Vercel) always has rates.
+export const getSettings = () => read<Settings>("settings.json", defaultSettings as unknown as Settings);
 export const saveSettings = (s: Settings) => write("settings.json", s);
 export const getLeads = () => read<Lead[]>("leads.json", []);
 export const saveLeads = (l: Lead[]) => write("leads.json", l);
