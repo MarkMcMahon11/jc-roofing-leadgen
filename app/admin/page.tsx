@@ -6,7 +6,9 @@ import type { Message } from "@/lib/store";
 import { fmtSlot } from "@/lib/dates";
 import { detailsText, PRICE_LABELS, SERVICE_INFO } from "@/lib/services";
 
-type Data = { settings: Settings; leads: Lead[]; outbox: Message[]; funnel: Record<string, number>; storage: "database" | "files" | "temporary" };
+type LeadPhotoView = { path: string; url?: string; hint?: string | null; assessment?: { material: string; condition: string; affectedPercent: number | null; confidence: "low" | "medium" | "high"; caveat: string } | null };
+type LeadView = Omit<Lead, "photos"> & { photos?: LeadPhotoView[] };
+type Data = { settings: Settings; leads: LeadView[]; outbox: Message[]; funnel: Record<string, number>; storage: "database" | "files" | "temporary" };
 const STATUSES = ["new", "contacted", "quoted", "won", "lost"];
 const FUNNEL: [string, string][] = [["start", "Opened the form"], ["address", "Confirmed address"], ["service", "Chose what they need"], ["home", "Described their home"], ["details", "Gave job details"], ["timing", "Gave timing"], ["price", "Saw their price"], ["booked", "Booked inspection"]];
 const input = "rounded-lg border-[1.5px] border-line bg-white px-2.5 py-2 text-base focus:border-ink";
@@ -39,7 +41,7 @@ export default function Admin() {
     if (nums.some((n) => typeof n !== "number" || !Number.isFinite(n) || n <= 0 && n !== s.weeksBacklog && n !== s.quickJobWeeks)) return setSaved("Not saved: please fill in every price and number.");
     if (await put({ settings: s })) setSaved("Saved ✓");
   }
-  function exportLead(l: Lead) {
+  function exportLead(l: LeadView) {
     const mine = data?.outbox.filter((m) => m.leadId === l.id) ?? [];
     const url = URL.createObjectURL(new Blob([JSON.stringify({ lead: l, messages: mine }, null, 2)], { type: "application/json" }));
     const a = Object.assign(document.createElement("a"), { href: url, download: `enquiry-${l.name.replace(/\W+/g, "-")}.json` });
@@ -131,6 +133,25 @@ export default function Admin() {
               <p className="text-sm">{l.noPrice ? "No price given" : `£${l.low.toLocaleString()}–£${l.high.toLocaleString()}`} · {l.urgency} · <a className="underline" href={`tel:${l.phone}`}>{l.phone}</a> · {l.email}</p>
               {l.inspectionBooked && <p className="text-sm font-semibold text-green-800">Inspection: {fmtSlot(l.inspectionBooked)}</p>}
               <p className="text-xs text-mute">Consent given {new Date(l.consentAt ?? l.createdAt).toLocaleString("en-GB")} (wording {l.consentVersion ?? "v1"}) · {l.placeId ? "address checked" : "address typed by customer, please check"}</p>
+              {l.photos && l.photos.length > 0 && (
+                <div className="mt-2 space-y-2">
+                  <div className="flex flex-wrap gap-2">
+                    {l.photos.map((p) => (
+                      p.url
+                        // eslint-disable-next-line @next/next/no-img-element -- signed, time-limited storage URL; next/image can't optimise this
+                        ? <a key={p.path} href={p.url} target="_blank" rel="noreferrer"><img src={p.url} alt="" className="h-20 w-20 rounded-lg border border-line object-cover" /></a>
+                        : <div key={p.path} className="grid h-20 w-20 place-items-center rounded-lg border border-line bg-cream text-center text-[0.6875rem] text-mute">Unavailable</div>
+                    ))}
+                  </div>
+                  {l.photos.filter((p) => p.assessment).map((p) => (
+                    <div key={p.path} className="rounded-xl bg-cream px-3 py-2 text-sm">
+                      <p><b className="capitalize">{p.assessment!.material}</b> · <span className="text-mute">{p.assessment!.confidence} confidence</span></p>
+                      <p className="text-mute">{p.assessment!.condition}</p>
+                      {p.hint && <p className="text-mute">Looks {p.hint}.</p>}
+                    </div>
+                  ))}
+                </div>
+              )}
               <div className="mt-2 flex flex-wrap items-center gap-3">
                 <label className="text-sm">Status <select className={`${input} py-1`} value={l.status} onChange={(e) => put({ leadStatus: { id: l.id, status: e.target.value } })}>{STATUSES.map((x) => <option key={x}>{x}</option>)}</select></label>
                 <button className="min-h-9 px-1 text-sm text-mute underline" onClick={() => exportLead(l)}>Export data</button>

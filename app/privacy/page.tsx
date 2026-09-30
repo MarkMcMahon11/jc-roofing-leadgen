@@ -15,6 +15,7 @@ export default function Privacy() {
 
       <h2 className="text-lg font-bold">What we collect and why</h2>
       <p>Your name, mobile number, email, the property address, details you choose about the roof, and any inspection time you book. We also record when you gave your consent and which version of the wording you saw. We use this only to give you a price estimate, contact you about your enquiry, and arrange and carry out an inspection.</p>
+      <p>If you choose to add photos, they are entirely optional. We store them to help prepare for your inspection, and, where we have switched this on, an AI service looks at each photo and gives a short, rough read (the likely material and roughly how much looks affected) shown to you and to us. This is never a survey and never a fixed price.</p>
       <p>We also count, anonymously, how far people get through this form (for example &quot;reached step 3&quot;) so we can make it easier to use. These counts contain no personal information.</p>
 
       <h2 className="text-lg font-bold">Who else handles it</h2>
@@ -24,6 +25,7 @@ export default function Privacy() {
         <li><b>Hosting and storage:</b> our website host and database.</li>
         <li><b>Messages:</b> text message and email providers that deliver your estimate and booking confirmation.</li>
         <li><b>Booking:</b> our booking tool, if we use one.</li>
+        <li><b>Photos:</b> if you add any, they are stored with our hosting provider. Where the AI read is switched on, a photo is also sent to Anthropic (the company behind Claude) to generate that read.</li>
       </ul>
       <p>We do not sell your information. To help prevent misuse of this form, our systems briefly note your internet address to limit how often it can be used.</p>
 
@@ -31,7 +33,7 @@ export default function Privacy() {
       <p>While you fill in the form, your answers are kept in this browser tab only, so a refresh doesn&apos;t lose them. They are not sent anywhere until you press &quot;Show my price&quot;, and they disappear when you close the tab.</p>
 
       <h2 className="text-lg font-bold">How long we keep it</h2>
-      <p>Enquiries that do not lead to a booked inspection or a job are deleted after 6 months. Other customer records are kept for up to 24 months after the last contact. Deleted enquiries are removed together with the messages we stored about them.</p>
+      <p>Enquiries that do not lead to a booked inspection or a job are deleted after 6 months. Other customer records are kept for up to 24 months after the last contact. Deleted enquiries are removed together with the messages and any photos we stored about them.</p>
 
       <h2 className="text-lg font-bold">Your rights</h2>
       <p>You can ask to see (get a copy of), correct or delete your information, or withdraw consent, at any time by calling {BUSINESS.phone} or emailing {BUSINESS.email}. You can also complain to the Information Commissioner&apos;s Office (ico.org.uk).</p>

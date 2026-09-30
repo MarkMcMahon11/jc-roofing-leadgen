@@ -1,8 +1,10 @@
 import { createHash, timingSafeEqual } from "crypto";
-import { deleteMessagesForLead, getEvents, getLeads, getOutbox, getSettings, saveSettings, storageMode, updateLeads } from "@/lib/store";
+import { deleteLeadArtifacts, getEvents, getLeads, getOutbox, getSettings, saveSettings, storageMode, updateLeads } from "@/lib/store";
 import { bad, isObj, readJson } from "@/lib/http";
 import { clientIp, isBlocked, limited } from "@/lib/limits";
 import { parseSettings } from "@/lib/validate";
+import { photosEnabled, signPhotoUrls } from "@/lib/photos";
+import { positionHint } from "@/lib/vision";
 import type { Lead } from "@/lib/types";
 
 const STATUSES: Lead["status"][] = ["new", "contacted", "quoted", "won", "lost"];
@@ -41,7 +43,17 @@ async function getAdmin(req: Request) {
   for (const step of ["start", "address", "service", "home", "details", "timing", "price", "booked"])
     funnel[step] = new Set(events.filter((e) => e.step === step).map((e) => e.sid)).size;
   const [settings, leads, outbox] = await Promise.all([getSettings(), getLeads(), getOutbox()]);
-  return Response.json({ settings, leads, outbox: outbox.slice(0, 60), funnel, storage: storageMode() });
+
+  // Owner-side viewing: attach a short-lived signed URL (and a plain-English "where this falls" hint) to each photo.
+  // The bucket is private, so a bare storage path is useless without one - nothing here needs the secret key client-side.
+  const allPaths = leads.flatMap((l) => l.photos?.map((p) => p.path) ?? []);
+  const urls: Record<string, string> = photosEnabled() && allPaths.length ? await signPhotoUrls(allPaths).catch(() => ({})) : {};
+  const leadsWithPhotos = leads.map((l) => ({
+    ...l,
+    photos: l.photos?.map((p) => ({ ...p, url: urls[p.path], hint: positionHint(p.assessment?.affectedPercent ?? null) })),
+  }));
+
+  return Response.json({ settings, leads: leadsWithPhotos, outbox: outbox.slice(0, 60), funnel, storage: storageMode() });
 }
 
 export async function PUT(req: Request) {
@@ -79,8 +91,8 @@ async function putAdmin(req: Request) {
       const i = leads.findIndex((x) => x.id === b.deleteLead);
       return i >= 0 ? leads.splice(i, 1)[0] : null;
     });
-    // Erase the customer's stored messages too (they contain name, phone, email and address).
-    if (removed) await deleteMessagesForLead(removed);
+    // Erase the customer's stored messages and photos too (they contain name, phone, email, address and images).
+    if (removed) await deleteLeadArtifacts(removed);
   }
   return Response.json({ ok: true });
 }

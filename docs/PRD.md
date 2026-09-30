@@ -4,7 +4,7 @@
 |---|---|
 | **Client** | JC Roofing Dumfries (28 Auchenkeld Avenue, Heathhall, Dumfries DG1 3QX) |
 | **Owner / decision maker** | JC Roofing business owner **[assumed: Jamie, per the contact email on the website; confirm]** |
-| **Status** | Draft v1 · 2026-09-21 · MVP built and hardened; demo deployed; database support added |
+| **Status** | Draft v1 · 2026-09-21 · MVP built and hardened; demo deployed; database support added; customer photos + AI read added 2026-09-30 |
 | **Product lead** | Mark |
 | **Repo** | `~/Desktop/jc-roofing-app` · preview at `localhost:3000` and `/preview.html` |
 
@@ -64,7 +64,6 @@ This product is a mobile-first web app, branded to JC Roofing, that takes a pros
 - Privacy and consent.
 
 ### Backlog / later
-- Photo upload to speed inspections.
 - Calendar-driven start dates (reads job calendar).
 - Roof measurement from satellite data (Google Solar) or OSM building footprints.
 - Reactivation follow-ups for unbooked leads.
@@ -124,6 +123,14 @@ This product is a mobile-first web app, branded to JC Roofing, that takes a pros
 **FR-8 Brand and content**
 - Logo header, brand red, charcoal and cream palette, Inter typeface, trust chips (Trusted Trader, 50+ reviews, 250+ customers), business address in the footer. Claims must be kept in sync with the business's own website.
 
+**FR-9 Customer photos and AI read** (added 2026-09-30)
+- FR-9.1 On the result screen, the customer may add up to 4 photos, at full quality (no client-side compression). Optional; never blocks booking.
+- FR-9.2 Uploads go directly from the browser to storage (not through the app server), so a large phone photo is not limited by the hosting platform's request-size cap.
+- FR-9.3 When configured (`ANTHROPIC_API_KEY`), each photo gets an AI-generated read: material guess, plain-English condition, a rough % of the visible roof affected, and a confidence level. Shown to the customer immediately and to the owner on `/admin`.
+- FR-9.4 The AI read is always shown alongside the existing price range, never in place of it, and is described as a rough visual impression confirmed at the free inspection - it never states a price itself.
+- FR-9.5 Deleting a lead deletes its stored photos, not just the database row.
+- FR-9.6 Without the AI key, photo upload and viewing still work; there is simply no AI read.
+
 ## 7. UX principles
 
 1. **One thing per screen; taps over typing.** Free text only where unavoidable (address, name, phone, email).
@@ -164,6 +171,8 @@ Instrumentation: log each step reached and drop-off point (no personal data in a
 | Email | Logged to console | Resend or equivalent | Verified sending domain needed |
 | Hosting | Local | Production host | Vercel's free Hobby plan is **non-commercial only** [verified]; a commercial deployment needs a paid plan or another host |
 | Database | JSON files (dev only); temporary storage on Vercel | Supabase (free plan to start), built in: set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` | Every server copy shares it; writes are checked and retried so nothing is overwritten. See README |
+| Photo storage | Same Supabase project's Storage, built in once the database is connected | Same | Private bucket; browser uploads directly to it (bypasses the host's request-size limit); owner views via short-lived signed links |
+| AI photo read | Off (photos still upload and can be viewed, just no read) | Anthropic API (`ANTHROPIC_API_KEY`), model `claude-sonnet-5` | Billed per photo analysed by Anthropic (input/output tokens; larger photos cost more) - see README for the current rate and how to set a spending limit |
 | Calendar (phase 2) | Manual "weeks free" | Google Calendar read-only access | Separate read-only OAuth scope |
 
 Budget owner: to be confirmed. Recommend the owner approve a monthly ceiling before licensing.
@@ -171,7 +180,7 @@ Budget owner: to be confirmed. Recommend the owner approve a monthly ceiling bef
 ## 10. Data, privacy and compliance (UK GDPR / PECR)
 
 - **Lawful basis:** consent for contact about the enquiry; explicit, unticked checkbox with plain-language wording (built).
-- **Data collected:** name, mobile, email, property address and coordinates, property details, choices, timing, inspection time.
+- **Data collected:** name, mobile, email, property address and coordinates, property details, choices, timing, inspection time, and any photos the customer chooses to add (optional; sent to Anthropic for the AI read, when that's switched on).
 - **Retention:** propose 24 months for won/lost customers, 6 months for unbooked leads, then delete or anonymise **[assumed]**.
 - **Rights:** owner must be able to export and delete a lead on request (admin action to add before launch).
 - **SMS marketing:** transactional messages about the enquiry only; any promotional messaging needs separate opt-in.
@@ -181,8 +190,8 @@ Budget owner: to be confirmed. Recommend the owner approve a monthly ceiling bef
 
 ## 11. Technical overview (as built)
 
-- **Stack:** Next.js (App Router), React, Tailwind, TypeScript. Routes: `/` (customer flow), `/admin` (owner), `/api/quote`, `/api/places/*`, `/api/calendly`, `/api/admin`.
-- **Key modules:** `lib/pricing.ts` (range, scoring, coverage, start date), `lib/places.ts` (address providers), `lib/roof.ts` (roof area), `lib/notify.ts` (alerts), `lib/store.ts` (storage).
+- **Stack:** Next.js (App Router), React, Tailwind, TypeScript. Routes: `/` (customer flow), `/admin` (owner), `/api/quote`, `/api/places/*`, `/api/calendly`, `/api/admin`, `/api/photos/sign`, `/api/photos/complete`.
+- **Key modules:** `lib/pricing.ts` (range, scoring, coverage, start date), `lib/places.ts` (address providers), `lib/roof.ts` (roof area), `lib/notify.ts` (alerts), `lib/store.ts` (storage), `lib/photos.ts` (Supabase Storage), `lib/vision.ts` (Anthropic API photo read, official `@anthropic-ai/sdk`).
 - **Provider switch:** address search uses Google when `GOOGLE_MAPS_API_KEY` is set, otherwise the free provider.
 - **Lead record:** contact, address (+ Google place ID and coordinates when verified), property answers, roof area and source, price low/high, earliest start, score, status, inspection time.
 

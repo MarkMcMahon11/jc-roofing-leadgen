@@ -5,6 +5,7 @@ import Link from "next/link";
 import { InlineWidget } from "react-calendly";
 import AddressField, { type Place } from "./AddressField";
 import BookingPicker from "./BookingPicker";
+import PhotoCapture from "./PhotoCapture";
 import { Field, Ghost, inputCls, Label, Opt, Primary, Seg, StickyBar, Swatches } from "./ui";
 import { OPTIONS, SERVICE_IDS, SERVICE_INFO, type ServiceId } from "@/lib/services";
 import { BUSINESS, telHref } from "@/lib/config";
@@ -377,6 +378,8 @@ export default function QuoteWizard() {
                     <p className="text-[0.8125rem] opacity-90">Final price confirmed at a free {svc === "solar" ? "survey" : "inspection"}.</p>
                   </div>
                 )}
+                <Label id="q-photos" hint="Optional, but it helps us prepare - your roof, the problem area, or a chimney. Full quality is fine, however big.">Add photos</Label>
+                <PhotoCapture leadId={result.id} />
                 {result.waitlist ? (
                   <div className="rounded-xl bg-white px-3.5 py-3 ring-1 ring-line">
                     <p className="text-[0.875rem] leading-snug"><b className="font-semibold">You&apos;re on our waiting list</b><br /><span className="text-mute">We&apos;re fully booked at the moment. We&apos;ll be in touch as soon as we have space. We&apos;ve texted and emailed you a copy of this estimate.</span></p>

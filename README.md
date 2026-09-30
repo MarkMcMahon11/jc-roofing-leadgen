@@ -45,6 +45,25 @@ add real authentication to `/admin`, and have JC Roofing approve the privacy not
 Keep the secret key private: it only goes in server environment variables, never in the browser or in git.
 Note: Supabase free projects pause after about a week without use; upgrade or keep the site active for live use.
 
+## Customer photos + AI read (optional)
+On the result screen, a customer can add up to 4 photos (roof, the problem area, a chimney) at full quality - no
+compression, so a large phone photo still works. They upload **directly to Supabase Storage** from the browser
+(never through this app's own server), because Vercel and similar hosts cap a serverless function's request body at
+about 4.5MB, well under a real phone photo. The bucket is private; the owner page shows photos via short-lived
+signed links.
+
+If `ANTHROPIC_API_KEY` is set, each photo also gets an instant AI read via the Claude API (model `claude-sonnet-5`):
+a material guess, a plain-English description of what's visible, and roughly how much of the roof looks affected -
+shown to the customer immediately and to the owner on `/admin`. This is a rough visual impression, not a survey: it
+is always shown next to the existing price range (never in place of it) and labelled "confirmed at your free
+inspection", the same as every other estimate in this app. With no key set, photo uploads still work; there is just
+no AI read.
+
+Cost: this calls the Anthropic API, which bills per photo analysed (a small amount per call at Claude Sonnet 5's
+rate of $2 per million input tokens / $10 per million output tokens - larger, higher-resolution photos cost more
+since they use more tokens; check the Anthropic Console for exact per-request cost once switched on). Leave the key
+unset to keep this free, or set a spending limit in the Anthropic Console before enabling it for real customers.
+
 ## Jobs the quote form handles
 New roofs (slate/tile, measured or estimated roof size), repairs, flat roofs (GRP), gutters and fascias, chimney removal,
 solar panels, and "something else" (no price, the owner calls). Every price except new roofs is editable on `/admin`

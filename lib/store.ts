@@ -4,6 +4,7 @@ import os from "os";
 import type { Lead, Settings } from "./types";
 import defaultSettings from "../data/settings.json";
 import { RETAIN_ALL_DAYS, RETAIN_UNBOOKED_DAYS } from "./config";
+import { deletePhotos } from "./photos";
 
 /**
  * Storage, three ways (same functions either way):
@@ -179,6 +180,12 @@ export const deleteMessagesForLead = (lead: Pick<Lead, "id" | "phone" | "email">
     box.push(...keep);
   });
 
+/** Erase everything a removed lead left behind: its stored messages, and any photos in Supabase Storage. */
+export async function deleteLeadArtifacts(lead: Pick<Lead, "id" | "phone" | "email" | "photos">) {
+  await deleteMessagesForLead(lead);
+  if (lead.photos?.length) await deletePhotos(lead.photos.map((p) => p.path)).catch((e) => console.error("[store] could not delete photos:", (e as Error).message));
+}
+
 // ---------- anonymous funnel events (no personal data) ----------
 export type Ev = { at: string; sid: string; step: string };
 export const getEvents = () => readDoc<Ev[]>("events", [], isArr);
@@ -207,6 +214,6 @@ export async function purgeExpired() {
     }
     return removed;
   });
-  for (const l of gone) await deleteMessagesForLead(l);
+  for (const l of gone) await deleteLeadArtifacts(l);
   return gone.length;
 }

@@ -68,6 +68,17 @@ export interface QuoteInput {
 
 export type Score = "hot" | "warm" | "not-a-fit";
 
+export interface LeadPhoto {
+  path: string; // Supabase Storage object path
+  assessment?: {
+    material: string;
+    condition: string;
+    affectedPercent: number | null;
+    confidence: "low" | "medium" | "high";
+    caveat: string;
+  } | null; // null/absent = AI analysis wasn't available or didn't return anything usable; the photo itself is still there
+}
+
 export interface Lead extends QuoteInput {
   id: string;
   createdAt: string;
@@ -84,4 +95,5 @@ export interface Lead extends QuoteInput {
   waitlist?: boolean; // taken while intake was paused
   consentAt: string; // when the customer ticked the consent box
   consentVersion: string; // which consent wording they saw
+  photos?: LeadPhoto[]; // optional, added on the result screen after the estimate is shown
 }
