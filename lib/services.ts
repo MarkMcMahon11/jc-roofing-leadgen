@@ -23,18 +23,33 @@ export const OPTIONS = {
 } as const satisfies Record<string, readonly Opt[]>;
 export const optLabel = (list: readonly Opt[], v: string | undefined) => list.find(([k]) => k === v)?.[1] ?? "";
 
-// What each price setting is called on the owner page.
+// What each price setting is called on the owner page. Plain names only - the unit (per m², each, etc.)
+// is shown next to the price input instead (PRICE_UNITS below), so the label and the number stay together.
 export const PRICE_LABELS: Record<string, string> = {
-  repairMin: "Smallest repair (£)",
-  flatRatePerM2: "Flat roof, per m² (£)",
-  flatMin: "Flat roof minimum job (£)",
-  gutterCleanFrom: "Gutter cleaning, average house (£)",
-  gutterReplacePerM: "New gutters, per metre (£)",
-  fasciaPerM: "Fascias and soffits, per metre (£)",
-  chimneyEach: "Chimney removal, each (£)",
-  chimneyFullExtra: "Extra for full removal inside the roof space, each (£)",
-  chimneyAccess: "Scaffold or access for chimney work (£)",
-  solarPerKw: "Solar panels, per kW installed (£)",
+  repairMin: "Smallest repair",
+  flatRatePerM2: "Flat roof",
+  flatMin: "Flat roof minimum job",
+  gutterCleanFrom: "Gutter cleaning (average house)",
+  gutterReplacePerM: "New gutters",
+  fasciaPerM: "Fascias and soffits",
+  chimneyEach: "Chimney removal",
+  chimneyFullExtra: "Extra for full removal inside the roof space",
+  chimneyAccess: "Scaffold or access for chimney work",
+  solarPerKw: "Solar panels",
+};
+
+/** The unit for each price, shown beside its input (e.g. "£ [165] /m²"). Empty = a flat fee, no unit. */
+export const PRICE_UNITS: Record<string, string> = {
+  repairMin: "",
+  flatRatePerM2: "/m²",
+  flatMin: "",
+  gutterCleanFrom: "",
+  gutterReplacePerM: "/m",
+  fasciaPerM: "/m",
+  chimneyEach: "/chimney",
+  chimneyFullExtra: "/chimney",
+  chimneyAccess: "",
+  solarPerKw: "/kW",
 };
 
 /** One short sentence about the job details, for messages and the owner page. */

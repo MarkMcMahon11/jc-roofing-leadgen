@@ -4,7 +4,7 @@ import Image from "next/image";
 import type { Lead, Settings } from "@/lib/types";
 import type { Message } from "@/lib/store";
 import { fmtSlot } from "@/lib/dates";
-import { detailsText, PRICE_LABELS, SERVICE_INFO } from "@/lib/services";
+import { detailsText, PRICE_LABELS, PRICE_UNITS, SERVICE_INFO } from "@/lib/services";
 
 type LeadPhotoView = { path: string; url?: string; hint?: string | null; assessment?: { material: string; condition: string; affectedPercent: number | null; confidence: "low" | "medium" | "high"; caveat: string } | null };
 type LeadView = Omit<Lead, "photos"> & { photos?: LeadPhotoView[] };
@@ -86,16 +86,24 @@ export default function Admin() {
         <label className="block text-[0.8125rem] font-semibold">Your mobile (lead texts)<input className={`${input} mt-1 w-full`} inputMode="tel" value={s.ownerPhone} onChange={(e) => upd({ ownerPhone: e.target.value })} /></label>
         <label className="block text-[0.8125rem] font-semibold">Your email<input className={`${input} mt-1 w-full`} type="email" value={s.ownerEmail} onChange={(e) => upd({ ownerEmail: e.target.value })} /></label>
         <label className="block text-[0.8125rem] font-semibold">Areas we cover (postcode letters, comma separated, e.g. DG, CA)<input className={`${input} mt-1 w-full`} value={s.serviceAreaPrefixes.join(", ")} onChange={(e) => upd({ serviceAreaPrefixes: e.target.value.split(",").map((x) => x.trim().toUpperCase()).filter(Boolean) })} /></label>
-        <h3 className="font-semibold">Price per m² (fitted)</h3>
+        <h3 className="font-semibold">Materials <span className="font-normal text-mute">(price fitted, per m²)</span></h3>
         {s.materials.map((m, i) => (
           <label key={m.id} className="flex items-center justify-between gap-3">{m.label}
-            <input type="number" min={1} className={num} value={Number.isNaN(m.ratePerM2) ? "" : m.ratePerM2} onChange={(e) => upd({ materials: s.materials.map((x, j) => (j === i ? { ...x, ratePerM2: e.target.value === "" ? NaN : +e.target.value } : x)) })} />
+            <span className="flex items-center gap-1 text-sm text-mute">
+              <span aria-hidden>£</span>
+              <input type="number" min={1} className={num} value={Number.isNaN(m.ratePerM2) ? "" : m.ratePerM2} onChange={(e) => upd({ materials: s.materials.map((x, j) => (j === i ? { ...x, ratePerM2: e.target.value === "" ? NaN : +e.target.value } : x)) })} />
+              <span aria-hidden>/m²</span>
+            </span>
           </label>
         ))}
-        <h3 className="font-semibold">Other jobs (repairs, flat roofs, gutters, chimneys, solar)</h3>
+        <h3 className="font-semibold">Other jobs <span className="font-normal text-mute">(repairs, flat roofs, gutters, chimneys, solar)</span></h3>
         {(Object.keys(s.prices) as (keyof Settings["prices"])[]).map((k) => (
           <label key={k} className="flex items-center justify-between gap-3">{PRICE_LABELS[k] ?? k}
-            <input type="number" min={1} className={num} value={Number.isNaN(s.prices[k]) ? "" : s.prices[k]} onChange={(e) => upd({ prices: { ...s.prices, [k]: e.target.value === "" ? NaN : +e.target.value } })} />
+            <span className="flex items-center gap-1 text-sm text-mute">
+              <span aria-hidden>£</span>
+              <input type="number" min={1} className={num} value={Number.isNaN(s.prices[k]) ? "" : s.prices[k]} onChange={(e) => upd({ prices: { ...s.prices, [k]: e.target.value === "" ? NaN : +e.target.value } })} />
+              {PRICE_UNITS[k] && <span aria-hidden>{PRICE_UNITS[k]}</span>}
+            </span>
           </label>
         ))}
         <div className="flex items-center gap-3">
