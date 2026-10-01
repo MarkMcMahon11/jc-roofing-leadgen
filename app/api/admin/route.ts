@@ -91,8 +91,9 @@ async function putAdmin(req: Request) {
       const i = leads.findIndex((x) => x.id === b.deleteLead);
       return i >= 0 ? leads.splice(i, 1)[0] : null;
     });
+    if (!removed) return bad("That enquiry is already gone", 404);
     // Erase the customer's stored messages and photos too (they contain name, phone, email, address and images).
-    if (removed) await deleteLeadArtifacts(removed);
+    await deleteLeadArtifacts(removed);
   }
   return Response.json({ ok: true });
 }

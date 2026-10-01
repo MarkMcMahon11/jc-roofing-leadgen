@@ -78,7 +78,7 @@ export default function PhotoCapture({ leadId }: { leadId: string }) {
               </div>
             )}
             {i.status === "error" && (
-              <div className="absolute inset-0 grid place-items-center bg-brand-tint p-1 text-center text-[10px] leading-tight text-brand">{i.error ?? "Failed"}</div>
+              <div className="absolute inset-0 grid place-items-center bg-brand-tint p-1 text-center text-[11px] leading-tight text-brand">{i.error ?? "Failed"}</div>
             )}
           </div>
         ))}

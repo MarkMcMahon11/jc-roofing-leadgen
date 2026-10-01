@@ -18,6 +18,7 @@ export default function Admin() {
   const [data, setData] = useState<Data | null>(null);
   const [msg, setMsg] = useState("");
   const [saved, setSaved] = useState("");
+  const [brokenPhotos, setBrokenPhotos] = useState<Set<string>>(new Set());
 
   async function load(e?: React.FormEvent) {
     e?.preventDefault();
@@ -65,8 +66,9 @@ export default function Admin() {
 
   const s = data.settings;
   const upd = (patch: Partial<Settings>) => { setSaved(""); setData({ ...data, settings: { ...s, ...patch } }); };
-  const num = `${input} w-28`;
+  const num = `${input} w-20 sm:w-28`;
   const top = Math.max(data.funnel.start ?? 0, 1);
+  const markBroken = (path: string) => setBrokenPhotos((p) => (p.has(path) ? p : new Set(p).add(path)));
 
   return (
     <main className="mx-auto max-w-2xl space-y-6 p-4">
@@ -88,8 +90,8 @@ export default function Admin() {
         <label className="block text-[0.8125rem] font-semibold">Areas we cover (postcode letters, comma separated, e.g. DG, CA)<input className={`${input} mt-1 w-full`} value={s.serviceAreaPrefixes.join(", ")} onChange={(e) => upd({ serviceAreaPrefixes: e.target.value.split(",").map((x) => x.trim().toUpperCase()).filter(Boolean) })} /></label>
         <h3 className="font-semibold">Materials <span className="font-normal text-mute">(price fitted, per m²)</span></h3>
         {s.materials.map((m, i) => (
-          <label key={m.id} className="flex items-center justify-between gap-3">{m.label}
-            <span className="flex items-center gap-1 text-sm text-mute">
+          <label key={m.id} className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">{m.label}
+            <span className="flex shrink-0 items-center gap-1 text-sm text-mute">
               <span aria-hidden>£</span>
               <input type="number" min={1} className={num} value={Number.isNaN(m.ratePerM2) ? "" : m.ratePerM2} onChange={(e) => upd({ materials: s.materials.map((x, j) => (j === i ? { ...x, ratePerM2: e.target.value === "" ? NaN : +e.target.value } : x)) })} />
               <span aria-hidden>/m²</span>
@@ -98,8 +100,8 @@ export default function Admin() {
         ))}
         <h3 className="font-semibold">Other jobs <span className="font-normal text-mute">(repairs, flat roofs, gutters, chimneys, solar)</span></h3>
         {(Object.keys(s.prices) as (keyof Settings["prices"])[]).map((k) => (
-          <label key={k} className="flex items-center justify-between gap-3">{PRICE_LABELS[k] ?? k}
-            <span className="flex items-center gap-1 text-sm text-mute">
+          <label key={k} className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">{PRICE_LABELS[k] ?? k}
+            <span className="flex shrink-0 items-center gap-1 text-sm text-mute">
               <span aria-hidden>£</span>
               <input type="number" min={1} className={num} value={Number.isNaN(s.prices[k]) ? "" : s.prices[k]} onChange={(e) => upd({ prices: { ...s.prices, [k]: e.target.value === "" ? NaN : +e.target.value } })} />
               {PRICE_UNITS[k] && <span aria-hidden>{PRICE_UNITS[k]}</span>}
@@ -145,9 +147,9 @@ export default function Admin() {
                 <div className="mt-2 space-y-2">
                   <div className="flex flex-wrap gap-2">
                     {l.photos.map((p) => (
-                      p.url
+                      p.url && !brokenPhotos.has(p.path)
                         // eslint-disable-next-line @next/next/no-img-element -- signed, time-limited storage URL; next/image can't optimise this
-                        ? <a key={p.path} href={p.url} target="_blank" rel="noreferrer"><img src={p.url} alt="" className="h-20 w-20 rounded-lg border border-line object-cover" /></a>
+                        ? <a key={p.path} href={p.url} target="_blank" rel="noreferrer"><img src={p.url} alt="" onError={() => markBroken(p.path)} className="h-20 w-20 rounded-lg border border-line object-cover" /></a>
                         : <div key={p.path} className="grid h-20 w-20 place-items-center rounded-lg border border-line bg-cream text-center text-[0.6875rem] text-mute">Unavailable</div>
                     ))}
                   </div>
@@ -162,8 +164,8 @@ export default function Admin() {
               )}
               <div className="mt-2 flex flex-wrap items-center gap-3">
                 <label className="text-sm">Status <select className={`${input} py-1`} value={l.status} onChange={(e) => put({ leadStatus: { id: l.id, status: e.target.value } })}>{STATUSES.map((x) => <option key={x}>{x}</option>)}</select></label>
-                <button className="min-h-9 px-1 text-sm text-mute underline" onClick={() => exportLead(l)}>Export data</button>
-                <button className="min-h-9 px-1 text-sm text-mute underline" onClick={() => { if (confirm(`Delete ${l.name}'s enquiry and their messages permanently?`)) put({ deleteLead: l.id }); }}>Delete</button>
+                <button className="min-h-11 px-2 text-sm text-mute underline" onClick={() => exportLead(l)}>Export data</button>
+                <button className="min-h-11 px-2 text-sm text-mute underline" onClick={() => { if (confirm(`Delete ${l.name}'s enquiry and their messages permanently?`)) put({ deleteLead: l.id }); }}>Delete</button>
               </div>
             </li>
           ))}
