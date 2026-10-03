@@ -43,10 +43,13 @@ export async function deliver(phone: string, text: string, by: "bot" | "owner" =
       if (res === "failed" && templateName()) res = await sendTemplate(phone, text);
       if (res === "failed" && !windowOpen(c?.lastInboundAt) && !templateName()) res = "skipped";
     }
-    await mutateAssistant((d) => {
-      ensureContact(d, phone);
-      pushMsg(d, { phone, dir: "out", by, text: text.slice(0, 1500), delivery: res });
-    });
+    // a message WhatsApp couldn't carry is not a conversation turn: keep it out of the thread (and out of the AI's history)
+    if (res !== "skipped" || by === "owner") {
+      await mutateAssistant((d) => {
+        ensureContact(d, phone);
+        pushMsg(d, { phone, dir: "out", by, text: text.slice(0, 1500), delivery: res });
+      });
+    }
     return res;
   } catch (e) {
     console.error("[assistant] deliver failed:", (e as Error).message);
@@ -61,7 +64,8 @@ export async function notifyOwner(ctx: Ctx, text: string, urgent: boolean): Prom
   if (!urgent && !windowOpen(doc.ownerLastInboundAt)) return;
   const r = await deliver(ctx.ownerDigits, text, "bot");
   // WhatsApp can't carry it (his 24 h window is closed and no template is set up): an urgent alert still reaches him by text
-  if (urgent && (r === "skipped" || r === "failed") && ctx.settings.ownerPhone) await textOwner(ctx.settings.ownerPhone, text.replace(/^🚨\s*/, "").slice(0, 300));
+  const smsTo = ctx.settings.ownerPhone || `+${ctx.ownerDigits}`;
+  if (urgent && (r === "skipped" || r === "failed") && smsTo.length > 5) await textOwner(smsTo, text.replace(/^🚨\s*/, "").slice(0, 300));
 }
 
 type Rec = {
@@ -113,7 +117,7 @@ export async function handleInbound(m: WaInbound): Promise<void> {
     const t = Date.now();
     const inRecent = d.messages.filter((x) => x.phone === m.from && x.dir === "in" && t - Date.parse(x.at) < 10 * 60_000).length;
     const outRecent = d.messages.filter((x) => x.phone === m.from && x.dir === "out" && t - Date.parse(x.at) < HOUR).length;
-    const limited = role === "public" ? inRecent > 25 || outRecent > 15 : inRecent > 60;
+    const limited = role === "public" ? inRecent >= 25 || outRecent >= 15 : inRecent >= 60;
     // someone flooding us: not stored, no reply, no AI spend
     if (!limited) pushMsg(d, { phone: m.from, dir: "in", by: "contact", text: text || `[${m.type}]`, at: now, waId: m.waId });
     return { phone: m.from, name: c.name, history, blocked: !!c.blocked, botOn: c.bot, enabled: d.enabled, staffAuto: d.settings.staffAutoUpdates, limited };
@@ -170,8 +174,9 @@ async function handlePublic(ctx: Ctx, rec: Rec, text: string) {
   const who = rec.name ?? pretty(rec.phone);
   if (rec.blocked || !rec.enabled || !rec.botOn) {
     // the assistant is off, they asked us to stop, or Jamie has taken this conversation: stay quiet but make sure he sees it
-    const r = await addTask({ phone: rec.phone, who, role: "public", kind: "other", urgent: false, summary: `"${text.slice(0, 300)}"` });
-    if (r.fresh) await notifyOwner(ctx, ping(r.task), false);
+    const urgent = looksUrgent(text);
+    const r = await addTask({ phone: rec.phone, who, role: "public", kind: urgent ? "urgent" : "other", urgent, summary: `"${text.slice(0, 300)}"` });
+    if (r.fresh || r.becameUrgent) await notifyOwner(ctx, ping(r.task), r.task.urgent);
     return;
   }
   const useAi = await takeAi("public");

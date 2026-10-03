@@ -18,7 +18,7 @@ import { obj, runAgent, untrusted, type Turn } from "./agent";
 import { applyFleet, setLeadStatus } from "./apply";
 import type { Ctx } from "./ctx";
 import { itemLine } from "./staff";
-import { pretty, toDigits } from "./phone";
+import { pretty, toDigits, validWa } from "./phone";
 import type { AssistantDoc, Msg, OwnerAction, Pending, Task } from "./types";
 
 /** The numbered list Jamie sees: urgent first, then newest. "done 2" always refers to this order. */
@@ -163,10 +163,15 @@ export async function execute(ctx: Ctx, io: Io, a: OwnerAction): Promise<string>
       const t = await io.claimExpense(a.taskId);
       if (!t?.expense) return "Couldn't: that claim isn't waiting for approval any more.";
       const e = t.expense;
-      const r = await applyFleet((d) => {
+      let r: Awaited<ReturnType<typeof applyFleet>>;
+      try {
+        r = await applyFleet((d) => {
         addExpense(d, { date: ctx.today, category: "other", amount: e.amount, description: `${t.who}: ${e.description}`, ...(e.vehicleId ? { vehicleId: e.vehicleId } : {}), method: "cash" });
         log(d, "expense", `${who} approved ${t.who}'s expense`, "/admin/costs");
-      });
+        });
+      } catch (err) {
+        r = { ok: false, error: (err as Error).message };
+      }
       if (!r.ok) {
         await io.reopenTask(a.taskId); // nothing was recorded, so it is still waiting
         return `Couldn't: ${r.error}`;
@@ -183,7 +188,7 @@ export async function execute(ctx: Ctx, io: Io, a: OwnerAction): Promise<string>
       for (const id of a.crewIds) {
         const c = ctx.fleet.crew.find((x) => x.id === id);
         const phone = toDigits(c?.phone);
-        if (!c || !phone) { out.push(`${c ? first(c.name) : "?"}: no phone number`); continue; }
+        if (!c || !validWa(phone)) { out.push(`${c ? first(c.name) : "?"}: no usable WhatsApp number`); continue; }
         const d = await io.sendTo(phone, a.text, "bot");
         out.push(`${first(c.name)}: ${d === "sent" || d === "demo" ? "sent" : "not delivered (they need to message us, or a reminder template must be set up)"}`);
       }

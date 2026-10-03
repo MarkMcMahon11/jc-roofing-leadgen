@@ -92,7 +92,7 @@ const clean = (s: string | null | undefined, max = 200) => (s ?? "").replace(/\s
 
 const FALLBACK = "Thanks, I've passed that to Jamie and he'll come back to you.";
 const MONEY = /[£$€￡]\s*\d|\d\s*[£$€￡]|\d[\d,.]*\s*(pounds|quid|gbp|usd|dollars|euros?)\b|\b\d+\s*%/i;
-const COMMIT = /\b(is|has been|have been|been|now|all)\s+(booked|confirmed|scheduled|arranged)\b|\b(i|we)('ve| have)?\s+(booked|confirmed|scheduled)\b|\bdiscount\b|\brefund\b|\bguarantee\b/i;
+const COMMIT = /\b(is|has been|have been|been|now|all)\s+(booked|confirmed|scheduled|arranged)\b|\b(i|we)('ve| have)?\s+(booked|confirmed|scheduled|arranged)\b|\bdiscount\b|\brefund\b|\bguarantee\b/i;
 const DOMAIN = /\b(?:[a-z0-9-]+\.)+(?:com|co\.uk|uk|net|org|io|ly|me|link|app|xyz|info|biz|gl|cc|to|tv|co|shop|online|site|top|click)\b(?:\/\S*)?/gi;
 const EMAIL = /[\w.+-]+@[\w-]+(?:\.[\w-]+)+/g;
 
@@ -108,11 +108,11 @@ export function sanitiseReply(text: string): string {
   };
   let out = text
     .replace(EMAIL, (m) => (m.toLowerCase() === ownEmail ? m : ""))
-    .replace(/https?:\/\/[^\s)]+|www\.[^\s)]+/gi, (u) => {
+    .replace(/(https?:\/\/[^\s)]*[^\s).,;:!?'"]|www\.[^\s)]*[^\s).,;:!?'"])([.,;:!?'"]*)/gi, (_m, u: string, tail: string) => {
       try {
-        return isOurs(new URL(u.startsWith("http") ? u : `https://${u}`).hostname) ? u : "";
+        return isOurs(new URL(u.startsWith("http") ? u : `https://${u}`).hostname) ? u + tail : tail;
       } catch {
-        return "";
+        return tail;
       }
     })
     .replace(DOMAIN, (d) => (isOurs(d.split("/")[0]) || d.toLowerCase() === ownEmail.split("@")[1] ? d : ""))
@@ -163,7 +163,10 @@ export async function aiPublic(ctx: Ctx, history: Msg[], text: string): Promise<
 }
 
 /** Only a message that IS an opt-out ("STOP", "unsubscribe", "please stop messaging me") counts. "Stop by on Friday" does not. */
-export const isStop = (t: string) => /^\s*(please\s+)?(stop|unsubscribe|opt[ -]?out|stop (messaging|texting|contacting) me|(don'?t|do not) (message|text|contact) me( again)?)\s*[.!]*\s*$/i.test(t);
+export const isStop = (raw: string) => {
+  const t = raw.replace(/[\u2018\u2019\u02BC]/g, "'");
+  return /^\s*(please\s+)?(stop|unsubscribe|opt[ -]?out|stop (messaging|texting|contacting|calling) me|(don'?t|do not) (message|text|contact|call) me( again)?)(\s+please)?\s*[.!]*\s*$/i.test(t);
+};
 
 const URGENT = /(\bleak(s|ing)?\b|\bdrip(s|ping)?\b|water (is )?(coming|pouring|running|dripping|through)|\bflood(ed|ing)?\b|storm damage|\bstorm\b(?!\s*proof)|blown (off|down)|(slates?|tiles?|ridge|chimney)[^.]{0,30}(off|down|fallen|missing|come off|collaps)|tree (has )?(fallen )?(through|on|into) (my|the) roof|hole in (my|the) roof|ceiling[^.]{0,40}(wet|water|leak|drip|sag|collaps)|(wet|water|drip|leak)[^.]{0,40}ceiling|collaps|dangerous|emergency|\burgent(ly)?\b)/i;
 const NOT_URGENT = /(not (an? )?(urgent|emergency)|non[- ]?urgent|no rush|no hurry|whenever|not in a hurry)/i;

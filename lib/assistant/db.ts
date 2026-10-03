@@ -31,7 +31,7 @@ function trim(d: AssistantDoc) {
   }
   if (d.contacts.length > CAPS.contacts) {
     const busy = new Set(d.tasks.filter((t) => t.status === "open").map((t) => t.phone));
-    const idle = d.contacts.filter((c) => c.kind !== "staff" && !busy.has(c.phone)).sort((a, b) => ((a.lastInboundAt ?? a.createdAt) < (b.lastInboundAt ?? b.createdAt) ? -1 : 1));
+    const idle = d.contacts.filter((c) => c.kind !== "staff" && !c.blocked && !busy.has(c.phone)).sort((a, b) => ((a.lastInboundAt ?? a.createdAt) < (b.lastInboundAt ?? b.createdAt) ? -1 : 1));
     for (const c of idle.slice(0, d.contacts.length - CAPS.contacts)) {
       d.contacts.splice(d.contacts.indexOf(c), 1);
       d.messages = d.messages.filter((m) => m.phone !== c.phone);
