@@ -80,7 +80,7 @@ export function BackgroundButton({ bg, onChange }: { bg: BackgroundMeta; onChang
 
   return (
     <>
-      <button type="button" onClick={() => setOpen(true)} title="Change the background picture" className="btn-silver inline-flex h-9 items-center gap-1.5 rounded-lg border-[1.5px] border-ctrl px-2.5 text-sm font-semibold text-night">
+      <button type="button" onClick={() => setOpen(true)} title="Change the background picture" className="btn-silver inline-flex h-10 items-center gap-1.5 rounded-lg border-[1.5px] border-ctrl px-2.5 text-sm font-semibold text-night">
         <ImageIcon size={16} aria-hidden />
         <span className="hidden sm:inline">Background</span>
         <span className="sr-only sm:hidden">Change background</span>
@@ -109,7 +109,7 @@ export function BackgroundButton({ bg, onChange }: { bg: BackgroundMeta; onChang
               <span>Picture strength</span>
               <span className="text-steel">{strength}%</span>
             </label>
-            <input id="bg-strength" type="range" min={15} max={100} step={1} value={strength} onChange={(e) => slide(Number(e.target.value))} className="w-full accent-brand" />
+            <input id="bg-strength" type="range" min={15} max={100} step={1} value={strength} onChange={(e) => slide(Number(e.target.value))} className="h-6 w-full accent-brand" />
             <p className="mt-1 text-xs text-steel">Lower keeps the text easy to read. Higher shows more of the picture. Any size or shape of picture works; we shrink it for you.</p>
           </div>
           {err && <p role="alert" className="rounded-lg border border-brand bg-brand-tint p-2.5 text-sm text-brand">{err}</p>}

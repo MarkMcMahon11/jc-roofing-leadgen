@@ -54,6 +54,7 @@ const crew = z.object({
   cscsExpiry: optDate,
   heightExpiry: optDate,
   firstAidExpiry: optDate,
+  whatsappOk: z.boolean().optional(),
   notes: optShort(500),
 });
 

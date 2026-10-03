@@ -56,6 +56,7 @@ export type CrewMember = {
   cscsExpiry?: string;
   heightExpiry?: string; // working-at-height training
   firstAidExpiry?: string;
+  whatsappOk?: boolean; // agreed to get work reminders on WhatsApp
   notes?: string;
 };
 

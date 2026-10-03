@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button, Field, FormError, Input, Modal, Select, Textarea } from "./ui";
 import { useNextStep } from "./Guide";
+import { toDigits, validWa } from "@/lib/assistant/phone";
 import { addCrew, crewHasHistory, deleteCrew, updateCrew } from "@/lib/ops/actions";
 import { today } from "@/lib/ops/format";
 import { crewRoles } from "@/lib/ops/labels";
@@ -16,6 +17,7 @@ export function CrewForm({ onClose, member }: { onClose: () => void; member?: Cr
   const router = useRouter();
   const nextStep = useNextStep();
   const [drives, setDrives] = useState(member?.drives ?? false);
+  const [wa, setWa] = useState(member?.whatsappOk ?? false);
   const [error, setError] = useState("");
   const m = member;
 
@@ -24,6 +26,7 @@ export function CrewForm({ onClose, member }: { onClose: () => void; member?: Cr
     const f = new FormData(e.currentTarget);
     const s = (k: string) => String(f.get(k) ?? "").trim();
     if (!s("name")) return setError("Enter their name.");
+    if (s("phone") && wa && !validWa(toDigits(s("phone")))) return setError("That mobile number doesn't look right for WhatsApp. Use the full number, like 07700 900123.");
     const pts = s("licencePoints");
     if (pts !== "" && (!Number.isInteger(Number(pts)) || Number(pts) < 0 || Number(pts) > 36)) return setError("Licence points should be a whole number from 0 to 36.");
     if (drives && !s("licenceExpiry")) return setError("Add when their driving licence next needs checking, or untick “Drives company vans”.");
@@ -41,6 +44,7 @@ export function CrewForm({ onClose, member }: { onClose: () => void; member?: Cr
       ...(s("cscsExpiry") ? { cscsExpiry: s("cscsExpiry") } : {}),
       ...(s("heightExpiry") ? { heightExpiry: s("heightExpiry") } : {}),
       ...(s("firstAidExpiry") ? { firstAidExpiry: s("firstAidExpiry") } : {}),
+      ...(wa && s("phone") ? { whatsappOk: true } : {}),
       ...(s("notes") ? { notes: s("notes") } : {}),
     };
     if (member) {
@@ -95,6 +99,13 @@ export function CrewForm({ onClose, member }: { onClose: () => void; member?: Cr
         <Field label="CSCS card expires"><Input name="cscsExpiry" type="date" defaultValue={m?.cscsExpiry} /></Field>
         <Field label="Working at height training expires"><Input name="heightExpiry" type="date" defaultValue={m?.heightExpiry} /></Field>
         <Field label="First aid certificate expires"><Input name="firstAidExpiry" type="date" defaultValue={m?.firstAidExpiry} /></Field>
+        <label className="flex min-h-11 cursor-pointer items-start gap-3 rounded-xl border-[1.5px] border-ctrl bg-white px-3 py-2 text-sm sm:col-span-2">
+          <input type="checkbox" checked={wa} onChange={(e) => setWa(e.target.checked)} className="mt-0.5 h-4 w-4 shrink-0 accent-[#b11017]" />
+          <span>
+            <b>WhatsApp reminders</b>
+            <span className="block text-xs text-steel">They have agreed to get their daily jobs on WhatsApp from the company assistant. They can message it any time either way, and say STOP to opt out. Needs a mobile number above.</span>
+          </span>
+        </label>
         <Field label="Notes" className="sm:col-span-2"><Textarea name="notes" defaultValue={m?.notes} maxLength={500} /></Field>
         {member && (
           <label className="flex min-h-11 cursor-pointer items-center gap-3 text-sm sm:col-span-2">

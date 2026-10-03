@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Activity, CalendarClock, CalendarDays, ExternalLink, Inbox, LayoutDashboard, LogOut, MapPinned, Menu, MessageSquare, PoundSterling, Printer, ShieldAlert, Truck, Users, Wallet, Wrench, X } from "lucide-react";
+import { Activity, CalendarClock, CalendarDays, ExternalLink, Inbox, LayoutDashboard, LogOut, MapPinned, Menu, MessageSquare, MessagesSquare, PoundSterling, Printer, ShieldAlert, Truck, Users, Wallet, Wrench, X } from "lucide-react";
 import { GuideProvider, GuideToggle, PageGuide } from "./Guide";
 import { BackgroundButton, BackgroundLayer } from "./Background";
 import { Button } from "./ui";
@@ -23,6 +23,7 @@ export function Shell({ children, ownerName, background }: { children: React.Rea
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [bg, setBg] = useState(background);
+  const [wa, setWa] = useState({ open: 0, urgent: 0 });
   const menuBtn = useRef<HTMLButtonElement>(null);
   const drawer = useRef<HTMLDivElement>(null);
 
@@ -48,6 +49,23 @@ export function Shell({ children, ownerName, background }: { children: React.Rea
     return () => document.removeEventListener("keydown", onKey);
   }, [open]);
 
+  // the menu badge: how many WhatsApp messages are waiting for Jamie (checked each minute while the tab is showing)
+  useEffect(() => {
+    let live = true;
+    const load = () => {
+      if (document.hidden) return;
+      fetch("/api/admin/assistant?brief=1", { cache: "no-store" })
+        .then((r) => (r.ok ? r.json() : null))
+        .then((j) => live && j && setWa({ open: Number(j.open) || 0, urgent: Number(j.urgent) || 0 }))
+        .catch(() => {});
+    };
+    load();
+    const t = setInterval(load, 60_000);
+    document.addEventListener("visibilitychange", load);
+    window.addEventListener("assistant:changed", load);
+    return () => { live = false; clearInterval(t); document.removeEventListener("visibilitychange", load); window.removeEventListener("assistant:changed", load); };
+  }, [path]);
+
   const counts = useMemo(() => {
     const alerts = buildAlerts(db, biz.leads);
     return {
@@ -67,6 +85,7 @@ export function Shell({ children, ownerName, background }: { children: React.Rea
       items: [
         { href: "/admin/leads", icon: Inbox, label: "Leads and quotes", badge: counts.newLeads, tone: "red" },
         { href: "/admin/jobs", icon: CalendarDays, label: "Jobs and schedule", badge: counts.todayVisits, tone: "amber" },
+        { href: "/admin/assistant", icon: MessagesSquare, label: "WhatsApp assistant", badge: wa.open, tone: wa.urgent ? "red" : "amber" },
         { href: "/admin/map", icon: MapPinned, label: "Project map" },
       ],
     },
@@ -91,7 +110,7 @@ export function Shell({ children, ownerName, background }: { children: React.Rea
       title: "Settings",
       items: [
         { href: "/admin/pricing", icon: PoundSterling, label: "Quote prices" },
-        { href: "/admin/messages", icon: MessageSquare, label: "Messages" },
+        { href: "/admin/messages", icon: MessageSquare, label: "Texts and emails" },
         { href: "/admin/activity", icon: Activity, label: "Activity log" },
       ],
     },

@@ -84,6 +84,33 @@ Messages, Quote prices and an Activity log.
   from jobs added with a postcode. Van positions are SAMPLES until a tracker/telematics feed is connected.
 - Set `SESSION_SECRET` (32+ random characters) on the live site; otherwise the cookie key is derived from the password.
 
+## WhatsApp assistant (`/admin/assistant`)
+One WhatsApp Business number that customers, suppliers, the team and Jamie all message. Who is talking is decided only by the
+sender's verified number (Meta signs every webhook call; unsigned calls are refused).
+
+- **Customers and suppliers**: the assistant is a front desk. It sees only a public facts sheet (no leads, prices, staff or costs), never
+  agrees a price or date, collects name / address / postcode / job / when suits, and turns it into a task for Jamie (urgent ones ping him at once).
+  Replies are filtered (no foreign links, no money amounts). STOP opts the person out.
+- **Team**: a recognised employee (their number is in Team) can ask for their own schedule, job details, van and deadlines, say a job has
+  started / finished or give a van's mileage (these update the system straight away; switch off under Set up to route them via Jamie),
+  and raise issues (van fault, safety, materials, late/sick, time off, expense). Nothing is approved by raising it.
+  Daily WhatsApp reminders go only to people with "WhatsApp reminders" ticked on their Team record.
+- **Jamie** (number from `OWNER_WHATSAPP`, else "Your mobile" under Quote prices): asks anything ("what's on tomorrow", "who's free Friday",
+  "new leads?") and gives instructions in plain English ("book an inspection for Mrs Smith Thursday 10am with Callum and the Transit and tell her",
+  "remind the lads about the toolbox talk", "log £62 diesel on the Transit"). Every change is shown back as a numbered list and only happens
+  when he replies YES; NO cancels; a pending list expires after 2 hours. Without an AI key he gets simple commands (today, tomorrow, week, leads, tasks, alerts, vans, costs, "done 2").
+- The dashboard page shows what needs doing, every conversation (take over / hand back / stop / delete), a "Try it" simulator that sends nothing
+  to any phone, and a setup checklist. A morning cron (`vercel.json`, 06:00 UTC) sends Jamie a briefing and each opted-in team member their day.
+- Everything goes through the same validated write path as the dashboard, so a bad message can't write bad data.
+- Conversations and finished tasks are deleted after 90 days.
+
+Environment: `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_APP_SECRET`, `WHATSAPP_VERIFY_TOKEN` (any long random string you also paste into Meta),
+`OWNER_WHATSAPP`, `ANTHROPIC_API_KEY`, `CRON_SECRET`, optional `WHATSAPP_TEMPLATE_NAME` / `WHATSAPP_TEMPLATE_LANG` (an approved utility template
+with ONE variable, used for reminders to people who haven't messaged in 24 h), `ASSISTANT_MODEL` (default `claude-sonnet-5-5`),
+`ASSISTANT_DAILY_AI_CAP` (default 300 AI-answered messages a day), `SITE_URL`. In Meta's WhatsApp settings set the webhook Callback URL to
+`https://<your-site>/api/whatsapp/webhook` and subscribe to **messages**. Free-form WhatsApp replies only work within 24 h of the person's last
+message; anything else needs an approved template. With none of this set the assistant runs in demo mode (dashboard only).
+
 ## Testing
 `scripts/agent-server.sh <port>` starts an isolated production server (own data folder, fake address data,
 admin password `testpw`). Run `npm run build` first. Stop it with `kill $(lsof -tiTCP:<port> -sTCP:LISTEN)`.

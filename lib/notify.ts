@@ -67,6 +67,9 @@ async function email(to: string, subject: string, text: string, audience: Messag
 }
 
 /** Short, plain-character text for the owner (keeps it to one or two SMS segments). */
+/** A plain text to the owner's mobile (used when WhatsApp can't carry an urgent alert). Previewed if texts aren't switched on. */
+export const textOwner = (to: string, body: string) => sms(to, body, "owner", "assistant");
+
 export function ownerSummary(l: Lead, s: Settings) {
   const flag = `${l.urgency === "urgent" ? "URGENT " : ""}${l.waitlist ? "WAITLIST " : ""}`;
   return `${flag}${l.score.toUpperCase()}: ${l.name} ${l.phone}. ${shortAddress(l)}. ${jobLine(l, s)}, ${range(l)}. ${TIMING[l.urgency]}.`;

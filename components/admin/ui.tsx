@@ -37,10 +37,10 @@ export function Card({ children, className = "", href }: { children: React.React
 
 export function CardHeader({ title, sub, action }: { title: React.ReactNode; sub?: React.ReactNode; action?: React.ReactNode }) {
   return (
-    <div className="flex items-start justify-between gap-3 rounded-t-2xl border-b border-silver bg-gradient-to-b from-white/60 to-transparent px-5 py-4">
-      <div className="min-w-0">
-        <h2 className="font-semibold text-night">{title}</h2>
-        {sub && <p className="mt-0.5 text-xs text-steel">{sub}</p>}
+    <div className="flex flex-wrap items-start justify-between gap-3 rounded-t-2xl border-b border-silver bg-gradient-to-b from-white/60 to-transparent px-5 py-4">
+      <div className="min-w-0 max-w-full">
+        <h2 className="break-words font-semibold text-night [overflow-wrap:anywhere]">{title}</h2>
+        {sub && <p className="mt-0.5 break-words text-xs text-steel [overflow-wrap:anywhere]">{sub}</p>}
       </div>
       {action}
     </div>
@@ -65,9 +65,9 @@ export function Stat({ label, value, sub, href, tone, icon }: { label: React.Rea
 export function PageHeader({ title, sub, actions }: { title: string; sub?: React.ReactNode; actions?: React.ReactNode }) {
   return (
     <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-      <div className="min-w-0">
+      <div className="glass -mx-2 min-w-0 rounded-2xl px-3 py-2 sm:max-w-[70%]">
         <h1 className="text-2xl font-bold tracking-tight text-night">{title}</h1>
-        {sub && <p className="mt-1 text-sm text-steel">{sub}</p>}
+        {sub && <p className="mt-1 text-sm text-night/75">{sub}</p>}
       </div>
       {actions && <div className="flex flex-wrap gap-2 print:hidden">{actions}</div>}
     </div>
