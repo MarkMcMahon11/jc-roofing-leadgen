@@ -15,7 +15,7 @@ import { useOps, type SyncState } from "@/lib/ops/store";
 type Item = { href: string; icon: React.ComponentType<{ size?: number; className?: string; "aria-hidden"?: boolean }>; label: string; badge?: number; tone?: "red" | "amber" };
 
 export function Shell({ children, ownerName }: { children: React.ReactNode; ownerName: string }) {
-  const { db, biz, sync, notice, clearNotice, resetFleet } = useOps();
+  const { db, biz, sync, notice, clearNotice, resetFleet, day } = useOps();
   const path = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -54,7 +54,8 @@ export function Shell({ children, ownerName }: { children: React.ReactNode; owne
       fines: db.fines.filter((f) => f.status === "to_name").length,
       docs: alerts.filter((a) => (a.group === "vans" || a.group === "crew" || a.group === "service") && a.severity !== "low").length,
     };
-  }, [db, biz.leads]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- `day` makes the badges roll over at midnight
+  }, [db, biz.leads, day]);
 
   const groups: { title?: string; items: Item[] }[] = [
     { items: [{ href: "/admin", icon: LayoutDashboard, label: "Dashboard" }] },
@@ -95,11 +96,6 @@ export function Shell({ children, ownerName }: { children: React.ReactNode; owne
 
   const isActive = (href: string) => (href === "/admin" ? path === "/admin" : path.startsWith(href));
 
-  // each section gets its own browser-tab title
-  const here = groups.flatMap((g) => g.items).find((n) => isActive(n.href))?.label ?? "Dashboard";
-  useEffect(() => {
-    document.title = `${here} · JC Roofing`;
-  }, [here]);
 
   async function signOut() {
     await fetch("/api/admin/logout", { method: "POST" }).catch(() => {});
@@ -122,7 +118,7 @@ export function Shell({ children, ownerName }: { children: React.ReactNode; owne
         </Link>
         <div className="mt-1 text-[11px] text-mute">Owner dashboard · Dumfries</div>
       </div>
-      <nav aria-label="Dashboard sections" className={`flex-1 space-y-4 px-3 py-2 ${scrollAll ? "" : "overflow-y-auto"}`}>
+      <nav aria-label="Dashboard sections" className={`flex-1 space-y-4 px-3 py-2 lg:space-y-3 ${scrollAll ? "" : "overflow-y-auto"}`}>
         {groups.map((g, gi) => (
           <div key={gi}>
             {g.title && <div className="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wider text-mute">{g.title}</div>}
@@ -135,7 +131,7 @@ export function Shell({ children, ownerName }: { children: React.ReactNode; owne
                     href={n.href}
                     onClick={() => setOpen(false)}
                     aria-current={active ? "page" : undefined}
-                    className={`group relative flex min-h-10 items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${active ? "bg-brand-tint text-brand" : "text-ink hover:bg-cream"}`}
+                    className={`group relative flex min-h-10 items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors lg:min-h-9 lg:py-1.5 ${active ? "bg-brand-tint text-brand" : "text-ink hover:bg-cream"}`}
                   >
                     {active && <span aria-hidden className="absolute inset-y-1.5 left-0 w-1 rounded-r bg-brand" />}
                     <n.icon size={18} aria-hidden className={active ? "text-brand" : "text-mute group-hover:text-ink"} />
@@ -167,13 +163,13 @@ export function Shell({ children, ownerName }: { children: React.ReactNode; owne
 
   return (
     <GuideProvider>
-      <div className="min-h-screen bg-cream transition-[padding] duration-200 lg:pl-64 print:pl-0">
+      <div className="admin-root min-h-screen bg-cream transition-[padding] duration-200 lg:pl-64 print:pl-0">
         <a href="#main" className="sr-only z-[2000] rounded-lg bg-white px-4 py-2 font-semibold text-brand focus:not-sr-only focus:fixed focus:left-3 focus:top-3">Skip to content</a>
         <aside className="fixed inset-y-0 left-0 hidden w-64 border-r border-sand lg:block print:hidden">{renderSidebar(false)}</aside>
 
         {open && (
           <div ref={drawer} id="mobile-menu" role="dialog" aria-modal="true" aria-label="Menu" className="fixed inset-0 z-[1250] lg:hidden">
-            <div className="absolute inset-0 bg-ink/50" onClick={() => setOpen(false)} />
+            <div className="absolute inset-0 bg-ink/50" onClick={() => { setOpen(false); menuBtn.current?.focus(); }} />
             <aside className="absolute inset-y-0 left-0 w-72 max-w-[85%] shadow-xl">{renderSidebar(true)}</aside>
             <button type="button" onClick={() => { setOpen(false); menuBtn.current?.focus(); }} className="absolute right-3 top-3 grid h-11 w-11 place-items-center rounded-full bg-white text-ink shadow" aria-label="Close menu">
               <X size={20} />
@@ -182,7 +178,7 @@ export function Shell({ children, ownerName }: { children: React.ReactNode; owne
         )}
 
         <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-sand bg-white/90 px-4 backdrop-blur sm:px-6 print:hidden">
-          <button ref={menuBtn} type="button" onClick={() => setOpen(true)} aria-expanded={open} aria-controls="mobile-menu" className="-ml-2 grid h-11 w-11 place-items-center rounded-lg text-ink hover:bg-cream lg:hidden" aria-label="Open menu">
+          <button ref={menuBtn} type="button" onClick={() => setOpen(true)} aria-expanded={open} aria-controls={open ? "mobile-menu" : undefined} className="-ml-2 grid h-11 w-11 place-items-center rounded-lg text-ink hover:bg-cream lg:hidden" aria-label="Open menu">
             <Menu size={20} />
           </button>
           <div className="lg:hidden">

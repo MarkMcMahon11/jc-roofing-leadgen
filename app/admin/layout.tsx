@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Owner page – JC Roofing",
+  title: { template: "%s · JC Roofing", default: "Dashboard · JC Roofing" },
   robots: { index: false, follow: false },
 };
 

@@ -54,6 +54,7 @@ export function OpsProvider({ children }: { children: React.ReactNode }) {
   const [notice, setNotice] = useState("");
   const [day, setDay] = useState(today());
   const bizText = useRef("");
+  const bizSetAt = useRef(0);
   const dbRef = useRef<FleetDB | null>(null);
   const pending = useRef(new Map<string, Change>());
   const flushing = useRef(false);
@@ -71,6 +72,8 @@ export function OpsProvider({ children }: { children: React.ReactNode }) {
       if (!res.ok) throw new Error("load failed");
       const body = (await res.json()) as { unchanged?: boolean; doc?: FleetDB };
       if (body.unchanged || !body.doc) return;
+      // a slow poll that was already in flight when we saved must not put an older copy back on screen
+      if (!force && body.doc.rev < rev.current) return;
       rev.current = body.doc.rev;
       commit(sortDB(applyPending(body.doc, pending.current.values())));
     },
@@ -82,9 +85,11 @@ export function OpsProvider({ children }: { children: React.ReactNode }) {
     if (res.status === 401) return toLogin();
     if (!res.ok) throw new Error("load failed");
     const text = await res.text();
-    if (text !== bizText.current) {
-      // only re-render when something actually changed
+    // photo links are re-signed on every request, so compare without them; but refresh them before they expire (they last an hour)
+    const sameData = text.replace(/"url":"[^"]*"/g, "") === bizText.current.replace(/"url":"[^"]*"/g, "");
+    if (!sameData || Date.now() - bizSetAt.current > 25 * 60_000) {
       bizText.current = text;
+      bizSetAt.current = Date.now();
       setBiz(JSON.parse(text) as Biz);
     }
   }, []);

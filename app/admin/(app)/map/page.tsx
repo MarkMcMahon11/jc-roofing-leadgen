@@ -102,12 +102,12 @@ function ProjectMap() {
     if (showProjects)
       for (const p of visiblePins) {
         const sel = selected === `p:${p.key}`;
-        want.set(`p:${p.key}`, { lat: p.lat, lng: p.lng, z: sel ? 900 : 100, html: `<div class="map-pin${sel ? " is-sel" : ""}" style="--c:${STAGES[p.stage].color}"><span class="dot"></span>${esc(surname(p.name))}</div>` });
+        want.set(`p:${p.key}`, { lat: p.lat, lng: p.lng, z: sel ? 900 : 100, html: `<div class="map-pin${sel ? " is-sel" : ""}" style="--c:${STAGES[p.stage].color};--ct:${STAGES[p.stage].text}"><span class="dot"></span>${esc(surname(p.name))}</div>` });
       }
     if (showVans)
       for (const { v, p } of vans) {
         const sel = selected === `v:${v.id}`;
-        want.set(`v:${v.id}`, { lat: p.lat, lng: p.lng, z: sel ? 950 : 500, html: `<div class="map-pin van${sel ? " is-sel" : ""}" style="--c:${VAN_COLOR[p.kind]}">${esc(v.reg)}</div>` });
+        want.set(`v:${v.id}`, { lat: p.lat, lng: p.lng, z: sel ? 950 : 500, html: `<div class="map-pin van${sel ? " is-sel" : ""}" style="--c:${VAN_COLOR[p.kind]};--ct:${VAN_TEXT[p.kind]}">${esc(v.reg)}</div>` });
       }
     for (const [key, w] of want) {
       let m = markers.current.get(key);
@@ -139,7 +139,16 @@ function ProjectMap() {
     const map = mapRef.current;
     if (!map || !ready || !selected) return;
     const pos = selected.startsWith("p:") ? pins.find((p) => `p:${p.key}` === selected) : vans.find(({ v }) => `v:${v.id}` === selected)?.p;
-    if (pos) map.flyTo([pos.lat, pos.lng], Math.max(map.getZoom(), 12), { duration: 0.8 });
+    if (pos) {
+      const zoom = Math.max(map.getZoom(), 12);
+      // on phones the info card sits over the bottom of the map: aim a little low so the pin stays in view above it
+      const size = map.getSize();
+      const lower = size.x < 640 ? size.y * 0.22 : 0;
+      const centre = map.unproject(map.project([pos.lat, pos.lng], zoom).add([0, lower]), zoom);
+      map.flyTo(centre, zoom, { duration: 0.8 });
+      const r = mapEl.current?.getBoundingClientRect();
+      if (r && (r.top < 56 || r.bottom > window.innerHeight)) mapEl.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- only when the selection changes
   }, [selected, ready]);
 

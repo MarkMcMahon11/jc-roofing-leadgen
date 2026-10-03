@@ -37,7 +37,7 @@ export const PAGE_GUIDES: Record<string, Guide> = {
     ],
   },
   "/admin/vans": {
-    title: "Vans: your four vehicles",
+    title: "Vans",
     steps: [
       "“Add van” for a new vehicle: number plate, make, model, mileage and the MOT, tax and insurance dates.",
       "Click a van to see its deadlines, servicing, jobs, penalty notices and running costs.",

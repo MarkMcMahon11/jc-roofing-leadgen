@@ -11,7 +11,7 @@ import { VanForm } from "@/components/admin/VanForm";
 import { setVanStatus, updateVan } from "@/lib/ops/actions";
 import { daysBetween, fmtDate, fmtDay, fmtDateTime, gbp, num, pct, relDays, sum, today } from "@/lib/ops/format";
 import { expenseCat, fineStatus, jobStatus, maintStatus, maintType, vehicleStatus } from "@/lib/ops/labels";
-import { vanUtilisation, vehicleCosts } from "@/lib/ops/selectors";
+import { SERVICE_MILES_WARN, vanUtilisation, vehicleCosts } from "@/lib/ops/selectors";
 import { useOps } from "@/lib/ops/store";
 import type { ExpenseCategory } from "@/lib/ops/types";
 
@@ -72,7 +72,7 @@ export default function VanPage() {
       {v.notes && <div className="rounded-xl border border-gold/70 bg-amber-50 px-4 py-3 text-sm">{v.notes}</div>}
 
       <div className="grid grid-cols-2 gap-3 @3xl:grid-cols-4">
-        <Stat label="Mileage" value={`${num(v.mileage)} mi`} tone={left < 0 ? "bad" : left < 1000 ? "warn" : undefined} sub={left < 0 ? `Service overdue ${num(-left)} mi` : `Service in ${num(left)} mi`} />
+        <Stat label="Mileage" value={`${num(v.mileage)} mi`} tone={left < 0 ? "bad" : left < SERVICE_MILES_WARN ? "warn" : undefined} sub={left < 0 ? `Service overdue ${num(-left)} mi` : `Service in ${num(left)} mi`} />
         <Stat label="Costs, 90 days" value={gbp(c90.total)} sub={`${gbp(c90.fuel)} of it fuel`} />
         <Stat label="Booked, next 2 weeks" value={v.status === "off_road" ? "—" : pct(util)} sub="Working days with a job or visit" />
         <Stat label="Worth about" value={gbp(v.value)} sub={`Bought for ${gbp(v.purchasePrice)}`} />
@@ -80,7 +80,7 @@ export default function VanPage() {
 
       <div className="grid gap-4 @3xl:grid-cols-3">
         <Card>
-          <CardHeader title="Deadlines" action={<button type="button" onClick={() => setEdit(true)} className="inline-flex min-h-9 items-center gap-1 text-xs font-medium text-mute hover:text-ink"><Pencil size={12} /> Update</button>} />
+          <CardHeader title="Deadlines" action={<button type="button" onClick={() => setEdit(true)} className="inline-flex min-h-10 items-center gap-1 text-xs font-medium text-mute hover:text-ink"><Pencil size={12} /> Update</button>} />
           <ul className="divide-y divide-cream">
             {docs.map(([label, , date]) => {
               if (!date) return null;
@@ -94,12 +94,12 @@ export default function VanPage() {
             })}
             <li className="flex items-center justify-between gap-2 px-5 py-2.5 text-sm">
               <span>Service (miles)</span>
-              <Badge tone={left < 0 ? "red" : left < 1000 ? "amber" : "green"}>{num(v.nextServiceMiles)} mi</Badge>
+              <Badge tone={left < 0 ? "red" : left < SERVICE_MILES_WARN ? "amber" : "green"}>{num(v.nextServiceMiles)} mi</Badge>
             </li>
           </ul>
           <div className="space-y-1 border-t border-cream px-5 py-3 text-xs text-mute">
             {v.vin && <div>VIN <span className="font-mono">{v.vin}</span></div>}
-            <a href="https://www.gov.uk/check-vehicle-tax" target="_blank" rel="noreferrer" className="underline">Check tax and MOT on GOV.UK</a>
+            <a href="https://www.gov.uk/check-vehicle-tax" target="_blank" rel="noreferrer" className="inline-flex min-h-10 items-center underline">Check tax and MOT on GOV.UK</a>
           </div>
         </Card>
 
@@ -109,7 +109,7 @@ export default function VanPage() {
             <div className="flex flex-wrap gap-1.5">
               {v.equipment.length ? v.equipment.map((x) => <Badge key={x}>{x}</Badge>) : <span className="text-mute">Nothing listed.</span>}
             </div>
-            <div>Usual driver: {driver ? <Link href={`/admin/crew/${driver.id}`} className="font-medium underline">{driver.name}</Link> : <span className="text-mute">none</span>}</div>
+            <div>Usual driver: {driver ? <Link href={`/admin/crew/${driver.id}`} className="inline-flex min-h-10 items-center font-medium underline">{driver.name}</Link> : <span className="text-mute">none</span>}</div>
           </div>
         </Card>
 

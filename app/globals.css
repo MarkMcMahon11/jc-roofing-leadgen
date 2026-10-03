@@ -51,7 +51,7 @@ body {
 /* ---------- owner dashboard ---------- */
 .scroll-x { overflow-x: auto; scrollbar-width: thin; position: relative; }
 /* grid items may shrink below their content (wide tables scroll inside their card instead of widening the page) */
-:where(.grid) > * { min-width: 0; }
+.admin-root :where(.grid) > * { min-width: 0; }
 
 /* project map pins */
 .map-pin {
@@ -61,7 +61,7 @@ body {
   transform: translateY(-2px);
 }
 .map-pin .dot { width: 9px; height: 9px; border-radius: 999px; background: var(--c); flex: none; }
-.map-pin.is-sel { background: var(--c); color: #fff; transform: scale(1.12); }
+.map-pin.is-sel { background: var(--ct, var(--c)); color: #fff; transform: scale(1.12); }
 .map-pin.is-sel .dot { background: #fff; }
 .map-pin.van { border-radius: 8px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
 .hq-pin {

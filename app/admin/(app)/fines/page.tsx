@@ -72,8 +72,8 @@ export default function FinesPage() {
                     <div className="text-xs text-mute">{fineType[f.type]} · {fmtDate(f.date)}{f.time ? ` ${f.time}` : ""}</div>
                   </Td>
                   <Td>
-                    {v ? <Link href={`/admin/vans/${v.id}`} className="hover:underline"><Plate>{v.reg}</Plate></Link> : "—"}
-                    <div className="mt-0.5 text-xs">{c ? <Link href={`/admin/crew/${c.id}`} className="hover:underline">{c.name}</Link> : <span className="text-mute">driver not set</span>}</div>
+                    {v ? <Link href={`/admin/vans/${v.id}`} className="inline-flex min-h-10 items-center hover:underline"><Plate>{v.reg}</Plate></Link> : "—"}
+                    <div className="mt-0.5 text-xs">{c ? <Link href={`/admin/crew/${c.id}`} className="inline-flex min-h-10 items-center hover:underline">{c.name}</Link> : <span className="text-mute">driver not set</span>}</div>
                   </Td>
                   <Td><div className="max-w-[16rem]">{f.description}</div><div className="text-xs text-mute">{f.location}{f.points ? ` · ${f.points} points` : ""}</div></Td>
                   <Td right>{gbp(f.amount)}</Td>
@@ -166,7 +166,7 @@ function FineForm({ onClose }: { onClose: () => void }) {
         </Field>
         <Field label="What happened" className="sm:col-span-2"><Input name="description" maxLength={200} placeholder="Parked on double yellow lines" /></Field>
         <Field label="Where"><Input name="location" maxLength={120} placeholder="Church Crescent, Dumfries" /></Field>
-        <Field label="Amount (£)"><Input name="amount" type="number" min={0} step={1} required /></Field>
+        <Field label="Amount (£)"><Input name="amount" type="number" min={0} step="any" required /></Field>
         <Field label="Penalty points (speeding)"><Input name="points" type="number" min={0} max={12} defaultValue={0} /></Field>
         <FormError>{error}</FormError>
         <div className="flex justify-end gap-2 sm:col-span-2">

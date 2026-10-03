@@ -9,9 +9,10 @@ import { allDocuments, buildAlerts, type Alert } from "@/lib/ops/selectors";
 import { useOps } from "@/lib/ops/store";
 
 export default function DocumentsPage() {
-  const { db, biz } = useOps();
+  const { db, biz, day } = useOps();
   const [group, setGroup] = useState<"all" | Alert["group"]>("all");
-  const alerts = useMemo(() => buildAlerts(db, biz.leads), [db, biz.leads]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- `day` re-runs the checks after midnight
+  const alerts = useMemo(() => buildAlerts(db, biz.leads), [db, biz.leads, day]);
   const shown = alerts.filter((a) => group === "all" || a.group === group);
   const n = (g: Alert["group"]) => alerts.filter((a) => a.group === g).length;
   const t = today();

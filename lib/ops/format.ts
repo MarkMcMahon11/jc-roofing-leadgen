@@ -16,7 +16,8 @@ let ukFmt: Intl.DateTimeFormat | null = null;
 /** The UK calendar day for an instant, whatever timezone the device or server runs in. */
 export function ukDate(at: Date | string = new Date()): string {
   ukFmt ??= new Intl.DateTimeFormat("en-CA", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit" });
-  return ukFmt.format(new Date(at));
+  const d = new Date(at);
+  return Number.isNaN(d.getTime()) ? "" : ukFmt.format(d);
 }
 
 export const today = () => ukDate();

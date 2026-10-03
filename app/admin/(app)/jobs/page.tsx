@@ -202,12 +202,13 @@ function Planner({ onOpen }: { onOpen: (f: FormState) => void }) {
     <Card>
       <CardHeader title="Van planner" sub="Next 14 days. Tap an empty day to book that van, or a booking to edit it." />
       <div className="flex flex-wrap gap-x-4 gap-y-1 border-b border-cream px-5 py-2 text-xs text-mute">
-        {[["bg-sky-100", "Job"], ["bg-orange-100", "Job in progress"], ["bg-amber-100", "Inspection"], ["bg-emerald-100", "Done"], ["bg-red-100", "Garage"], ["bg-stone-200", "Off the road"]].map(([c, l]) => (
-          <span key={l} className="flex items-center gap-1.5"><span aria-hidden className={`h-3 w-3 rounded ${c}`} />{l}</span>
+        {[["bg-sky-100 border-l-4 border-sky-600", "Job"], ["bg-orange-100 border-l-4 border-orange-600", "Job in progress"], ["bg-amber-50 border-l-4 border-dashed border-amber-500", "Inspection"], ["bg-emerald-50 border-l-4 border-emerald-600", "Done"], ["bg-red-100 ring-1 ring-inset ring-red-300", "Garage"], ["bg-stone-200", "Off the road"]].map(([c, l]) => (
+          <span key={l} className="flex items-center gap-1.5"><span aria-hidden className={`h-4 w-5 rounded-sm ${c}`} />{l}</span>
         ))}
+        <span className="flex items-center gap-1.5"><span aria-hidden className="font-bold text-brand">⚠</span>Has a warning</span>
       </div>
       <div className="scroll-x">
-        <table className="w-full border-collapse text-xs" style={{ minWidth: 900 }}>
+        <table className="w-full border-collapse text-xs" style={{ minWidth: 900, tableLayout: "fixed" }}>
           <thead>
             <tr>
               <th scope="col" className="sticky left-0 z-10 w-24 border-b border-cream bg-white px-2 py-2 text-left font-semibold text-mute sm:w-36 sm:px-3">Van</th>
@@ -244,9 +245,9 @@ function Planner({ onOpen }: { onOpen: (f: FormState) => void }) {
                           type="button"
                           onClick={() => onOpen({ job })}
                           title={`${job.title}${job.customer ? `, ${job.customer}` : ""}${here.length > 1 ? ` (+${here.length - 1} more)` : ""}`}
-                          className={`h-full min-h-[3rem] w-full overflow-hidden rounded px-1 py-0.5 text-left text-[11px] font-medium leading-tight ${job.kind === "inspection" ? "bg-amber-100 text-amber-900" : job.status === "done" ? "bg-emerald-100 text-emerald-900" : job.status === "in_progress" ? "bg-orange-100 text-orange-900" : "bg-sky-100 text-sky-900"} ${jobIssues(db, job).length ? "ring-2 ring-brand" : ""}`}
+                          className={`h-full min-h-[3rem] w-full overflow-hidden rounded px-1 py-0.5 text-left text-[11px] font-medium leading-tight ${job.kind === "inspection" ? "border-l-4 border-dashed border-amber-500 bg-amber-50 text-amber-900" : job.status === "done" ? "border-l-4 border-emerald-600 bg-emerald-50 text-emerald-900" : job.status === "in_progress" ? "border-l-4 border-orange-600 bg-orange-100 text-orange-900" : "border-l-4 border-sky-600 bg-sky-100 text-sky-900"}`}
                         >
-                          {job.time ? `${job.time} ` : ""}{job.customer ?? job.title}
+                          {jobIssues(db, job).length > 0 && <span className="mr-0.5 font-bold text-brand" title="Has a warning">⚠</span>}{job.time ? `${job.time} ` : ""}{job.customer ?? job.title}
                           {here.length > 1 && <span className="block text-[10px] opacity-80">+{here.length - 1} more</span>}
                         </button>
                       ) : off ? (

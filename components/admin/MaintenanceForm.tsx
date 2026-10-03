@@ -55,7 +55,7 @@ export function MaintenanceForm({ onClose, vehicleId }: { onClose: () => void; v
         <Field label="Date"><Input name="date" type="date" defaultValue={today()} required /></Field>
         <Field label="What needs doing?" className="sm:col-span-2"><Input name="description" required maxLength={200} placeholder={type === "mot" ? "MOT test" : type === "service" ? "Full service and oil change" : "Brake pads and discs"} /></Field>
         <Field label="Garage"><Input name="garage" maxLength={80} placeholder="Dumfries Van Centre" /></Field>
-        <Field label="Estimated cost (£)"><Input name="cost" type="number" min={0} step={5} defaultValue={0} required /></Field>
+        <Field label="Estimated cost (£)"><Input name="cost" type="number" min={0} step="any" defaultValue={0} required /></Field>
         <label className="flex min-h-11 cursor-pointer items-center gap-3 rounded-xl border-[1.5px] border-line bg-white px-3 py-2 text-sm sm:col-span-2">
           <input name="now" type="checkbox" className="h-4 w-4 accent-[#b11017]" /> The van is going into the garage now
         </label>

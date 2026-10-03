@@ -6,7 +6,7 @@ import { Button, Field, FormError, Input, Modal, Plate, Select, Textarea } from 
 import { useNextStep } from "./Guide";
 import { SERVICE_INFO } from "@/lib/services";
 import { UK_POSTCODE, formatPostcode } from "@/lib/format";
-import { addJob, deleteJob, updateJob } from "@/lib/ops/actions";
+import { addJob, deleteJob, syncVanStatuses, updateJob } from "@/lib/ops/actions";
 import { pence, today } from "@/lib/ops/format";
 import { vehicleStatus } from "@/lib/ops/labels";
 import { jobIssues } from "@/lib/ops/selectors";
@@ -90,6 +90,7 @@ export function JobForm({ open, onClose, job, lead, kind: kindIn, prefill }: { o
         const i = d.jobs.findIndex((x) => x.id === job.id);
         if (i >= 0) d.jobs[i] = { id: job.id, ...body }; // replace, so a cleared field really goes
         updateJob(d, job.id, {});
+        syncVanStatuses(d, [...job.vanIds, ...vanIds]);
       });
     } else {
       mutate((d) => addJob(d, body));
@@ -122,7 +123,7 @@ export function JobForm({ open, onClose, job, lead, kind: kindIn, prefill }: { o
           </div>
           {geo && <span className="mt-1 block text-xs text-emerald-700">Found on the map ✓</span>}
         </Field>
-        <Field label="Address" className="sm:col-span-2"><Input value={address} onChange={(e) => setAddress(e.target.value)} required maxLength={200} /></Field>
+        <Field label="Address (required)" className="sm:col-span-2"><Input value={address} onChange={(e) => setAddress(e.target.value)} required maxLength={200} /></Field>
         <Field label={kind === "job" ? "First day" : "Date"}><Input type="date" value={date} onChange={(e) => setDate(e.target.value)} required /></Field>
         {kind === "job" ? (
           <Field label="Last day (if more than one day)"><Input type="date" value={endDate} min={date} onChange={(e) => setEndDate(e.target.value)} /></Field>
@@ -165,7 +166,7 @@ export function JobForm({ open, onClose, job, lead, kind: kindIn, prefill }: { o
           </div>
         )}
 
-        {kind === "job" && <Field label="Agreed price (£)"><Input type="number" min={0} step={10} value={value} onChange={(e) => setValue(e.target.value)} /></Field>}
+        {kind === "job" && <Field label="Agreed price (£)"><Input type="number" min={0} step="any" value={value} onChange={(e) => setValue(e.target.value)} /></Field>}
         {editing && (
           <Field label="Status">
             <Select value={status} onChange={(e) => setStatus(e.target.value as JobStatus)}>

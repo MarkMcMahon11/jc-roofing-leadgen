@@ -86,7 +86,7 @@ export default function Dashboard() {
         />
         <Stat
           href="/admin/costs"
-          label="Van costs this month"
+          label="Running costs this month"
           value={gbp(Math.round(m.costsThis))}
           icon={<TrendingUp size={18} />}
           tone={costDelta > 0 ? "warn" : "good"}
@@ -251,7 +251,7 @@ export default function Dashboard() {
             {m.util.map(({ v, u }) => (
               <li key={v.id}>
                 <div className="mb-1 flex justify-between text-xs">
-                  <Link href={`/admin/vans/${v.id}`} className="font-medium hover:underline"><Plate>{v.reg}</Plate> <span className="ml-1 text-mute">{v.make} {v.model}</span></Link>
+                  <Link href={`/admin/vans/${v.id}`} className="inline-flex min-h-10 items-center font-medium hover:underline"><Plate>{v.reg}</Plate> <span className="ml-1 text-mute">{v.make} {v.model}</span></Link>
                   <span className="tabular-nums text-mute">{pct(u)}</span>
                 </div>
                 <Progress value={u} tone={u < 0.3 ? "amber" : "green"} />

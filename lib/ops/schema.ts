@@ -9,7 +9,7 @@ const id = z.string().min(1).max(80);
 const date = z.string().refine((s) => isRealDay(s) && s >= "2000-01-01" && s <= "2100-12-31", "Not a real date");
 const time = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/);
 const optDate = date.optional();
-const money = z.number().finite().min(0).max(10_000_000);
+const money = z.number().finite().min(0).max(10_000_000).refine((n) => Math.abs(n * 100 - Math.round(n * 100)) < 1e-6, "Money has at most 2 decimal places");
 const short = (n = 120) => z.string().max(n);
 const optShort = (n = 120) => z.string().max(n).optional();
 const int = z.number().int().finite();
@@ -88,7 +88,9 @@ const maintenance = z.object({
   cost: money,
   status: z.enum(["scheduled", "in_progress", "done"]),
   mileage: int.min(0).max(2_000_000),
-});
+})
+  .refine((m) => !m.closedAt || m.closedAt >= m.openedAt, { message: "Finished before it started", path: ["closedAt"] })
+  .refine((m) => m.status !== "done" || !!m.closedAt, { message: "A finished order needs a finish date", path: ["closedAt"] });
 
 const fine = z.object({
   id,
@@ -105,7 +107,8 @@ const fine = z.object({
   nameBy: date,
   discountBy: optDate,
   status: z.enum(["to_name", "named", "paid", "appealed", "recharged"]),
-}).refine((f) => f.nameBy >= f.date, { message: "The deadline is before the date of the notice", path: ["nameBy"] });
+}).refine((f) => f.nameBy >= f.date, { message: "The deadline is before the date of the notice", path: ["nameBy"] })
+  .refine((f) => !f.discountBy || (f.discountBy >= f.date && f.discountBy <= f.nameBy), { message: "The reduced-payment date is outside the notice period", path: ["discountBy"] });
 
 const expense = z.object({
   id,

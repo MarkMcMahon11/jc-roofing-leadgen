@@ -101,18 +101,26 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 async function readDoc<T>(name: string, fallback: T, valid: (v: unknown) => boolean = () => true): Promise<T> {
   return dbEnabled() ? (await dbRead(name, fallback, valid)).value : fileRead(name, fallback, valid);
 }
+/** Return `noWrite(result)` from a mutate callback when nothing was changed: the result is passed back but the document is not saved. */
+class NoWrite<R> {
+  constructor(readonly value: R) {}
+}
+export const noWrite = <R,>(value: R) => new NoWrite<R>(value);
+
 /** Read, let `fn` change the value in place, save. `fn` may run more than once (database retries): keep it free of side effects. */
-function mutateDoc<T, R>(name: string, fallback: () => T, valid: (v: unknown) => boolean, fn: (value: T) => R | Promise<R>): Promise<R> {
+function mutateDoc<T, R>(name: string, fallback: () => T, valid: (v: unknown) => boolean, fn: (value: T) => R | NoWrite<R> | Promise<R | NoWrite<R>>): Promise<R> {
   return locked(name, async () => {
     if (!dbEnabled()) {
       const v = await fileRead(name, fallback(), valid);
       const r = await fn(v);
+      if (r instanceof NoWrite) return r.value;
       await fileWrite(name, v);
       return r;
     }
     for (let attempt = 0; attempt < 12; attempt++) {
       const { value, version } = await dbRead(name, fallback(), valid);
       const r = await fn(value);
+      if (r instanceof NoWrite) return r.value;
       if (await dbWrite(name, value, version)) return r;
       await sleep(15 + Math.random() * 45 * (attempt + 1)); // another server won: back off a little, re-read, redo
     }
@@ -173,7 +181,7 @@ export async function getFleetRev(): Promise<number | null> {
   return Number.isFinite(n) ? n : null;
 }
 /** Read, let `fn` change the document in place, save (retried on conflict, so `fn` must have no side effects). */
-export const mutateFleetDoc = <T, R>(fallback: () => T, fn: (doc: T) => R | Promise<R>) => mutateDoc<T, R>("fleet", fallback, isFleet, fn);
+export const mutateFleetDoc = <T, R>(fallback: () => T, fn: (doc: T) => R | ReturnType<typeof noWrite<R>> | Promise<R | ReturnType<typeof noWrite<R>>>) => mutateDoc<T, R>("fleet", fallback, isFleet, fn);
 
 // ---------- messages ----------
 // Outbox: what was (or would be) texted / emailed. "preview" = not really sent (no provider keys yet).

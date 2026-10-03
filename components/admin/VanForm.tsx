@@ -104,9 +104,9 @@ export function VanForm({ onClose, van }: { onClose: () => void; van?: Vehicle }
             {drivers.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
           </Select>
         </Field>
-        <Field label="Bought for (£)"><Input name="purchasePrice" type="number" min={0} step={100} defaultValue={v?.purchasePrice} /></Field>
+        <Field label="Bought for (£)"><Input name="purchasePrice" type="number" min={0} step="any" defaultValue={v?.purchasePrice} /></Field>
         <Field label="Date bought"><Input name="purchaseDate" type="date" defaultValue={v?.purchaseDate} /></Field>
-        <Field label="Worth about now (£)"><Input name="value" type="number" min={0} step={100} defaultValue={v?.value} /></Field>
+        <Field label="Worth about now (£)"><Input name="value" type="number" min={0} step="any" defaultValue={v?.value} /></Field>
 
         <fieldset className="sm:col-span-2">
           <legend className="text-sm font-medium text-ink">Fitted equipment</legend>

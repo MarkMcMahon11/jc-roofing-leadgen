@@ -7,7 +7,7 @@ import { Badge, Button, Modal, Plate } from "./ui";
 import { JobForm } from "./JobForm";
 import { fmtSlot } from "@/lib/dates";
 import { detailsText, SERVICE_INFO } from "@/lib/services";
-import { fmtDate, fmtDay, ukDate } from "@/lib/ops/format";
+import { fmtDate, fmtDateTime, fmtDay, ukDate } from "@/lib/ops/format";
 import { jobKind, jobStatus, leadStatus } from "@/lib/ops/labels";
 import { vanReg } from "@/lib/ops/selectors";
 import { useOps, type LeadView } from "@/lib/ops/store";
@@ -63,7 +63,7 @@ export function LeadDetail({ lead, onClose }: { lead: LeadView; onClose: () => v
             <div>
               <div className="text-xs font-semibold uppercase tracking-wide text-mute">Contact</div>
               <a href={`tel:${lead.phone}`} className="mt-1 flex min-h-10 items-center gap-2 font-medium underline"><Phone size={14} aria-hidden /> {lead.phone}</a>
-              <a href={`mailto:${lead.email}`} className="block break-all underline">{lead.email}</a>
+              <a href={`mailto:${lead.email}`} className="flex min-h-10 items-center break-all underline">{lead.email}</a>
               <p className="mt-2">{lead.address.replace(/, (UK|United Kingdom)$/, "")}{lead.address.includes(lead.postcode) ? "" : `, ${lead.postcode}`}</p>
               <p className="text-xs text-mute">{lead.placeId ? "Address checked" : "Address typed by the customer: please check"}</p>
               {typeof lead.lat === "number" && typeof lead.lng === "number" && lead.score !== "not-a-fit" && (
@@ -156,7 +156,7 @@ export function LeadDetail({ lead, onClose }: { lead: LeadView; onClose: () => v
             </details>
           )}
 
-          <p className="text-xs text-mute">Consent given {new Date(lead.consentAt ?? lead.createdAt).toLocaleString("en-GB")} (wording {lead.consentVersion ?? "v1"}).</p>
+          <p className="text-xs text-mute">Consent given {fmtDateTime(lead.consentAt ?? lead.createdAt)} (wording {lead.consentVersion ?? "v1"}).</p>
 
           <div className="flex flex-wrap justify-between gap-2 border-t border-cream pt-4">
             <Button variant="secondary" size="sm" onClick={exportLead}><Download size={14} /> Export data</Button>

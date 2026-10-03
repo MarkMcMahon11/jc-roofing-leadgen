@@ -27,7 +27,7 @@ export function BarChart({
   }, []);
 
   const max = Math.max(1, ...data.flatMap((r) => series.map((s) => Number(r[s.key]) || 0)));
-  const nice = niceMax(max);
+  const { step, top: nice } = niceScale(max);
   const H = height, padL = 46, padB = 26, padT = 8;
   const innerW = W - padL - 8, innerH = H - padB - padT;
   const groupW = innerW / Math.max(1, data.length);
@@ -45,12 +45,12 @@ export function BarChart({
         ))}
       </div>
       <svg viewBox={`0 0 ${W} ${H}`} width={W} height={H} className="block max-w-full" role="img" aria-label={series.map((s) => s.label).join(" and ")} onMouseLeave={() => setHover(null)}>
-        {[0, 0.25, 0.5, 0.75, 1].map((t) => {
-          const y = padT + innerH * (1 - t);
+        {Array.from({ length: Math.round(nice / step) + 1 }, (_, i) => i * step).map((tick) => {
+          const y = padT + innerH * (1 - tick / nice);
           return (
-            <g key={t}>
+            <g key={tick}>
               <line x1={padL} x2={W - 8} y1={y} y2={y} stroke="#e7e5da" />
-              <text x={padL - 6} y={y + 4} textAnchor="end" fontSize="11" fill="#5f5f57">{format(Math.round(nice * t))}</text>
+              <text x={padL - 6} y={y + 4} textAnchor="end" fontSize="11" fill="#5f5f57">{format(tick)}</text>
             </g>
           );
         })}
@@ -129,8 +129,12 @@ export function HBar({ items, format = gbp }: { items: { label: string; value: n
   );
 }
 
-function niceMax(v: number) {
-  const p = Math.pow(10, Math.floor(Math.log10(v)));
-  for (const m of [1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10]) if (m * p >= v) return m * p;
-  return 10 * p;
+/** Whole-number gridlines: a step of 1, 2 or 5 (times a power of ten) with at most 5 gaps, and the top rounded up to match. */
+function niceScale(max: number) {
+  const p = Math.pow(10, Math.floor(Math.log10(max)));
+  for (const m of [0.1, 0.2, 0.5, 1, 2, 5, 10]) {
+    const step = Math.max(1, m * p);
+    if (max / step <= 5) return { step, top: Math.ceil(max / step) * step };
+  }
+  return { step: 10 * p, top: Math.ceil(max / (10 * p)) * 10 * p };
 }

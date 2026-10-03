@@ -7,6 +7,8 @@ import type { CrewMember, FleetDB, Job, Vehicle } from "./types";
 
 // ---------- documents and deadlines ----------
 
+const plural = (n: number, w: string) => `${n.toLocaleString("en-GB")} ${w}${n === 1 ? "" : "s"}`;
+
 /** A service is flagged when fewer than this many miles are left. */
 export const SERVICE_MILES_WARN = 1000;
 
@@ -28,7 +30,7 @@ export function allDocuments(db: FleetDB): DocRow[] {
     }
     rows.push({ key: `${v.id}-ins`, label: "Insurance", date: v.docs.insurance, who: v.reg, href, kind: "van" });
     if (v.docs.breakdown) rows.push({ key: `${v.id}-bd`, label: "Breakdown cover", date: v.docs.breakdown, who: v.reg, href, kind: "van" });
-    if (v.nextServiceDate) rows.push({ key: `${v.id}-svc`, label: "Service due", date: v.nextServiceDate, who: v.reg, href, kind: "van" });
+    if (v.nextServiceDate && v.status !== "off_road") rows.push({ key: `${v.id}-svc`, label: "Service due", date: v.nextServiceDate, who: v.reg, href, kind: "van" });
   }
   for (const c of db.crew.filter((x) => x.status === "active")) {
     const href = `/admin/crew/${c.id}`;
@@ -65,7 +67,7 @@ export function buildAlerts(db: FleetDB, leads: Lead[]): Alert[] {
   for (const v of db.vehicles.filter((x) => x.status !== "off_road")) {
     const left = v.nextServiceMiles - v.mileage;
     if (left < SERVICE_MILES_WARN)
-      out.push({ id: `mi-${v.id}`, severity: left < 0 ? "high" : "medium", text: left < 0 ? `Service overdue by ${Math.abs(left).toLocaleString("en-GB")} miles: ${v.reg}` : `Service due in ${left.toLocaleString("en-GB")} miles: ${v.reg}`, href: `/admin/vans/${v.id}`, group: "service" });
+      out.push({ id: `mi-${v.id}`, severity: left < 0 ? "high" : "medium", text: left < 0 ? `Service overdue by ${plural(Math.abs(left), "mile")}: ${v.reg}` : left === 0 ? `Service due now: ${v.reg}` : `Service due in ${plural(left, "mile")}: ${v.reg}`, href: `/admin/vans/${v.id}`, group: "service" });
   }
 
   for (const c of db.crew.filter((x) => x.status === "active" && x.drives && (x.licencePoints ?? 0) >= 6))
@@ -79,7 +81,7 @@ export function buildAlerts(db: FleetDB, leads: Lead[]): Alert[] {
     }
     if (f.discountBy && (f.status === "to_name" || f.status === "named")) {
       const days = daysBetween(t, f.discountBy);
-      if (days >= 0 && days <= 7) out.push({ id: `disc-${f.id}`, severity: "medium", text: `Reduced amount for notice ${f.ref} ends ${days === 0 ? "today" : `in ${days} days`}`, href: "/admin/fines", days, group: "fines" });
+      if (days >= 0 && days <= 7) out.push({ id: `disc-${f.id}`, severity: "medium", text: `Reduced amount for notice ${f.ref} ends ${days === 0 ? "today" : `in ${plural(days, "day")}`}`, href: "/admin/fines", days, group: "fines" });
     }
   }
 

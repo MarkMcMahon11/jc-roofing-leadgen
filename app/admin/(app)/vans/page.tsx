@@ -21,13 +21,13 @@ function nextDeadline(v: Vehicle) {
 }
 
 export default function VansPage() {
-  const { db } = useOps();
+  const { db, day } = useOps();
   const router = useRouter();
   const [filter, setFilter] = useState<Filter>("all");
   const [q, setQ] = useState("");
   const [adding, setAdding] = useState(false);
 
-  const rows = useMemo(() => db.vehicles.map((v) => ({ v, driver: db.crew.find((c) => c.id === v.assignedCrewId), cost: vehicleCosts(db, v, 90).total, util: vanUtilisation(db, v.id) })), [db]);
+  const rows = useMemo(() => db.vehicles.map((v) => ({ v, driver: db.crew.find((c) => c.id === v.assignedCrewId), cost: vehicleCosts(db, v, 90).total, util: vanUtilisation(db, v.id) })), [db, day]); // eslint-disable-line react-hooks/exhaustive-deps -- `day` refreshes the 2-week window at midnight
   const shown = rows.filter(({ v, driver }) => (filter === "all" || v.status === filter) && (!q || `${v.reg} ${v.make} ${v.model} ${driver?.name ?? ""}`.toLowerCase().includes(q.toLowerCase())));
   const count = (s: Filter) => (s === "all" ? db.vehicles.length : db.vehicles.filter((v) => v.status === s).length);
 

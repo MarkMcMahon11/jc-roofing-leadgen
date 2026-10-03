@@ -1,7 +1,7 @@
 // Server side of the operations dashboard: loads, saves and resets the fleet document (vans, crew, jobs ...).
 // The document lives in the same store as leads and settings (Supabase "kv" row "fleet", or a JSON file locally).
 
-import { getFleetDoc, mutateFleetDoc } from "@/lib/store";
+import { getFleetDoc, mutateFleetDoc, noWrite } from "@/lib/store";
 import { buildSeed, emptyFleet } from "@/lib/ops/seed";
 import { SCHEMAS } from "@/lib/ops/schema";
 import { COLLECTIONS, type Collection, type FleetDB } from "@/lib/ops/types";
@@ -55,6 +55,7 @@ const CAPS: Record<Collection, number> = { vehicles: 60, crew: 120, jobs: 5000, 
 
 type Rec = Record<string, unknown> & { id: string };
 export type BatchResult = { ok: true; rev: number } | { ok: false; error: string; status: number };
+const rejected = (error: string, status = 400) => noWrite<BatchResult>({ ok: false, error, status });
 
 /** Does the document, as it would be after this batch, still hang together? Returns a plain-English problem, or null. */
 function integrityProblem(doc: FleetDB, rows: Row[], deletes: Delete[]): string | null {
@@ -70,47 +71,63 @@ function integrityProblem(doc: FleetDB, rows: Row[], deletes: Delete[]): string 
 
   const vans = new Set(post("vehicles").map((v) => v.id));
   const crew = new Set(post("crew").map((c) => c.id));
-  // only look at what this batch could have broken: records it wrote, or anything pointing at what it deleted
-  const check = (c: Collection, list: Rec[], bad: (r: Rec) => string | null) => {
-    if (!touched.has(c) && !touched.has("vehicles") && !touched.has("crew")) return null;
-    for (const r of list) {
-      const p = bad(r);
-      if (p) return p;
-    }
-    return null;
-  };
-  return (
-    check("jobs", post("jobs"), (j) => ((j.vanIds as string[]).some((id) => !vans.has(id)) || (j.crewIds as string[]).some((id) => !crew.has(id)) ? "A job points at a van or team member that no longer exists." : null)) ??
-    check("maintenance", post("maintenance"), (m) => (vans.has(m.vehicleId as string) ? null : "A service record points at a van that no longer exists.")) ??
-    check("fines", post("fines"), (f) => (vans.has(f.vehicleId as string) && (!f.crewId || crew.has(f.crewId as string)) ? null : "A notice points at a van or driver that no longer exists.")) ??
-    check("expenses", post("expenses"), (e) => (!e.vehicleId || vans.has(e.vehicleId as string) ? null : "A cost points at a van that no longer exists.")) ??
-    check("vehicles", post("vehicles"), (v) => (!v.assignedCrewId || crew.has(v.assignedCrewId as string) ? null : "A van's usual driver no longer exists."))
-  );
+
+  // deleting something that is still in use
+  const deletedVans = deletes.filter((x) => x.collection === "vehicles").map((x) => x.id);
+  if (deletedVans.length) {
+    const used = (id: string) =>
+      post("jobs").some((j) => (j.vanIds as string[]).includes(id)) ||
+      post("maintenance").some((m) => m.vehicleId === id) ||
+      post("fines").some((f) => f.vehicleId === id) ||
+      post("expenses").some((e) => e.vehicleId === id);
+    if (deletedVans.some(used)) return "That van still has jobs, service records, notices or costs. Take it off the road instead of deleting it.";
+  }
+  const deletedCrew = deletes.filter((x) => x.collection === "crew").map((x) => x.id);
+  if (deletedCrew.length) {
+    const used = (id: string) =>
+      post("jobs").some((j) => (j.crewIds as string[]).includes(id)) || post("fines").some((f) => f.crewId === id) || post("vehicles").some((v) => v.assignedCrewId === id);
+    if (deletedCrew.some(used)) return "That team member is still on jobs, notices or a van. Mark them as having left instead of deleting them.";
+  }
+
+  // records written by this batch must point at things that exist
+  for (const r of rows) {
+    const d = r.data as Rec;
+    if (r.collection === "jobs" && ((d.vanIds as string[]).some((id) => !vans.has(id)) || (d.crewIds as string[]).some((id) => !crew.has(id)))) return "A job points at a van or team member that doesn't exist.";
+    if (r.collection === "maintenance" && !vans.has(d.vehicleId as string)) return "A service record points at a van that doesn't exist.";
+    if (r.collection === "fines" && (!vans.has(d.vehicleId as string) || (d.crewId && !crew.has(d.crewId as string)))) return "A notice points at a van or driver that doesn't exist.";
+    if (r.collection === "expenses" && d.vehicleId && !vans.has(d.vehicleId as string)) return "A cost points at a van that doesn't exist.";
+    if (r.collection === "vehicles" && d.assignedCrewId && !crew.has(d.assignedCrewId as string)) return "A van's usual driver doesn't exist.";
+  }
+  return null;
 }
 
 /** Apply a validated batch atomically (checked write, retried on conflict) and bump the revision. */
 export function applyBatch(rows: Row[], deletes: Delete[]): Promise<BatchResult> {
   return mutateFleetDoc<FleetDB, BatchResult>(buildSeed, (doc) => {
     const problem = integrityProblem(doc, rows, deletes);
-    if (problem) {
-      const wasDelete = deletes.length > 0 && !problem.startsWith("There are too many");
-      return {
-        ok: false,
-        error: wasDelete ? "That can't be deleted because a job, service record, notice or cost still uses it. Take a van off the road instead of deleting it." : problem,
-        status: problem.startsWith("There are too many") ? 413 : 400,
-      };
-    }
+    if (problem) return rejected(problem, problem.startsWith("There are too many") ? 413 : 400);
+    let changed = false;
     for (const r of rows) {
       const list = doc[r.collection] as { id: string }[];
       const i = list.findIndex((x) => x.id === r.id);
-      if (i >= 0) list[i] = r.data;
-      else list.push(r.data);
+      if (i >= 0) {
+        if (JSON.stringify(list[i]) !== JSON.stringify(r.data)) changed = true;
+        list[i] = r.data;
+      } else {
+        list.push(r.data);
+        changed = true;
+      }
     }
     for (const x of deletes) {
       const list = doc[x.collection] as { id: string }[];
       const i = list.findIndex((y) => y.id === x.id);
-      if (i >= 0) list.splice(i, 1);
+      if (i >= 0) {
+        list.splice(i, 1);
+        changed = true;
+      }
     }
+    // nothing actually changed (a repeat save, or deleting something already gone): don't save or bump the revision
+    if (!changed) return noWrite<BatchResult>({ ok: true, rev: doc.rev });
     doc.activity.sort((a, b) => (a.at < b.at ? 1 : -1));
     if (doc.activity.length > MAX_ACTIVITY) doc.activity.length = MAX_ACTIVITY;
     doc.rev += 1;

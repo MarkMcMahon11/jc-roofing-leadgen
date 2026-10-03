@@ -61,7 +61,7 @@ export default function MaintenancePage() {
                   <div className="min-w-0 flex-1">
                     <div className="font-medium">{m.description}</div>
                     <div className="text-xs text-mute">
-                      {v && <Link href={`/admin/vans/${v.id}`} className="hover:underline"><Plate>{v.reg}</Plate></Link>} {v?.make} {v?.model} · {m.garage || "garage not set"} · {maintType[m.type]} ·{" "}
+                      {v && <Link href={`/admin/vans/${v.id}`} className="inline-flex min-h-10 items-center hover:underline"><Plate>{v.reg}</Plate></Link>} {v?.make} {v?.model} · {m.garage || "garage not set"} · {maintType[m.type]} ·{" "}
                       {m.status === "scheduled" ? `${fmtDate(m.openedAt)} (${relDays(-days)})` : `${days} day${days === 1 ? "" : "s"} in the garage`}
                     </div>
                   </div>
@@ -120,7 +120,7 @@ export default function MaintenancePage() {
               return (
                 <tr key={m.id}>
                   <Td className="whitespace-nowrap">{fmtDate(m.closedAt)}</Td>
-                  <Td>{v ? <Link href={`/admin/vans/${v.id}`} className="hover:underline"><Plate>{v.reg}</Plate></Link> : "—"}</Td>
+                  <Td>{v ? <Link href={`/admin/vans/${v.id}`} className="inline-flex min-h-10 items-center hover:underline"><Plate>{v.reg}</Plate></Link> : "—"}</Td>
                   <Td>{m.description} <span className="text-xs text-mute">· {maintType[m.type]}</span></Td>
                   <Td>{m.garage}</Td>
                   <Td right>{Math.max(0, daysBetween(m.openedAt, m.closedAt ?? m.openedAt))}</Td>
@@ -148,7 +148,7 @@ export default function MaintenancePage() {
             className="space-y-4"
           >
             <p className="text-sm text-mute">{order.description}</p>
-            <Field label="Final cost (£)" hint="It becomes a cost against this van. A service moves the next service on; an MOT moves the MOT date on a year."><Input name="cost" type="number" min={0} step={5} defaultValue={order.cost} required /></Field>
+            <Field label="Final cost (£)" hint="It becomes a cost against this van. A service moves the next service on; an MOT moves the MOT date on a year."><Input name="cost" type="number" min={0} step="any" defaultValue={order.cost} required /></Field>
             <div className="flex justify-end"><Button type="submit">Finish</Button></div>
           </form>
         )}

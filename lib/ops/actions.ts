@@ -80,6 +80,7 @@ export function deleteCrew(d: FleetDB, id: string): boolean {
 export function addJob(d: FleetDB, j: Omit<Job, "id" | "status"> & { status?: JobStatus }): string {
   const id = uid("j");
   d.jobs.push({ status: "scheduled", ...j, id });
+  if (j.kind === "job") syncVanStatuses(d, j.vanIds);
   log(d, "job", `${j.kind === "inspection" ? "Inspection" : "Job"} scheduled: ${j.title} (${j.customer ?? j.address})`, "/admin/jobs");
   return id;
 }
@@ -96,6 +97,11 @@ function refreshVanStatus(d: FleetDB, vanId: string) {
   const v = d.vehicles.find((x) => x.id === vanId);
   if (!v || (v.status !== "in_use" && v.status !== "at_yard")) return;
   v.status = d.jobs.some((j) => j.kind === "job" && j.status === "in_progress" && j.vanIds.includes(vanId)) ? "in_use" : "at_yard";
+}
+
+/** Re-work the status of these vans from the jobs now in progress (used after a job is added, edited or removed). */
+export function syncVanStatuses(d: FleetDB, vanIds: string[]) {
+  for (const id of new Set(vanIds)) refreshVanStatus(d, id);
 }
 
 export function setJobStatus(d: FleetDB, id: string, status: JobStatus) {
@@ -157,7 +163,10 @@ export function closeMaintenance(d: FleetDB, id: string, cost: number) {
   const v = d.vehicles.find((x) => x.id === m.vehicleId);
   if (v) {
     const stillIn = d.maintenance.some((o) => o.id !== m.id && o.vehicleId === v.id && o.status === "in_progress");
-    if (v.status === "in_garage" && !stillIn) v.status = "at_yard";
+    if (v.status === "in_garage" && !stillIn) {
+      v.status = "at_yard";
+      refreshVanStatus(d, v.id); // back on the road if a started job still has it
+    }
     if (m.type === "service") {
       v.nextServiceMiles = v.mileage + 12000;
       v.nextServiceDate = addDays(today(), 365);
