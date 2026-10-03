@@ -50,7 +50,7 @@ function LoginForm() {
           <span className="elev inline-block rounded-2xl px-5 py-3 shadow-2xl">
             <Image src="/logo.png" alt="JC Roofing" width={512} height={198} priority className="h-16 w-auto" />
           </span>
-          <div className="mt-3 text-xs text-white/80">JC Roofing Dumfries · Heathhall, Dumfries</div>
+          <div className="mt-3 text-xs text-white">JC Roofing Dumfries · Heathhall, Dumfries</div>
         </div>
         <div className="relative max-w-md">
           <p className="text-4xl font-bold leading-tight tracking-tight">Your whole roofing business, on one screen.</p>
@@ -63,7 +63,7 @@ function LoginForm() {
             ))}
           </ul>
         </div>
-        <div className="relative text-xs text-white/70">Owner access only</div>
+        <div className="relative text-xs text-white/95">Owner access only</div>
       </aside>
 
       <main className="flex items-center justify-center p-6">

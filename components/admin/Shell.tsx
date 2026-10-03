@@ -6,7 +6,9 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Activity, CalendarClock, CalendarDays, ExternalLink, Inbox, LayoutDashboard, LogOut, MapPinned, Menu, MessageSquare, PoundSterling, Printer, ShieldAlert, Truck, Users, Wallet, Wrench, X } from "lucide-react";
 import { GuideProvider, GuideToggle, PageGuide } from "./Guide";
+import { BackgroundButton, BackgroundLayer } from "./Background";
 import { Button } from "./ui";
+import type { BackgroundMeta } from "@/lib/server/background";
 import { guideFor } from "@/lib/ops/guides";
 import { buildAlerts, scheduleItems } from "@/lib/ops/selectors";
 import { today } from "@/lib/ops/format";
@@ -14,12 +16,13 @@ import { useOps, type SyncState } from "@/lib/ops/store";
 
 type Item = { href: string; icon: React.ComponentType<{ size?: number; className?: string; "aria-hidden"?: boolean }>; label: string; badge?: number; tone?: "red" | "amber" };
 
-export function Shell({ children, ownerName }: { children: React.ReactNode; ownerName: string }) {
+export function Shell({ children, ownerName, background }: { children: React.ReactNode; ownerName: string; background: BackgroundMeta }) {
   const { db, biz, sync, notice, clearNotice, resetFleet, day } = useOps();
   const path = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [bg, setBg] = useState(background);
   const menuBtn = useRef<HTMLButtonElement>(null);
   const drawer = useRef<HTMLDivElement>(null);
 
@@ -163,7 +166,8 @@ export function Shell({ children, ownerName }: { children: React.ReactNode; owne
 
   return (
     <GuideProvider>
-      <div className="admin-root admin-bg min-h-screen transition-[padding] duration-200 lg:pl-64 print:pl-0">
+      <div className="admin-root admin-bg isolate min-h-screen transition-[padding] duration-200 lg:pl-64 print:pl-0">
+        <BackgroundLayer bg={bg} />
         <a href="#main" className="sr-only z-[2000] rounded-lg bg-white px-4 py-2 font-semibold text-brand focus:not-sr-only focus:fixed focus:left-3 focus:top-3">Skip to content</a>
         <aside className="fixed inset-y-0 left-0 hidden w-64 border-r border-edge shadow-[8px_0_30px_-18px_rgba(18,24,38,0.35)] lg:block print:hidden">{renderSidebar(false)}</aside>
 
@@ -185,6 +189,7 @@ export function Shell({ children, ownerName }: { children: React.ReactNode; owne
             <span className="elev inline-block rounded-lg px-2 py-0.5"><Image src="/logo.png" alt="JC Roofing" width={512} height={198} className="h-7 w-auto" /></span>
           </div>
           <div className="ml-auto flex items-center gap-3">
+            <BackgroundButton bg={bg} onChange={setBg} />
             <SyncPill state={sync} />
             {biz.storage !== "database" && (
               <span title="Data isn't being kept permanently yet. Connect the database (see the README)." className="hidden whitespace-nowrap rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-900 ring-1 ring-amber-300 sm:inline">
@@ -228,7 +233,7 @@ export function Shell({ children, ownerName }: { children: React.ReactNode; owne
 function SyncPill({ state }: { state: SyncState }) {
   const cfg = {
     saved: { dot: "bg-emerald-600", text: "Saved", cls: "text-emerald-800" },
-    saving: { dot: "bg-amber-500 animate-pulse", text: "Saving…", cls: "text-amber-800" },
+    saving: { dot: "bg-amber-500 motion-safe:animate-pulse", text: "Saving…", cls: "text-amber-800" },
     error: { dot: "bg-brand", text: "Offline, will retry", cls: "text-brand" },
     rejected: { dot: "bg-brand", text: "Some changes weren't saved", cls: "text-brand" },
   }[state];

@@ -183,7 +183,7 @@ function ProjectMap() {
         <button type="button" aria-pressed={showVans} onClick={() => setShowVans(!showVans)} className={`min-h-10 rounded-full px-4 py-1.5 text-sm font-semibold ${showVans ? "bg-night text-white" : "bg-white text-night ring-1 ring-edge"}`}>Vans</button>
         {showVans && <Badge tone="amber">Van positions are samples until a tracker is connected</Badge>}
       </div>
-      <div className="mb-4 scroll-x flex gap-1.5 pb-1" role="group" aria-label="Show projects at these stages">
+      <div className="scroll-x chips -mx-1.5 mb-4 flex gap-1.5 px-1.5 py-1.5" role="group" aria-label="Show projects at these stages">
         {(Object.keys(STAGES) as Stage[]).map((s) => (
           <button key={s} type="button" aria-pressed={!off.has(s)} onClick={() => toggleStage(s)} className={`flex min-h-10 items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1 text-sm font-medium ring-1 ${off.has(s) ? "bg-white text-steel ring-edge" : "bg-white text-night ring-ctrl"}`}>
             <span aria-hidden className="h-2.5 w-2.5 rounded-full" style={{ background: off.has(s) ? "#b8c1cf" : STAGES[s].color }} />

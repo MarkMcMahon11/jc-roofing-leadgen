@@ -239,7 +239,7 @@ export function OpsProvider({ children }: { children: React.ReactNode }) {
   if (!db || !biz) {
     return (
       <div className="admin-bg flex min-h-screen items-center justify-center" role="status" aria-label="Loading">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-edge border-t-brand" />
+        <div className="h-6 w-6 motion-safe:animate-spin rounded-full border-2 border-edge border-t-brand" />
       </div>
     );
   }

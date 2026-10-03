@@ -12,7 +12,7 @@
   --color-edge: #cbd2dd;         /* card and divider lines */
   --color-steel: #566073;        /* secondary text: 4.9:1 on silver, 6:1 on white */
   --color-night: #1b2130;        /* main text and dark surfaces */
-  --color-ctrl: #7a8497;         /* control borders: 3.7:1 on white */
+  --color-ctrl: #6f7a8e;         /* control borders: 4.3:1 on white, 3.3:1 on silver */
 }
 
 @theme inline {
@@ -100,6 +100,22 @@ body {
     radial-gradient(1000px 560px at -10% 110%, rgba(177, 16, 23, 0.05), transparent 65%),
     linear-gradient(180deg, #e9ecf2 0%, #dde2ea 100%);
 }
+/* the owner's picture sits under everything; a light veil on top keeps headings readable */
+.admin-photo {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+.admin-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(233, 236, 242, calc(var(--veil, 0.35) + 0.08)), rgba(221, 226, 234, var(--veil, 0.35)));
+}
 .elev {
   background: linear-gradient(180deg, #ffffff 0%, #f5f7fa 100%);
   border: 1px solid rgba(203, 210, 221, 0.95);
@@ -151,5 +167,13 @@ body {
 }
 @media print {
   .admin-bg { background: #fff !important; }
+  .admin-photo { display: none !important; }
   .elev { box-shadow: none !important; background: #fff !important; }
+}
+
+.chips { scrollbar-width: none; }
+.chips::-webkit-scrollbar { display: none; }
+@media (forced-colors: active) {
+  .btn-red, .btn-silver, .chip-3d, .nav-active, .elev { border: 2px solid ButtonText; }
+  .glow-red { background: Highlight; }
 }

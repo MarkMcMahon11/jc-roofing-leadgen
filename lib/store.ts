@@ -183,6 +183,18 @@ export async function getFleetRev(): Promise<number | null> {
 /** Read, let `fn` change the document in place, save (retried on conflict, so `fn` must have no side effects). */
 export const mutateFleetDoc = <T, R>(fallback: () => T, fn: (doc: T) => R | ReturnType<typeof noWrite<R>> | Promise<R | ReturnType<typeof noWrite<R>>>) => mutateDoc<T, R>("fleet", fallback, isFleet, fn);
 
+// ---------- WhatsApp assistant: contacts, messages, tasks, owner confirmations (one document) ----------
+const isBackground = (v: unknown) => !!v && typeof v === "object" && typeof (v as { rev?: unknown }).rev === "number";
+export const getBackgroundDoc = <T>(fallback: T) => readDoc<T>("background", fallback, isBackground);
+export const mutateBackgroundDoc = <T, R>(fallback: () => T, fn: (doc: T) => R | Promise<R>) => mutateDoc<T, R>("background", fallback, isBackground, fn);
+
+const isAssistant = (v: unknown) => {
+  const a = v as { rev?: unknown; messages?: unknown };
+  return !!a && typeof a === "object" && typeof a.rev === "number" && isArr(a.messages);
+};
+export const getAssistantDoc = <T>(fallback: T) => readDoc<T>("assistant", fallback, isAssistant);
+export const mutateAssistantDoc = <T, R>(fallback: () => T, fn: (doc: T) => R | ReturnType<typeof noWrite<R>> | Promise<R | ReturnType<typeof noWrite<R>>>) => mutateDoc<T, R>("assistant", fallback, isAssistant, fn);
+
 // ---------- messages ----------
 // Outbox: what was (or would be) texted / emailed. "preview" = not really sent (no provider keys yet).
 export type Message = {

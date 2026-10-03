@@ -37,7 +37,7 @@ export function Card({ children, className = "", href }: { children: React.React
 
 export function CardHeader({ title, sub, action }: { title: React.ReactNode; sub?: React.ReactNode; action?: React.ReactNode }) {
   return (
-    <div className="flex items-start justify-between gap-3 border-b border-silver bg-gradient-to-b from-white/60 to-transparent px-5 py-4">
+    <div className="flex items-start justify-between gap-3 rounded-t-2xl border-b border-silver bg-gradient-to-b from-white/60 to-transparent px-5 py-4">
       <div className="min-w-0">
         <h2 className="font-semibold text-night">{title}</h2>
         {sub && <p className="mt-0.5 text-xs text-steel">{sub}</p>}
@@ -161,7 +161,7 @@ export function FormError({ children }: { children?: React.ReactNode }) {
 
 export function Segmented<T extends string>({ value, onChange, options }: { value: T; onChange: (v: T) => void; options: { value: T; label: string; count?: number }[] }) {
   return (
-    <div role="group" className="scroll-x -mx-1 flex gap-1.5 px-1 pb-1">
+    <div role="group" className="scroll-x chips -mx-1.5 flex gap-1.5 px-1.5 py-1.5">
       {options.map((o) => (
         <button
           key={o.value}
@@ -171,7 +171,7 @@ export function Segmented<T extends string>({ value, onChange, options }: { valu
           className={`min-h-10 whitespace-nowrap rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${value === o.value ? "btn-red text-white" : "chip-3d text-night ring-1 ring-edge hover:brightness-95"}`}
         >
           {o.label}
-          {o.count !== undefined && <span className={`ml-1.5 text-xs ${value === o.value ? "text-white/80" : "text-steel"}`}>{o.count}</span>}
+          {o.count !== undefined && <span className={`ml-1.5 text-xs ${value === o.value ? "text-white" : "text-steel"}`}>{o.count}</span>}
         </button>
       ))}
     </div>
@@ -203,7 +203,7 @@ export function Table({ children, minWidth = 640 }: { children: React.ReactNode;
 }
 
 export function Th({ children, right, className = "" }: { children?: React.ReactNode; right?: boolean; className?: string }) {
-  return <th scope="col" className={`border-b border-edge/70 bg-gradient-to-b from-white to-silver-soft px-4 py-2.5 text-xs font-semibold uppercase tracking-wider text-steel ${right ? "text-right" : "text-left"} ${className}`}>{children}</th>;
+  return <th scope="col" className={`border-b border-edge/70 bg-gradient-to-b from-white to-silver-soft px-4 py-2.5 text-xs font-semibold uppercase tracking-wider text-steel first:rounded-tl-2xl last:rounded-tr-2xl ${right ? "text-right" : "text-left"} ${className}`}>{children}</th>;
 }
 
 export function Td({ children, right, className = "" }: { children?: React.ReactNode; right?: boolean; className?: string }) {
