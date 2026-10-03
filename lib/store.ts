@@ -153,6 +153,28 @@ export const addLead = (lead: Lead) => mutateDoc<Lead[], void>("leads", () => []
 /** Atomically read, change and save the leads list. Return value of `fn` is passed back. */
 export const updateLeads = <R>(fn: (leads: Lead[]) => R | Promise<R>) => mutateDoc<Lead[], R>("leads", () => [], isArr, fn);
 
+// ---------- operations dashboard (vans, crew, jobs ...): one JSON document, checked writes ----------
+const isFleet = (v: unknown) => {
+  const f = v as { rev?: unknown; vehicles?: unknown };
+  return !!f && typeof f === "object" && typeof f.rev === "number" && isArr(f.vehicles);
+};
+export const getFleetDoc = <T>(fallback: T) => readDoc<T>("fleet", fallback, isFleet);
+/** Just the revision number of the fleet document (null if it doesn't exist yet): a few bytes from the database instead of the whole document. */
+export async function getFleetRev(): Promise<number | null> {
+  if (!dbEnabled()) {
+    const doc = await fileRead<{ rev?: number } | null>("fleet", null, isFleet);
+    return typeof doc?.rev === "number" ? doc.rev : null;
+  }
+  const r = await sb("kv?key=eq.fleet&select=rev:value->>rev");
+  if (!r.ok) throw new Error(`Database read failed (${r.status})`);
+  const rows = (await r.json()) as { rev?: string | number; value?: { rev?: number } }[];
+  if (!rows.length) return null;
+  const n = Number(rows[0].rev ?? rows[0].value?.rev);
+  return Number.isFinite(n) ? n : null;
+}
+/** Read, let `fn` change the document in place, save (retried on conflict, so `fn` must have no side effects). */
+export const mutateFleetDoc = <T, R>(fallback: () => T, fn: (doc: T) => R | Promise<R>) => mutateDoc<T, R>("fleet", fallback, isFleet, fn);
+
 // ---------- messages ----------
 // Outbox: what was (or would be) texted / emailed. "preview" = not really sent (no provider keys yet).
 export type Message = {

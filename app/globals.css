@@ -47,3 +47,36 @@ body {
 .sr-only-focusable:focus {
   position: static;
 }
+
+/* ---------- owner dashboard ---------- */
+.scroll-x { overflow-x: auto; scrollbar-width: thin; position: relative; }
+/* grid items may shrink below their content (wide tables scroll inside their card instead of widening the page) */
+:where(.grid) > * { min-width: 0; }
+
+/* project map pins */
+.map-pin {
+  display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;
+  padding: 2px 8px 2px 6px; border-radius: 999px; background: #fff; border: 2px solid var(--c);
+  box-shadow: 0 2px 6px rgba(52, 52, 43, 0.3); font: 700 11px/1.3 var(--font-inter), system-ui, sans-serif; color: #34342b;
+  transform: translateY(-2px);
+}
+.map-pin .dot { width: 9px; height: 9px; border-radius: 999px; background: var(--c); flex: none; }
+.map-pin.is-sel { background: var(--c); color: #fff; transform: scale(1.12); }
+.map-pin.is-sel .dot { background: #fff; }
+.map-pin.van { border-radius: 8px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.hq-pin {
+  width: 30px; height: 30px; border-radius: 9px; display: flex; align-items: center; justify-content: center;
+  background: #b11017; color: #fff; font-size: 16px; box-shadow: 0 2px 8px rgba(52, 52, 43, 0.45);
+}
+
+/* ---------- printing (Reports) ---------- */
+@media print {
+  @page { size: A4; margin: 10mm; }
+  html, body { background: #fff !important; color: #000; }
+  .scroll-x { overflow: visible !important; }
+  table { min-width: 0 !important; width: 100% !important; font-size: 10px; }
+  th, td { padding: 3px 5px !important; }
+  tr { break-inside: avoid; }
+  .rounded-2xl { border-radius: 0 !important; box-shadow: none !important; }
+  * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+}

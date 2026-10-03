@@ -10,7 +10,7 @@ cp .env.example .env.local      # then edit ADMIN_PASSWORD
 npm run dev                      # http://localhost:3000
 ```
 - Customer flow: `/`
-- Owner page: `/admin` (password from `ADMIN_PASSWORD`; `/admin` is locked if it is not set)
+- Owner dashboard: `/admin` (sign in at `/admin/login` with the business email and the `ADMIN_PASSWORD`; locked if the password is not set)
 - Clickable design mock: `/preview.html`
 - Privacy notice draft: `/privacy`
 
@@ -33,7 +33,7 @@ Set these in the host's environment (see `.env.example`). No code changes:
 | Test/other storage folder | `DATA_DIR` |
 
 Before going live also: replace JSON storage with a managed database, use a commercial-allowed host,
-add real authentication to `/admin`, and have JC Roofing approve the privacy notice and trust claims.
+and have JC Roofing approve the privacy notice and trust claims.
 
 ## Permanent storage (Supabase, free plan is enough to start)
 1. Create a free project at supabase.com. Choose a region close to the UK (London or Ireland).
@@ -68,6 +68,21 @@ unset to keep this free, or set a spending limit in the Anthropic Console before
 New roofs (slate/tile, measured or estimated roof size), repairs, flat roofs (GRP), gutters and fascias, chimney removal,
 solar panels, and "something else" (no price, the owner calls). Every price except new roofs is editable on `/admin`
 under "Other jobs"; new-roof prices are per material. All shipped numbers are placeholders until the owner confirms them.
+
+## Owner dashboard (operations)
+`/admin` is a business-operations dashboard in JC Roofing's own theme, structured like a fleet-management system:
+Dashboard, Leads and quotes, Jobs and schedule (with a van planner), Project map (customer projects coloured by stage,
+plus the vans), Vans, Team, Servicing, Fines and notices, Documents and deadlines, Costs, Reports (printable),
+Messages, Quote prices and an Activity log.
+
+- Sign in with an email + the `ADMIN_PASSWORD` (a signed 7-day cookie; 10 wrong tries lock that connection out for 10 minutes).
+  Allowed emails: `OWNER_EMAIL` (comma separated), the owner email saved under Quote prices, and the business email.
+- Vans, team, jobs, servicing, notices and costs are one JSON document ("fleet") in the same store as leads (Supabase
+  `kv` table, or `data/fleet.json` locally). A new site starts with SAMPLE data (made-up vans/crew/jobs/costs); use
+  "Clear sample data" on the dashboard, then enter the real ones. Enquiries and prices are always real.
+- The project map uses OpenStreetMap tiles (free). Customer pins come from each enquiry's address (or postcode) and
+  from jobs added with a postcode. Van positions are SAMPLES until a tracker/telematics feed is connected.
+- Set `SESSION_SECRET` (32+ random characters) on the live site; otherwise the cookie key is derived from the password.
 
 ## Testing
 `scripts/agent-server.sh <port>` starts an isolated production server (own data folder, fake address data,

@@ -14,6 +14,11 @@ const nextConfig: NextConfig = {
           { key: "Content-Security-Policy", value: "frame-ancestors 'self' https://www.jcroofingdumfries.com; base-uri 'self'; form-action 'self'; object-src 'none'" },
         ],
       },
+      {
+        // the owner dashboard must never be shown inside another site (the quote form may be)
+        source: "/admin/:path*",
+        headers: [{ key: "Content-Security-Policy", value: "frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'" }],
+      },
     ];
   },
 };
