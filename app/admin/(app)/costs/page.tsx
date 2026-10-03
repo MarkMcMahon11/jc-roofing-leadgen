@@ -55,7 +55,7 @@ export default function CostsPage() {
         <Card className="@3xl:col-span-2">
           <CardHeader title="Costs against jobs booked, last 6 months" sub="Jobs are counted in the month they start, at their agreed price" />
           <div className="p-5">
-            <BarChart data={m.months} series={[{ key: "costs", label: "Van costs", color: "#b11017" }, { key: "won", label: "Jobs booked", color: "#d6d4c7" }]} xLabel={(r) => fmtMonth(String(r.month))} format={(n) => gbp(n, true)} />
+            <BarChart data={m.months} series={[{ key: "costs", label: "Van costs", color: "#b11017" }, { key: "won", label: "Jobs booked", color: "#b8c1cf" }]} xLabel={(r) => fmtMonth(String(r.month))} format={(n) => gbp(n, true)} />
           </div>
         </Card>
         <Card>
@@ -73,7 +73,7 @@ export default function CostsPage() {
               const c = vehicleCosts(db, v, 90);
               return (
                 <tr key={v.id}>
-                  <Td><Link href={`/admin/vans/${v.id}`} className="flex min-h-10 items-center gap-2 hover:underline"><Plate>{v.reg}</Plate> <span className="text-mute">{v.make} {v.model}</span></Link></Td>
+                  <Td><Link href={`/admin/vans/${v.id}`} className="flex min-h-10 items-center gap-2 hover:underline"><Plate>{v.reg}</Plate> <span className="text-steel">{v.make} {v.model}</span></Link></Td>
                   <Td right>{gbp(c.fuel)}</Td>
                   <Td right>{gbp(c.total - c.fuel)}</Td>
                   <Td right className="font-semibold">{gbp(c.total)}</Td>
@@ -81,7 +81,7 @@ export default function CostsPage() {
               );
             })}
             {general90 > 0 && (
-              <tr><Td className="text-mute">General (not one van)</Td><Td right>—</Td><Td right>{gbp(general90)}</Td><Td right className="font-semibold">{gbp(general90)}</Td></tr>
+              <tr><Td className="text-steel">General (not one van)</Td><Td right>—</Td><Td right>{gbp(general90)}</Td><Td right className="font-semibold">{gbp(general90)}</Td></tr>
             )}
           </tbody>
         </Table>
@@ -90,7 +90,7 @@ export default function CostsPage() {
 
       <Card>
         <CardHeader title="All costs" sub={`${rows.length} entr${rows.length === 1 ? "y" : "ies"}`} />
-        <div className="grid gap-3 border-b border-cream p-4 sm:grid-cols-2">
+        <div className="grid gap-3 border-b border-silver p-4 sm:grid-cols-2">
           <Select aria-label="Filter by van" value={vanF} onChange={(e) => { setVanF(e.target.value); setLimit(40); }} className="!mt-0">
             <option value="">All vans</option>
             {db.vehicles.map((v) => <option key={v.id} value={v.id}>{v.reg}</option>)}
@@ -107,11 +107,11 @@ export default function CostsPage() {
               <tr key={e.id}>
                 <Td className="whitespace-nowrap">{fmtDate(e.date)}</Td>
                 <Td>{e.description}</Td>
-                <Td>{e.vehicleId ? <Plate>{db.vehicles.find((v) => v.id === e.vehicleId)?.reg ?? "—"}</Plate> : <span className="text-mute">General</span>}</Td>
+                <Td>{e.vehicleId ? <Plate>{db.vehicles.find((v) => v.id === e.vehicleId)?.reg ?? "—"}</Plate> : <span className="text-steel">General</span>}</Td>
                 <Td>{expenseCat[e.category]}</Td>
                 <Td>{e.method ? payMethod[e.method] : "—"}</Td>
                 <Td right>{gbp(e.amount)}</Td>
-                <Td><button type="button" aria-label={`Delete ${e.description}`} onClick={() => confirm(`Delete this cost (${e.description}, ${gbp(e.amount)})?`) && mutate((d) => deleteExpense(d, e.id))} className="grid h-10 w-10 place-items-center rounded-lg text-mute hover:bg-cream hover:text-brand"><Trash2 size={15} /></button></Td>
+                <Td><button type="button" aria-label={`Delete ${e.description}`} onClick={() => confirm(`Delete this cost (${e.description}, ${gbp(e.amount)})?`) && mutate((d) => deleteExpense(d, e.id))} className="grid h-10 w-10 place-items-center rounded-lg text-steel hover:bg-silver-soft hover:text-brand"><Trash2 size={15} /></button></Td>
               </tr>
             ))}
           </tbody>

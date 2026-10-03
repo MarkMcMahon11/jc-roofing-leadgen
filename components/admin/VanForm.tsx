@@ -91,7 +91,7 @@ export function VanForm({ onClose, van }: { onClose: () => void; van?: Vehicle }
         <Field label="Chassis number (VIN, optional)"><Input name="vin" defaultValue={v?.vin} maxLength={20} className="uppercase" /></Field>
 
         <div className="sm:col-span-2">
-          <div className="text-sm font-semibold text-ink">Deadlines</div>
+          <div className="text-sm font-semibold text-night">Deadlines</div>
         </div>
         <Field label="MOT expires" hint="New vans: the date the first MOT is due."><Input name="mot" type="date" required defaultValue={v?.docs.mot ?? addDays(today(), 365)} /></Field>
         <Field label="Vehicle tax expires"><Input name="roadTax" type="date" required defaultValue={v?.docs.roadTax ?? addDays(today(), 365)} /></Field>
@@ -109,10 +109,10 @@ export function VanForm({ onClose, van }: { onClose: () => void; van?: Vehicle }
         <Field label="Worth about now (£)"><Input name="value" type="number" min={0} step="any" defaultValue={v?.value} /></Field>
 
         <fieldset className="sm:col-span-2">
-          <legend className="text-sm font-medium text-ink">Fitted equipment</legend>
+          <legend className="text-sm font-medium text-night">Fitted equipment</legend>
           <div className="mt-1 flex flex-wrap gap-2">
             {[...EQUIPMENT, ...equipment.filter((x) => !EQUIPMENT.includes(x))].map((x) => (
-              <label key={x} className={`flex min-h-10 cursor-pointer items-center gap-2 rounded-full border-[1.5px] px-3 py-1.5 text-sm ${equipment.includes(x) ? "border-brand bg-brand-tint" : "border-line bg-white"}`}>
+              <label key={x} className={`flex min-h-10 cursor-pointer items-center gap-2 rounded-full border-[1.5px] px-3 py-1.5 text-sm ${equipment.includes(x) ? "border-brand bg-brand-tint" : "border-ctrl bg-white"}`}>
                 <input type="checkbox" checked={equipment.includes(x)} onChange={() => setEquipment(equipment.includes(x) ? equipment.filter((y) => y !== x) : [...equipment, x])} className="h-4 w-4 accent-[#b11017]" />
                 {x}
               </label>

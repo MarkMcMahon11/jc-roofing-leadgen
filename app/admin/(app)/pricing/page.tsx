@@ -6,7 +6,7 @@ import { PRICE_LABELS, PRICE_UNITS } from "@/lib/services";
 import { useOps } from "@/lib/ops/store";
 import type { Settings } from "@/lib/types";
 
-const numCls = "w-24 rounded-xl border-[1.5px] border-line bg-white px-2.5 py-2 text-base outline-none focus:border-ink sm:w-28";
+const numCls = "w-24 rounded-xl border-[1.5px] border-ctrl bg-white px-2.5 py-2 text-base outline-none focus:border-night sm:w-28";
 const toNum = (v: string) => (v === "" ? NaN : +v);
 const show = (n: number) => (Number.isNaN(n) ? "" : n);
 
@@ -71,7 +71,7 @@ export default function PricingPage() {
             {s.materials.map((m, i) => (
               <label key={m.id} className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-sm">
                 {m.label}
-                <span className="flex shrink-0 items-center gap-1 text-mute">
+                <span className="flex shrink-0 items-center gap-1 text-steel">
                   <span aria-hidden>£</span>
                   <input type="number" min={1} className={numCls} value={show(m.ratePerM2)} onChange={(e) => upd({ materials: s.materials.map((x, j) => (j === i ? { ...x, ratePerM2: toNum(e.target.value) } : x)) })} />
                   <span aria-hidden>/m²</span>
@@ -86,7 +86,7 @@ export default function PricingPage() {
             {(Object.keys(s.prices) as (keyof Settings["prices"])[]).map((k) => (
               <label key={k} className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-sm">
                 {PRICE_LABELS[k] ?? k}
-                <span className="flex shrink-0 items-center gap-1 text-mute">
+                <span className="flex shrink-0 items-center gap-1 text-steel">
                   <span aria-hidden>£</span>
                   <input type="number" min={1} className={numCls} value={show(s.prices[k])} onChange={(e) => upd({ prices: { ...s.prices, [k]: toNum(e.target.value) } })} />
                   {PRICE_UNITS[k] && <span aria-hidden>{PRICE_UNITS[k]}</span>}

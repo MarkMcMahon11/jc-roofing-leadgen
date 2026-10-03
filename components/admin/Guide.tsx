@@ -88,7 +88,7 @@ export const useNextStep = () => useGuide().next;
 function NextStepCard({ step, onClose }: { step: NextStep; onClose: () => void }) {
   const here = typeof window !== "undefined" && step.href === window.location.pathname + window.location.search;
   return (
-    <div role="status" className="fixed bottom-4 left-4 right-4 z-[1150] mx-auto max-w-md rounded-2xl bg-ink p-4 text-sm text-white shadow-2xl ring-1 ring-white/10 sm:left-auto sm:right-5 sm:mx-0 print:hidden">
+    <div role="status" className="fixed bottom-4 left-4 right-4 z-[1150] mx-auto max-w-md rounded-2xl bg-night p-4 text-sm text-white shadow-2xl ring-1 ring-white/10 sm:left-auto sm:right-5 sm:mx-0 print:hidden">
       <div className="flex items-start gap-3">
         <span aria-hidden className="mt-0.5 rounded-full bg-emerald-500/20 p-1.5 text-emerald-300">✓</span>
         <div className="min-w-0 flex-1">
@@ -96,7 +96,7 @@ function NextStepCard({ step, onClose }: { step: NextStep; onClose: () => void }
           <div className="mt-1 text-stone-300">{step.body}</div>
           {step.href && !here && step.action && (
             <div className="mt-3">
-              <Link href={step.href} onClick={onClose} className="inline-flex min-h-9 items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 font-semibold text-ink hover:bg-cream">
+              <Link href={step.href} onClick={onClose} className="inline-flex min-h-9 items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 font-semibold text-night hover:bg-silver-soft">
                 {step.action} <ArrowRight size={14} />
               </Link>
             </div>
@@ -116,19 +116,19 @@ export function PageGuide({ id, title, steps }: { id: string; title: string; ste
   const [open, setOpen] = useState(false); // on phones the steps stay folded away until asked for
   if (!on || dismissed.has(id)) return null;
   return (
-    <div className="mb-5 rounded-2xl border border-gold/60 bg-amber-50 p-4 text-sm text-ink print:hidden">
+    <div className="mb-5 rounded-2xl border border-gold/60 bg-gradient-to-b from-amber-50 to-amber-100/60 p-4 text-sm text-night shadow-[inset_0_1px_0_#fff,0_10px_24px_-18px_rgba(180,110,0,0.5)] print:hidden">
       <div className="flex items-start gap-3">
         <Lightbulb size={18} aria-hidden className="mt-0.5 shrink-0 text-amber-700" />
         <div className="min-w-0 flex-1">
           <div className="font-semibold">{title}</div>
           <button type="button" aria-expanded={open} onClick={() => setOpen(!open)} className="min-h-10 text-xs font-medium underline sm:hidden">{open ? "Hide the steps" : "Show the steps"}</button>
-          <ol className={`mt-1.5 list-decimal space-y-1 pl-5 text-ink/90 ${open ? "block" : "hidden sm:block"}`}>
+          <ol className={`mt-1.5 list-decimal space-y-1 pl-5 text-night/90 ${open ? "block" : "hidden sm:block"}`}>
             {steps.map((s) => (
               <li key={s}>{s}</li>
             ))}
           </ol>
         </div>
-        <button type="button" onClick={() => dismiss(id)} className="min-h-10 shrink-0 rounded-lg px-3 py-1.5 text-xs font-semibold text-ink ring-1 ring-gold hover:bg-amber-100">
+        <button type="button" onClick={() => dismiss(id)} className="min-h-10 shrink-0 rounded-lg px-3 py-1.5 text-xs font-semibold text-night ring-1 ring-gold hover:bg-amber-100">
           Got it
         </button>
       </div>
@@ -140,15 +140,15 @@ export function PageGuide({ id, title, steps }: { id: string; title: string; ste
 export function GuideToggle() {
   const { on, setOn, resetTips, dismissed } = useGuide();
   return (
-    <div className="px-3 py-1 text-sm text-mute">
-      <label className="flex min-h-10 cursor-pointer items-center justify-between gap-3 rounded-lg hover:text-ink">
+    <div className="px-3 py-1 text-sm text-steel">
+      <label className="flex min-h-10 cursor-pointer items-center justify-between gap-3 rounded-lg hover:text-night">
         <span className="flex items-center gap-3">
           <Lightbulb size={16} aria-hidden /> Usage tips
         </span>
         <input type="checkbox" checked={on} onChange={(e) => setOn(e.target.checked)} className="h-4 w-4 accent-[#b11017]" />
       </label>
       {on && dismissed.size > 0 && (
-        <button type="button" onClick={resetTips} className="pl-7 text-xs underline hover:text-ink">
+        <button type="button" onClick={resetTips} className="pl-7 text-xs underline hover:text-night">
           Show tips again
         </button>
       )}

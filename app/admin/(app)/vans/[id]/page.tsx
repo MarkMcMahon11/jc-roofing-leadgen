@@ -44,14 +44,14 @@ export default function VanPage() {
 
   return (
     <div className="space-y-6">
-      <Link href="/admin/vans" className="inline-flex min-h-10 items-center gap-1 text-sm text-mute hover:text-ink"><ArrowLeft size={16} /> Vans</Link>
+      <Link href="/admin/vans" className="inline-flex min-h-10 items-center gap-1 text-sm text-steel hover:text-night"><ArrowLeft size={16} /> Vans</Link>
 
       <div className="flex flex-col gap-4 @3xl:flex-row @3xl:items-end @3xl:justify-between">
         <div className="flex items-center gap-4">
-          <div className="rounded-xl bg-gold px-3 py-2 font-mono text-lg font-bold text-ink">{v.reg}</div>
+          <div className="rounded-xl bg-gold px-3 py-2 font-mono text-lg font-bold text-night">{v.reg}</div>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">{v.make} {v.model} <span className="font-normal text-mute">{v.year}</span></h1>
-            <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-mute">
+            <h1 className="text-2xl font-bold tracking-tight">{v.make} {v.model} <span className="font-normal text-steel">{v.year}</span></h1>
+            <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-steel">
               <Badge tone={vehicleStatus[v.status].tone} dot>{vehicleStatus[v.status].label}</Badge>
               <span>{v.kind}</span>·<span>{v.colour}</span>·<span>{v.fuel}</span>{v.payloadKg ? <>·<span>{num(v.payloadKg)} kg payload</span></> : null}
             </div>
@@ -80,8 +80,8 @@ export default function VanPage() {
 
       <div className="grid gap-4 @3xl:grid-cols-3">
         <Card>
-          <CardHeader title="Deadlines" action={<button type="button" onClick={() => setEdit(true)} className="inline-flex min-h-10 items-center gap-1 text-xs font-medium text-mute hover:text-ink"><Pencil size={12} /> Update</button>} />
-          <ul className="divide-y divide-cream">
+          <CardHeader title="Deadlines" action={<button type="button" onClick={() => setEdit(true)} className="inline-flex min-h-10 items-center gap-1 text-xs font-medium text-steel hover:text-night"><Pencil size={12} /> Update</button>} />
+          <ul className="divide-y divide-silver">
             {docs.map(([label, , date]) => {
               if (!date) return null;
               const days = daysBetween(today(), date);
@@ -97,7 +97,7 @@ export default function VanPage() {
               <Badge tone={left < 0 ? "red" : left < SERVICE_MILES_WARN ? "amber" : "green"}>{num(v.nextServiceMiles)} mi</Badge>
             </li>
           </ul>
-          <div className="space-y-1 border-t border-cream px-5 py-3 text-xs text-mute">
+          <div className="space-y-1 border-t border-silver px-5 py-3 text-xs text-steel">
             {v.vin && <div>VIN <span className="font-mono">{v.vin}</span></div>}
             <a href="https://www.gov.uk/check-vehicle-tax" target="_blank" rel="noreferrer" className="inline-flex min-h-10 items-center underline">Check tax and MOT on GOV.UK</a>
           </div>
@@ -107,17 +107,17 @@ export default function VanPage() {
           <CardHeader title="Fitted equipment and driver" />
           <div className="space-y-3 p-5 text-sm">
             <div className="flex flex-wrap gap-1.5">
-              {v.equipment.length ? v.equipment.map((x) => <Badge key={x}>{x}</Badge>) : <span className="text-mute">Nothing listed.</span>}
+              {v.equipment.length ? v.equipment.map((x) => <Badge key={x}>{x}</Badge>) : <span className="text-steel">Nothing listed.</span>}
             </div>
-            <div>Usual driver: {driver ? <Link href={`/admin/crew/${driver.id}`} className="inline-flex min-h-10 items-center font-medium underline">{driver.name}</Link> : <span className="text-mute">none</span>}</div>
+            <div>Usual driver: {driver ? <Link href={`/admin/crew/${driver.id}`} className="inline-flex min-h-10 items-center font-medium underline">{driver.name}</Link> : <span className="text-steel">none</span>}</div>
           </div>
         </Card>
 
         <Card>
           <CardHeader title="Location" sub="Sample position until a tracker is connected" />
           <div className="space-y-3 p-5 text-sm">
-            <div className="flex items-center gap-2"><Radio size={16} aria-hidden className={v.tracker.online ? "text-emerald-600" : "text-line"} /> {v.tracker.online ? "Online" : "No signal"} <span className="text-mute">· {fmtDateTime(v.tracker.lastSeen)}</span></div>
-            <div className="flex items-center gap-2"><MapPin size={16} aria-hidden className="text-mute" /> {v.tracker.area}</div>
+            <div className="flex items-center gap-2"><Radio size={16} aria-hidden className={v.tracker.online ? "text-emerald-600" : "text-ctrl"} /> {v.tracker.online ? "Online" : "No signal"} <span className="text-steel">· {fmtDateTime(v.tracker.lastSeen)}</span></div>
+            <div className="flex items-center gap-2"><MapPin size={16} aria-hidden className="text-steel" /> {v.tracker.area}</div>
             <Link href={`/admin/map?van=${v.id}`} className="flex min-h-11 items-center justify-center rounded-xl bg-brand px-3 py-2 text-sm font-semibold text-white hover:bg-brand-dark">See on the map</Link>
           </div>
         </Card>
@@ -126,10 +126,10 @@ export default function VanPage() {
       <div className="grid gap-4 @3xl:grid-cols-2">
         <Card>
           <CardHeader title="Jobs and visits" sub={`${jobs.length} on record`} />
-          <ul className="max-h-80 divide-y divide-cream overflow-y-auto">
+          <ul className="max-h-80 divide-y divide-silver overflow-y-auto">
             {jobs.slice(0, 12).map((j) => (
               <li key={j.id} className="flex items-center justify-between gap-3 px-5 py-2.5 text-sm">
-                <div className="min-w-0"><div className="truncate font-medium">{j.title}</div><div className="text-xs text-mute">{fmtDay(j.date)}{j.time ? ` ${j.time}` : ""} · {j.customer ?? j.address}</div></div>
+                <div className="min-w-0"><div className="truncate font-medium">{j.title}</div><div className="text-xs text-steel">{fmtDay(j.date)}{j.time ? ` ${j.time}` : ""} · {j.customer ?? j.address}</div></div>
                 <Badge tone={jobStatus[j.status].tone}>{jobStatus[j.status].label}</Badge>
               </li>
             ))}
@@ -145,10 +145,10 @@ export default function VanPage() {
       <div className="grid gap-4 @3xl:grid-cols-2">
         <Card>
           <CardHeader title="Servicing and repairs" sub={`${maint.length} orders · ${gbp(sum(maint.filter((m) => m.status === "done").map((m) => m.cost)))} spent`} />
-          <ul className="max-h-80 divide-y divide-cream overflow-y-auto">
+          <ul className="max-h-80 divide-y divide-silver overflow-y-auto">
             {maint.map((m) => (
               <li key={m.id} className="flex items-center justify-between gap-3 px-5 py-2.5 text-sm">
-                <div className="min-w-0"><div className="truncate font-medium">{m.description}</div><div className="text-xs text-mute">{fmtDate(m.openedAt)} · {maintType[m.type]}{m.garage ? ` · ${m.garage}` : ""}</div></div>
+                <div className="min-w-0"><div className="truncate font-medium">{m.description}</div><div className="text-xs text-steel">{fmtDate(m.openedAt)} · {maintType[m.type]}{m.garage ? ` · ${m.garage}` : ""}</div></div>
                 <div className="text-right"><div className="font-medium tabular-nums">{gbp(m.cost)}</div><Badge tone={maintStatus[m.status].tone}>{maintStatus[m.status].label}</Badge></div>
               </li>
             ))}
@@ -157,10 +157,10 @@ export default function VanPage() {
         </Card>
         <Card>
           <CardHeader title="Fines and notices" sub={`${fines.length} on record`} />
-          <ul className="max-h-80 divide-y divide-cream overflow-y-auto">
+          <ul className="max-h-80 divide-y divide-silver overflow-y-auto">
             {fines.map((f) => (
               <li key={f.id} className="flex items-center justify-between gap-3 px-5 py-2.5 text-sm">
-                <div className="min-w-0"><div className="truncate font-medium">{f.description}</div><div className="text-xs text-mute">{fmtDate(f.date)} · {f.location} · {db.crew.find((c) => c.id === f.crewId)?.name.split(" ")[0] ?? "driver unknown"}</div></div>
+                <div className="min-w-0"><div className="truncate font-medium">{f.description}</div><div className="text-xs text-steel">{fmtDate(f.date)} · {f.location} · {db.crew.find((c) => c.id === f.crewId)?.name.split(" ")[0] ?? "driver unknown"}</div></div>
                 <div className="text-right"><div className="font-medium tabular-nums">{gbp(f.amount)}</div><Badge tone={fineStatus[f.status].tone}>{fineStatus[f.status].label}</Badge></div>
               </li>
             ))}
@@ -170,7 +170,7 @@ export default function VanPage() {
       </div>
 
       <Card>
-        <CardHeader title="Recent costs" action={<Link href="/admin/costs" className="inline-flex min-h-10 items-center whitespace-nowrap text-xs font-medium text-mute hover:text-ink">All costs →</Link>} />
+        <CardHeader title="Recent costs" action={<Link href="/admin/costs" className="inline-flex min-h-10 items-center whitespace-nowrap text-xs font-medium text-steel hover:text-night">All costs →</Link>} />
         <Table minWidth={520}>
           <thead><tr><Th>Date</Th><Th>What</Th><Th>Category</Th><Th right>Amount</Th></tr></thead>
           <tbody>

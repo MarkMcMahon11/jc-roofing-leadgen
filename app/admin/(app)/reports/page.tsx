@@ -14,18 +14,18 @@ import type { ExpenseCategory } from "@/lib/ops/types";
 
 type Report = "vans" | "costs" | "leads" | "week" | "team";
 
-const th = "border-b-2 border-ink px-2 py-1.5 text-left text-xs font-semibold uppercase tracking-wide";
-const td = "border-b border-sand px-2 py-1.5 align-top";
+const th = "border-b-2 border-night px-2 py-1.5 text-left text-xs font-semibold uppercase tracking-wide";
+const td = "border-b border-edge px-2 py-1.5 align-top";
 
 function Sheet({ title, sub, children }: { title: string; sub: string; children: React.ReactNode }) {
   return (
-    <article className="rounded-2xl border border-sand bg-white p-6 print:border-0 print:p-0">
+    <article className="rounded-2xl border border-edge bg-white p-6 print:border-0 print:p-0">
       <header className="mb-5 flex items-start justify-between gap-4 border-b-2 border-brand pb-3">
         <div>
           <h2 className="text-xl font-bold">{title}</h2>
-          <p className="text-sm text-mute">{sub}</p>
+          <p className="text-sm text-steel">{sub}</p>
         </div>
-        <div className="text-right text-xs text-mute">
+        <div className="text-right text-xs text-steel">
           <Image src="/logo.png" alt="JC Roofing Dumfries" width={512} height={198} className="ml-auto h-10 w-auto" />
           Printed {fmtDate(today())}
         </div>
@@ -76,7 +76,7 @@ export default function ReportsPage() {
               {db.vehicles.map((v) => (
                 <tr key={v.id}>
                   <td className={`${td} font-mono font-semibold`}>{v.reg}</td>
-                  <td className={td}>{v.make} {v.model} {v.year}<div className="text-xs text-mute">{v.colour} · {v.fuel}{v.vin ? ` · VIN ${v.vin}` : ""}</div></td>
+                  <td className={td}>{v.make} {v.model} {v.year}<div className="text-xs text-steel">{v.colour} · {v.fuel}{v.vin ? ` · VIN ${v.vin}` : ""}</div></td>
                   <td className={td}>{vehicleStatus[v.status].label}</td>
                   <td className={td}>{v.status === "off_road" ? "SORN" : fmtDate(v.docs.mot)}</td>
                   <td className={td}>{v.status === "off_road" ? "SORN" : fmtDate(v.docs.roadTax)}</td>
@@ -87,7 +87,7 @@ export default function ReportsPage() {
               ))}
             </tbody>
           </table>
-          {db.vehicles.length === 0 && <p className="py-6 text-center text-sm text-mute">No vans yet.</p>}
+          {db.vehicles.length === 0 && <p className="py-6 text-center text-sm text-steel">No vans yet.</p>}
         </Sheet>
       )}
 
@@ -118,7 +118,7 @@ export default function ReportsPage() {
                 </tr>
               </tbody>
             </table>
-            {rows.length === 0 && <p className="py-6 text-center text-sm text-mute">No costs in this period.</p>}
+            {rows.length === 0 && <p className="py-6 text-center text-sm text-steel">No costs in this period.</p>}
           </Sheet>
         );
       })()}
@@ -143,8 +143,8 @@ export default function ReportsPage() {
                 {list.map((l) => (
                   <tr key={l.id}>
                     <td className={`${td} whitespace-nowrap`}>{fmtDate(ukDate(l.createdAt))}</td>
-                    <td className={td}>{l.name}<div className="text-xs text-mute">{l.postcode}</div></td>
-                    <td className={td}>{SERVICE_INFO[l.service ?? "roof"].label}<div className="text-xs text-mute">{detailsText(l, biz.settings.materials.find((m) => m.id === l.material)?.label)}</div></td>
+                    <td className={td}>{l.name}<div className="text-xs text-steel">{l.postcode}</div></td>
+                    <td className={td}>{SERVICE_INFO[l.service ?? "roof"].label}<div className="text-xs text-steel">{detailsText(l, biz.settings.materials.find((m) => m.id === l.material)?.label)}</div></td>
                     <td className={`${td} text-right tabular-nums`}>{l.noPrice ? "—" : `${gbp(l.low)}–${gbp(l.high)}`}</td>
                     <td className={`${td} capitalize`}>{l.score}</td>
                     <td className={td}>{leadStatus[l.status].label}</td>
@@ -153,7 +153,7 @@ export default function ReportsPage() {
                 ))}
               </tbody>
             </table>
-            {list.length === 0 && <p className="py-6 text-center text-sm text-mute">No enquiries in this period.</p>}
+            {list.length === 0 && <p className="py-6 text-center text-sm text-steel">No enquiries in this period.</p>}
           </Sheet>
         );
       })()}
@@ -167,8 +167,8 @@ export default function ReportsPage() {
               <tbody>
                 {items.map((it) => (
                   <tr key={it.key}>
-                    <td className={`${td} whitespace-nowrap`}>{fmtDay(it.date)}{it.time ? ` ${it.time}` : ""}{it.endDate ? <div className="text-xs text-mute">to {fmtDay(it.endDate)}</div> : null}</td>
-                    <td className={td}>{it.title}<div className="text-xs text-mute">{jobKind[it.kind]}{it.customer ? ` · ${it.customer}` : ""}</div></td>
+                    <td className={`${td} whitespace-nowrap`}>{fmtDay(it.date)}{it.time ? ` ${it.time}` : ""}{it.endDate ? <div className="text-xs text-steel">to {fmtDay(it.endDate)}</div> : null}</td>
+                    <td className={td}>{it.title}<div className="text-xs text-steel">{jobKind[it.kind]}{it.customer ? ` · ${it.customer}` : ""}</div></td>
                     <td className={td}>{it.address}</td>
                     <td className={`${td} font-mono`}>{it.vanIds.map((id) => vanReg(db, id)).join(", ") || "—"}</td>
                     <td className={td}>{it.crewIds.map((id) => crewName(db, id)).join(", ") || "—"}</td>
@@ -176,7 +176,7 @@ export default function ReportsPage() {
                 ))}
               </tbody>
             </table>
-            {items.length === 0 && <p className="py-6 text-center text-sm text-mute">Nothing booked this week.</p>}
+            {items.length === 0 && <p className="py-6 text-center text-sm text-steel">Nothing booked this week.</p>}
           </Sheet>
         );
       })()}

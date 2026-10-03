@@ -46,8 +46,8 @@ export default function VansPage() {
           options={[{ value: "all", label: "All", count: count("all") }, ...(["in_use", "at_yard", "in_garage", "off_road"] as const).map((s) => ({ value: s, label: vehicleStatus[s].label, count: count(s) }))]}
         />
         <div className="relative @3xl:w-72">
-          <Search size={16} aria-hidden className="absolute left-3 top-1/2 -translate-y-1/2 text-mute" />
-          <input aria-label="Search vans" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Plate, model or driver" className="min-h-11 w-full rounded-xl border-[1.5px] border-line bg-white py-2 pl-9 pr-3 text-base outline-none focus:border-ink" />
+          <Search size={16} aria-hidden className="absolute left-3 top-1/2 -translate-y-1/2 text-steel" />
+          <input aria-label="Search vans" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Plate, model or driver" className="min-h-11 w-full rounded-xl border-[1.5px] border-ctrl bg-white py-2 pl-9 pr-3 text-base outline-none focus:border-night" />
         </div>
       </div>
 
@@ -64,34 +64,34 @@ export default function VansPage() {
               const [dl, date] = nextDeadline(v);
               const days = daysBetween(today(), date);
               return (
-                <tr key={v.id} onClick={() => router.push(`/admin/vans/${v.id}`)} className="cursor-pointer hover:bg-cream">
+                <tr key={v.id} onClick={() => router.push(`/admin/vans/${v.id}`)} className="cursor-pointer hover:bg-silver-soft">
                   <Td>
                     <Link href={`/admin/vans/${v.id}`} onClick={(e) => e.stopPropagation()} className="flex min-h-10 items-center gap-3">
                       <Plate>{v.reg}</Plate>
                       <span>
                         <span className="block font-medium">{v.make} {v.model}</span>
-                        <span className="block text-xs text-mute">{v.year} · {v.colour} · {v.fuel} · {v.kind}</span>
+                        <span className="block text-xs text-steel">{v.year} · {v.colour} · {v.fuel} · {v.kind}</span>
                       </span>
                     </Link>
                   </Td>
                   <Td><Badge tone={vehicleStatus[v.status].tone} dot>{vehicleStatus[v.status].label}</Badge></Td>
-                  <Td>{driver ? driver.name : <span className="text-mute">—</span>}</Td>
+                  <Td>{driver ? driver.name : <span className="text-steel">—</span>}</Td>
                   <Td right>
                     <div>{num(v.mileage)} mi</div>
-                    <div className={`text-xs ${left < 0 ? "font-semibold text-brand" : left < 1000 ? "text-amber-700" : "text-mute"}`}>{left < 0 ? `service overdue ${num(-left)} mi` : `${num(left)} mi to service`}</div>
+                    <div className={`text-xs ${left < 0 ? "font-semibold text-brand" : left < 1000 ? "text-amber-700" : "text-steel"}`}>{left < 0 ? `service overdue ${num(-left)} mi` : `${num(left)} mi to service`}</div>
                   </Td>
                   <Td>
                     <Badge tone={days < 0 ? "red" : days <= 15 ? "amber" : "green"}>{dl} {fmtDate(date)}</Badge>
-                    <div className="mt-0.5 text-xs text-mute">{relDays(days)}</div>
+                    <div className="mt-0.5 text-xs text-steel">{relDays(days)}</div>
                   </Td>
-                  <Td right>{v.status === "off_road" ? <span className="text-mute">—</span> : pct(util)}</Td>
+                  <Td right>{v.status === "off_road" ? <span className="text-steel">—</span> : pct(util)}</Td>
                   <Td right className="font-semibold">{gbp(cost)}</Td>
                 </tr>
               );
             })}
           </tbody>
         </Table>
-        {shown.length === 0 && <div className="px-5 py-10 text-center text-sm text-mute">{db.vehicles.length === 0 ? "No vans yet. Press “Add van” to enter the first one." : "No vans match."}</div>}
+        {shown.length === 0 && <div className="px-5 py-10 text-center text-sm text-steel">{db.vehicles.length === 0 ? "No vans yet. Press “Add van” to enter the first one." : "No vans match."}</div>}
       </Card>
 
       {adding && <VanForm onClose={() => setAdding(false)} />}

@@ -72,7 +72,7 @@ export function CrewForm({ onClose, member }: { onClose: () => void; member?: Cr
         <Field label="Mobile"><Input name="phone" type="tel" defaultValue={m?.phone} maxLength={30} /></Field>
         <Field label="Email (optional)"><Input name="email" type="email" defaultValue={m?.email} maxLength={120} /></Field>
         <Field label="Started"><Input name="startDate" type="date" defaultValue={m?.startDate ?? today()} /></Field>
-        <label className="flex min-h-11 cursor-pointer items-center gap-3 self-end rounded-xl border-[1.5px] border-line bg-white px-3 py-2 text-sm">
+        <label className="flex min-h-11 cursor-pointer items-center gap-3 self-end rounded-xl border-[1.5px] border-ctrl bg-white px-3 py-2 text-sm">
           <input type="checkbox" checked={drives} onChange={(e) => setDrives(e.target.checked)} className="h-4 w-4 accent-[#b11017]" /> Drives company vans
         </label>
         {drives && (
@@ -81,7 +81,7 @@ export function CrewForm({ onClose, member }: { onClose: () => void; member?: Cr
             <Field label="Points on licence"><Input name="licencePoints" type="number" min={0} max={36} defaultValue={m?.licencePoints ?? 0} /></Field>
           </>
         )}
-        <div className="sm:col-span-2 text-sm font-semibold text-ink">Site cards and training</div>
+        <div className="sm:col-span-2 text-sm font-semibold text-night">Site cards and training</div>
         <Field label="CSCS card colour">
           <Select name="cscsCard" defaultValue={m?.cscsCard ?? ""}>
             <option value="">No card</option>

@@ -50,7 +50,7 @@ export default function Dashboard() {
   const statusParts = (["in_use", "at_yard", "in_garage", "off_road"] as const).map((s) => ({
     label: vehicleStatus[s].label,
     value: db.vehicles.filter((v) => v.status === s).length,
-    color: { in_use: "#16a34a", at_yard: "#ffb507", in_garage: "#b11017", off_road: "#8a877a" }[s],
+    color: { in_use: "#16a34a", at_yard: "#ffb507", in_garage: "#b11017", off_road: "#8b94a3" }[s],
   }));
   const hour = Number(new Date().toLocaleString("en-GB", { hour: "numeric", hour12: false, timeZone: "Europe/London" })) % 24;
   const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
@@ -60,8 +60,8 @@ export default function Dashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-ink">{greeting}</h1>
-        <p className="text-sm text-mute">
+        <h1 className="text-2xl font-bold tracking-tight text-night">{greeting}</h1>
+        <p className="text-sm text-steel">
           Your business at a glance · {parseDate(day).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })}
         </p>
       </div>
@@ -96,12 +96,12 @@ export default function Dashboard() {
 
       <div className="grid gap-4 @3xl:grid-cols-3">
         <Card className="@3xl:col-span-2">
-          <CardHeader title="Enquiries, last 12 weeks" sub="All enquiries and the hot ones, from the quote form" action={<Link href="/admin/leads" className="inline-flex min-h-10 items-center whitespace-nowrap text-xs font-medium text-mute hover:text-ink">See leads →</Link>} />
+          <CardHeader title="Enquiries, last 12 weeks" sub="All enquiries and the hot ones, from the quote form" action={<Link href="/admin/leads" className="inline-flex min-h-10 items-center whitespace-nowrap text-xs font-medium text-steel hover:text-night">See leads →</Link>} />
           <div className="p-5">
             <BarChart
               data={m.weekly}
               series={[
-                { key: "total", label: "Enquiries", color: "#d6d4c7" },
+                { key: "total", label: "Enquiries", color: "#b8c1cf" },
                 { key: "hot", label: "Hot leads", color: "#b11017" },
               ]}
               xLabel={(r) => fmtShort(String(r.week))}
@@ -117,14 +117,14 @@ export default function Dashboard() {
               center={
                 <>
                   <div className="text-2xl font-bold tabular-nums">{db.vehicles.length}</div>
-                  <div className="text-[11px] text-mute">vehicles</div>
+                  <div className="text-[11px] text-steel">vehicles</div>
                 </>
               }
             />
             <ul className="flex-1 space-y-2 text-sm">
               {statusParts.map((p) => (
                 <li key={p.label} className="flex items-center justify-between gap-2">
-                  <span className="flex items-center gap-2 text-mute">
+                  <span className="flex items-center gap-2 text-steel">
                     <span aria-hidden className="h-2.5 w-2.5 rounded-full" style={{ background: p.color }} />
                     {p.label}
                   </span>
@@ -141,33 +141,33 @@ export default function Dashboard() {
           <CardHeader
             title="Needs your attention"
             sub={`${m.alerts.filter((a) => a.severity === "high").length} urgent · ${m.alerts.length} in total`}
-            action={<Link href="/admin/documents" className="inline-flex min-h-10 items-center whitespace-nowrap text-xs font-medium text-mute hover:text-ink">See all →</Link>}
+            action={<Link href="/admin/documents" className="inline-flex min-h-10 items-center whitespace-nowrap text-xs font-medium text-steel hover:text-night">See all →</Link>}
           />
-          <ul className="divide-y divide-cream">
+          <ul className="divide-y divide-silver">
             {m.alerts.slice(0, 8).map((a) => (
               <li key={a.id}>
-                <Link href={a.href} className="flex min-h-11 items-center gap-3 px-5 py-2.5 text-sm hover:bg-cream">
+                <Link href={a.href} className="flex min-h-11 items-center gap-3 px-5 py-2.5 text-sm hover:bg-silver-soft">
                   <span aria-hidden className={`h-2 w-2 shrink-0 rounded-full ${a.severity === "high" ? "bg-brand" : a.severity === "medium" ? "bg-amber-500" : "bg-sky-500"}`} />
                   <span className="sr-only">{a.severity} priority: </span>
                   <span className="flex-1">{a.text}</span>
-                  <ArrowRight size={14} aria-hidden className="text-line" />
+                  <ArrowRight size={14} aria-hidden className="text-ctrl" />
                 </Link>
               </li>
             ))}
-            {m.alerts.length === 0 && <li className="px-5 py-8 text-center text-sm text-mute">Nothing needs attention right now.</li>}
+            {m.alerts.length === 0 && <li className="px-5 py-8 text-center text-sm text-steel">Nothing needs attention right now.</li>}
           </ul>
         </Card>
 
         <Card>
-          <CardHeader title="This week's schedule" sub="Inspections and jobs, next 7 days" action={<Link href="/admin/jobs" className="inline-flex min-h-10 items-center whitespace-nowrap text-xs font-medium text-mute hover:text-ink">Open schedule →</Link>} />
-          <ul className="divide-y divide-cream">
+          <CardHeader title="This week's schedule" sub="Inspections and jobs, next 7 days" action={<Link href="/admin/jobs" className="inline-flex min-h-10 items-center whitespace-nowrap text-xs font-medium text-steel hover:text-night">Open schedule →</Link>} />
+          <ul className="divide-y divide-silver">
             {m.week.slice(0, 8).map((it) => {
               const job = it.jobId ? db.jobs.find((j) => j.id === it.jobId) : undefined;
               const issues = job ? jobIssues(db, job).length : 0;
               return (
                 <li key={it.key}>
-                  <Link href="/admin/jobs" className="flex items-start gap-3 px-5 py-2.5 text-sm hover:bg-cream">
-                    <div className="w-16 shrink-0 text-xs font-semibold text-mute">
+                  <Link href="/admin/jobs" className="flex items-start gap-3 px-5 py-2.5 text-sm hover:bg-silver-soft">
+                    <div className="w-16 shrink-0 text-xs font-semibold text-steel">
                       {it.date <= m.t ? "Today" : fmtDay(it.date)}
                       {it.time && <div className="font-normal">{it.time}</div>}
                     </div>
@@ -176,13 +176,13 @@ export default function Dashboard() {
                         {it.title}
                         {it.kind === "inspection" ? "" : it.endDate ? ` · until ${fmtShort(it.endDate)}` : ""}
                       </div>
-                      <div className="truncate text-xs text-mute">
+                      <div className="truncate text-xs text-steel">
                         {it.customer ? `${it.customer} · ` : ""}
                         {it.address}
                       </div>
                       <div className="mt-0.5 flex flex-wrap gap-1 text-xs">
                         {it.vanIds.map((id) => <Plate key={id}>{vanReg(db, id)}</Plate>)}
-                        {it.crewIds.length > 0 && <span className="text-mute">{it.crewIds.map((id) => crewName(db, id).split(" ")[0]).join(", ")}</span>}
+                        {it.crewIds.length > 0 && <span className="text-steel">{it.crewIds.map((id) => crewName(db, id).split(" ")[0]).join(", ")}</span>}
                         {it.vanIds.length === 0 && <Badge tone="amber">No van yet</Badge>}
                         {issues > 0 && <Badge tone="red">{issues} warning{issues === 1 ? "" : "s"}</Badge>}
                       </div>
@@ -191,14 +191,14 @@ export default function Dashboard() {
                 </li>
               );
             })}
-            {m.week.length === 0 && <li className="px-5 py-8 text-center text-sm text-mute">Nothing scheduled in the next 7 days.</li>}
+            {m.week.length === 0 && <li className="px-5 py-8 text-center text-sm text-steel">Nothing scheduled in the next 7 days.</li>}
           </ul>
         </Card>
       </div>
 
       <div className="grid gap-4 @3xl:grid-cols-3">
         <Card>
-          <CardHeader title="Pipeline" sub="Real enquiries, by where they've got to" action={<Link href="/admin/leads" className="inline-flex min-h-10 items-center whitespace-nowrap text-xs font-medium text-mute hover:text-ink">Leads →</Link>} />
+          <CardHeader title="Pipeline" sub="Real enquiries, by where they've got to" action={<Link href="/admin/leads" className="inline-flex min-h-10 items-center whitespace-nowrap text-xs font-medium text-steel hover:text-night">Leads →</Link>} />
           <ul className="space-y-3.5 p-5">
             {([
               ["New or contacted", m.pipe.new + m.pipe.contacted, "brand"],
@@ -209,13 +209,13 @@ export default function Dashboard() {
               <li key={label}>
                 <div className="mb-1 flex justify-between text-xs">
                   <span className="font-medium">{label}</span>
-                  <span className="tabular-nums text-mute">{n}</span>
+                  <span className="tabular-nums text-steel">{n}</span>
                 </div>
                 <Progress value={n / pipeMax} tone={tone} />
               </li>
             ))}
-            <li className="border-t border-cream pt-3 text-xs text-mute">
-              Open quotes worth about <b className="text-ink">{gbp(Math.round(m.pipe.openValue))}</b> · won <b className="text-ink">{gbp(Math.round(m.pipe.wonValue))}</b>
+            <li className="border-t border-silver pt-3 text-xs text-steel">
+              Open quotes worth about <b className="text-night">{gbp(Math.round(m.pipe.openValue))}</b> · won <b className="text-night">{gbp(Math.round(m.pipe.wonValue))}</b>
               <div className="mt-0.5">Values use the middle of each quote range.</div>
             </li>
           </ul>
@@ -226,7 +226,7 @@ export default function Dashboard() {
           <ul className="space-y-2.5 p-5 text-sm">
             {(Object.keys(STAGES) as Stage[]).map((s) => (
               <li key={s} className="flex items-center justify-between gap-2">
-                <span className="flex items-center gap-2 text-mute">
+                <span className="flex items-center gap-2 text-steel">
                   <span aria-hidden className="h-2.5 w-2.5 rounded-full" style={{ background: STAGES[s].color }} />
                   {STAGES[s].label}
                 </span>
@@ -237,7 +237,7 @@ export default function Dashboard() {
         </Card>
 
         <Card>
-          <CardHeader title="Van running costs" sub="Last 90 days: fuel, servicing, insurance and more" action={<Link href="/admin/costs" className="inline-flex min-h-10 items-center whitespace-nowrap text-xs font-medium text-mute hover:text-ink">Costs →</Link>} />
+          <CardHeader title="Van running costs" sub="Last 90 days: fuel, servicing, insurance and more" action={<Link href="/admin/costs" className="inline-flex min-h-10 items-center whitespace-nowrap text-xs font-medium text-steel hover:text-night">Costs →</Link>} />
           <div className="p-5">
             <HBar items={m.vanCosts.map(({ v, c }) => ({ label: `${v.reg} · ${v.make} ${v.model}`, value: Math.round(c), color: "#b11017" }))} />
           </div>
@@ -251,50 +251,50 @@ export default function Dashboard() {
             {m.util.map(({ v, u }) => (
               <li key={v.id}>
                 <div className="mb-1 flex justify-between text-xs">
-                  <Link href={`/admin/vans/${v.id}`} className="inline-flex min-h-10 items-center font-medium hover:underline"><Plate>{v.reg}</Plate> <span className="ml-1 text-mute">{v.make} {v.model}</span></Link>
-                  <span className="tabular-nums text-mute">{pct(u)}</span>
+                  <Link href={`/admin/vans/${v.id}`} className="inline-flex min-h-10 items-center font-medium hover:underline"><Plate>{v.reg}</Plate> <span className="ml-1 text-steel">{v.make} {v.model}</span></Link>
+                  <span className="tabular-nums text-steel">{pct(u)}</span>
                 </div>
                 <Progress value={u} tone={u < 0.3 ? "amber" : "green"} />
               </li>
             ))}
-            {m.util.length === 0 && <li className="text-sm text-mute">Add your vans to see how busy they are.</li>}
+            {m.util.length === 0 && <li className="text-sm text-steel">Add your vans to see how busy they are.</li>}
           </ul>
         </Card>
 
         <Card>
-          <CardHeader title="Recent activity" action={<Link href="/admin/activity" className="inline-flex min-h-10 items-center whitespace-nowrap text-xs font-medium text-mute hover:text-ink">All →</Link>} />
-          <ul className="divide-y divide-cream">
+          <CardHeader title="Recent activity" action={<Link href="/admin/activity" className="inline-flex min-h-10 items-center whitespace-nowrap text-xs font-medium text-steel hover:text-night">All →</Link>} />
+          <ul className="divide-y divide-silver">
             {db.activity.slice(0, 6).map((a) => (
               <li key={a.id}>
-                <Link href={a.href ?? "/admin/activity"} className="block px-5 py-2.5 hover:bg-cream">
+                <Link href={a.href ?? "/admin/activity"} className="block px-5 py-2.5 hover:bg-silver-soft">
                   <div className="text-sm">{a.text}</div>
-                  <div className="text-xs text-mute">{fmtDateTime(a.at)}</div>
+                  <div className="text-xs text-steel">{fmtDateTime(a.at)}</div>
                 </Link>
               </li>
             ))}
-            {db.activity.length === 0 && <li className="px-5 py-8 text-center text-sm text-mute">Activity will appear here as you use the dashboard.</li>}
+            {db.activity.length === 0 && <li className="px-5 py-8 text-center text-sm text-steel">Activity will appear here as you use the dashboard.</li>}
           </ul>
         </Card>
       </div>
 
       <Card>
-        <div className="grid divide-y divide-cream sm:grid-cols-3 sm:divide-x sm:divide-y-0">
-          <Link href="/admin/leads" className="flex items-center gap-4 p-5 hover:bg-cream">
+        <div className="grid divide-y divide-silver sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+          <Link href="/admin/leads" className="flex items-center gap-4 p-5 hover:bg-silver-soft">
             <div>
-              <div className="text-xs uppercase tracking-wide text-mute">Enquiries and quotes still open</div>
+              <div className="text-xs uppercase tracking-wide text-steel">Enquiries and quotes still open</div>
               <div className="text-lg font-bold tabular-nums">{gbp(Math.round(m.pipe.openValue))}</div>
             </div>
           </Link>
-          <Link href="/admin/jobs" className="flex items-center gap-4 p-5 hover:bg-cream">
+          <Link href="/admin/jobs" className="flex items-center gap-4 p-5 hover:bg-silver-soft">
             <div>
-              <div className="text-xs uppercase tracking-wide text-mute">Jobs booked, to come</div>
+              <div className="text-xs uppercase tracking-wide text-steel">Jobs booked, to come</div>
               <div className="text-lg font-bold tabular-nums">{gbp(sum(db.jobs.filter((j) => j.kind === "job" && (j.status === "scheduled" || j.status === "in_progress")).map((j) => j.value ?? 0)))}</div>
             </div>
           </Link>
-          <Link href="/admin/fines" className="flex items-center gap-4 p-5 hover:bg-cream">
+          <Link href="/admin/fines" className="flex items-center gap-4 p-5 hover:bg-silver-soft">
             <AlertTriangle aria-hidden className="text-brand" />
             <div>
-              <div className="text-xs uppercase tracking-wide text-mute">Notices to name a driver for</div>
+              <div className="text-xs uppercase tracking-wide text-steel">Notices to name a driver for</div>
               <div className="text-lg font-bold tabular-nums">
                 {db.fines.filter((f) => f.status === "to_name").length} <Badge tone="red">28-day deadline</Badge>
               </div>

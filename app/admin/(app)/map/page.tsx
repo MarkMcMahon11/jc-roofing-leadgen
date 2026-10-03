@@ -15,8 +15,8 @@ import { useOps } from "@/lib/ops/store";
 import type { FleetDB, Vehicle } from "@/lib/ops/types";
 
 type VanKind = "on_job" | "on_road" | "yard" | "garage" | "off";
-const VAN_COLOR: Record<VanKind, string> = { on_job: "#ea580c", on_road: "#16a34a", yard: "#ffb507", garage: "#b11017", off: "#8a877a" };
-const VAN_TEXT: Record<VanKind, string> = { on_job: "#c2410c", on_road: "#15803d", yard: "#92400e", garage: "#b11017", off: "#5f5f57" };
+const VAN_COLOR: Record<VanKind, string> = { on_job: "#ea580c", on_road: "#16a34a", yard: "#ffb507", garage: "#b11017", off: "#8b94a3" };
+const VAN_TEXT: Record<VanKind, string> = { on_job: "#c2410c", on_road: "#15803d", yard: "#92400e", garage: "#b11017", off: "#566073" };
 const VAN_LABEL: Record<VanKind, string> = { on_job: "On a job", on_road: "On the road", yard: "At the yard", garage: "In the garage", off: "Off the road" };
 
 const short = (name: string) => (name.length > 16 ? name.slice(0, 15) + "…" : name);
@@ -179,15 +179,15 @@ function ProjectMap() {
       />
 
       <div className="mb-3 flex flex-wrap items-center gap-2" role="group" aria-label="Map layers">
-        <button type="button" aria-pressed={showProjects} onClick={() => setShowProjects(!showProjects)} className={`min-h-10 rounded-full px-4 py-1.5 text-sm font-semibold ${showProjects ? "bg-ink text-white" : "bg-white text-ink ring-1 ring-sand"}`}>Projects</button>
-        <button type="button" aria-pressed={showVans} onClick={() => setShowVans(!showVans)} className={`min-h-10 rounded-full px-4 py-1.5 text-sm font-semibold ${showVans ? "bg-ink text-white" : "bg-white text-ink ring-1 ring-sand"}`}>Vans</button>
+        <button type="button" aria-pressed={showProjects} onClick={() => setShowProjects(!showProjects)} className={`min-h-10 rounded-full px-4 py-1.5 text-sm font-semibold ${showProjects ? "bg-night text-white" : "bg-white text-night ring-1 ring-edge"}`}>Projects</button>
+        <button type="button" aria-pressed={showVans} onClick={() => setShowVans(!showVans)} className={`min-h-10 rounded-full px-4 py-1.5 text-sm font-semibold ${showVans ? "bg-night text-white" : "bg-white text-night ring-1 ring-edge"}`}>Vans</button>
         {showVans && <Badge tone="amber">Van positions are samples until a tracker is connected</Badge>}
       </div>
       <div className="mb-4 scroll-x flex gap-1.5 pb-1" role="group" aria-label="Show projects at these stages">
         {(Object.keys(STAGES) as Stage[]).map((s) => (
-          <button key={s} type="button" aria-pressed={!off.has(s)} onClick={() => toggleStage(s)} className={`flex min-h-10 items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1 text-sm font-medium ring-1 ${off.has(s) ? "bg-white text-mute ring-sand" : "bg-white text-ink ring-line"}`}>
-            <span aria-hidden className="h-2.5 w-2.5 rounded-full" style={{ background: off.has(s) ? "#d6d4c7" : STAGES[s].color }} />
-            {STAGES[s].label} <span className="text-xs text-mute">{count(s)}</span>
+          <button key={s} type="button" aria-pressed={!off.has(s)} onClick={() => toggleStage(s)} className={`flex min-h-10 items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1 text-sm font-medium ring-1 ${off.has(s) ? "bg-white text-steel ring-edge" : "bg-white text-night ring-ctrl"}`}>
+            <span aria-hidden className="h-2.5 w-2.5 rounded-full" style={{ background: off.has(s) ? "#b8c1cf" : STAGES[s].color }} />
+            {STAGES[s].label} <span className="text-xs text-steel">{count(s)}</span>
           </button>
         ))}
       </div>
@@ -197,25 +197,25 @@ function ProjectMap() {
         <Card className="relative isolate overflow-hidden">
           <div ref={mapEl} role="application" aria-label="Map of customer projects and vans. The list beside it has the same information." className="h-[60vh] w-full @3xl:h-[calc(100vh-300px)] @3xl:min-h-[480px]" />
           {(selPin || selVan) && (
-            <div className="absolute inset-x-3 bottom-3 z-[500] rounded-xl border border-sand bg-white p-4 text-sm shadow-xl sm:inset-x-auto sm:bottom-auto sm:right-3 sm:top-3 sm:w-72">
+            <div className="absolute inset-x-3 bottom-3 z-[500] rounded-xl border border-edge bg-white p-4 text-sm shadow-xl sm:inset-x-auto sm:bottom-auto sm:right-3 sm:top-3 sm:w-72">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
                   {selPin ? <div className="font-semibold">{selPin.name}</div> : <div className="flex items-center gap-2"><Plate>{selVan!.v.reg}</Plate></div>}
-                  <div className="text-mute">{selPin ? selPin.title : `${selVan!.v.make} ${selVan!.v.model}`}</div>
+                  <div className="text-steel">{selPin ? selPin.title : `${selVan!.v.make} ${selVan!.v.model}`}</div>
                 </div>
-                <button type="button" onClick={() => setSelected(null)} className="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-mute hover:bg-cream" aria-label="Close details">✕</button>
+                <button type="button" onClick={() => setSelected(null)} className="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-steel hover:bg-silver-soft" aria-label="Close details">✕</button>
               </div>
               {selPin && (
-                <div className="mt-2 space-y-1.5 text-xs text-ink">
+                <div className="mt-2 space-y-1.5 text-xs text-night">
                   <div><Badge tone={STAGES[selPin.stage].tone} dot>{STAGES[selPin.stage].label}</Badge></div>
-                  <div className="text-mute">{selPin.address}</div>
+                  <div className="text-steel">{selPin.address}</div>
                   {selPin.value ? <div>Price: <b>{gbp(selPin.value)}</b></div> : null}
                   {selPin.date && <div>Date: <b>{fmtDay(selPin.date)}</b></div>}
                   {selPin.vanIds.length > 0 && <div className="flex flex-wrap gap-1">{selPin.vanIds.map((id) => <Plate key={id}>{vanReg(db, id)}</Plate>)}</div>}
                   {selPin.crewIds.length > 0 && <div>Crew: {selPin.crewIds.map((id) => crewName(db, id).split(" ")[0]).join(", ")}</div>}
                   <div className="flex flex-wrap gap-2 pt-2">
                     {selPin.leadId && <Link href={`/admin/leads?lead=${selPin.leadId}`} className="flex min-h-10 items-center rounded-lg bg-brand px-3 py-1.5 text-xs font-semibold text-white hover:bg-brand-dark">Open enquiry</Link>}
-                    <Link href="/admin/jobs" className="flex min-h-10 items-center rounded-lg border-[1.5px] border-line px-3 py-1.5 text-xs font-semibold hover:bg-cream">Open schedule</Link>
+                    <Link href="/admin/jobs" className="flex min-h-10 items-center rounded-lg border-[1.5px] border-ctrl px-3 py-1.5 text-xs font-semibold hover:bg-silver-soft">Open schedule</Link>
                   </div>
                 </div>
               )}
@@ -232,40 +232,40 @@ function ProjectMap() {
         </Card>
 
         <Card className="flex flex-col @3xl:h-[calc(100vh-300px)] @3xl:min-h-[480px]">
-          <div className="space-y-2 border-b border-cream p-3">
+          <div className="space-y-2 border-b border-silver p-3">
             <div className="flex gap-1.5" role="group" aria-label="List">
               {(["projects", "vans"] as const).map((t) => (
-                <button key={t} type="button" aria-pressed={tab === t} onClick={() => setTab(t)} className={`min-h-10 flex-1 rounded-lg px-3 py-1 text-sm font-semibold ${tab === t ? "bg-brand text-white" : "bg-cream text-ink"}`}>{t === "projects" ? `Projects (${listPins.length})` : `Vans (${vans.length})`}</button>
+                <button key={t} type="button" aria-pressed={tab === t} onClick={() => setTab(t)} className={`min-h-10 flex-1 rounded-lg px-3 py-1 text-sm font-semibold ${tab === t ? "bg-brand text-white" : "bg-silver-soft text-night"}`}>{t === "projects" ? `Projects (${listPins.length})` : `Vans (${vans.length})`}</button>
               ))}
             </div>
             <div className="relative">
-              <Search size={16} aria-hidden className="absolute left-3 top-1/2 -translate-y-1/2 text-mute" />
-              <input aria-label="Search the list" value={q} onChange={(e) => setQ(e.target.value)} placeholder={tab === "projects" ? "Customer, address or job" : "Plate or model"} className="min-h-11 w-full rounded-xl border-[1.5px] border-line py-2 pl-9 pr-3 text-base outline-none focus:border-ink" />
+              <Search size={16} aria-hidden className="absolute left-3 top-1/2 -translate-y-1/2 text-steel" />
+              <input aria-label="Search the list" value={q} onChange={(e) => setQ(e.target.value)} placeholder={tab === "projects" ? "Customer, address or job" : "Plate or model"} className="min-h-11 w-full rounded-xl border-[1.5px] border-ctrl py-2 pl-9 pr-3 text-base outline-none focus:border-night" />
             </div>
           </div>
-          <ul className="max-h-96 flex-1 divide-y divide-cream overflow-y-auto @3xl:max-h-none">
+          <ul className="max-h-96 flex-1 divide-y divide-silver overflow-y-auto @3xl:max-h-none">
             {tab === "projects" && listPins.map((p) => (
               <li key={p.key}>
-                <button type="button" onClick={() => { setShowProjects(true); pick(`p:${p.key}`); }} className={`flex min-h-12 w-full items-center gap-3 px-4 py-2.5 text-left text-sm hover:bg-cream ${selected === `p:${p.key}` ? "bg-brand-tint" : ""}`}>
+                <button type="button" onClick={() => { setShowProjects(true); pick(`p:${p.key}`); }} className={`flex min-h-12 w-full items-center gap-3 px-4 py-2.5 text-left text-sm hover:bg-silver-soft ${selected === `p:${p.key}` ? "bg-brand-tint" : ""}`}>
                   <span aria-hidden className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: STAGES[p.stage].color }} />
                   <span className="min-w-0 flex-1">
                     <span className="block truncate font-medium">{p.name}</span>
-                    <span className="block truncate text-xs text-mute">{p.title}</span>
-                    <span className="block truncate text-xs text-mute">{p.address}</span>
+                    <span className="block truncate text-xs text-steel">{p.title}</span>
+                    <span className="block truncate text-xs text-steel">{p.address}</span>
                   </span>
                   <span className="text-right text-xs">
                     <span className="block font-semibold" style={{ color: STAGES[p.stage].text }}>{STAGES[p.stage].label}</span>
-                    {p.value ? <span className="block tabular-nums text-mute">{gbp(p.value)}</span> : null}
+                    {p.value ? <span className="block tabular-nums text-steel">{gbp(p.value)}</span> : null}
                   </span>
                 </button>
               </li>
             ))}
-            {tab === "projects" && listPins.length === 0 && <li className="px-5 py-10 text-center text-sm text-mute">{pins.length === 0 ? "No customer projects have a location yet. They appear here as enquiries come in and jobs are scheduled." : "Nothing matches. Check the stage chips above the map."}</li>}
+            {tab === "projects" && listPins.length === 0 && <li className="px-5 py-10 text-center text-sm text-steel">{pins.length === 0 ? "No customer projects have a location yet. They appear here as enquiries come in and jobs are scheduled." : "Nothing matches. Check the stage chips above the map."}</li>}
             {tab === "vans" && listVans.map(({ v, p }) => (
               <li key={v.id}>
-                <button type="button" onClick={() => { setShowVans(true); pick(`v:${v.id}`); }} className={`flex min-h-12 w-full items-center gap-3 px-4 py-2.5 text-left text-sm hover:bg-cream ${selected === `v:${v.id}` ? "bg-brand-tint" : ""}`}>
+                <button type="button" onClick={() => { setShowVans(true); pick(`v:${v.id}`); }} className={`flex min-h-12 w-full items-center gap-3 px-4 py-2.5 text-left text-sm hover:bg-silver-soft ${selected === `v:${v.id}` ? "bg-brand-tint" : ""}`}>
                   <span aria-hidden className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: VAN_COLOR[p.kind] }} />
-                  <span className="min-w-0 flex-1"><Plate>{v.reg}</Plate> <span className="text-mute">{v.make} {v.model}</span></span>
+                  <span className="min-w-0 flex-1"><Plate>{v.reg}</Plate> <span className="text-steel">{v.make} {v.model}</span></span>
                   <span className="text-right text-xs font-semibold" style={{ color: VAN_TEXT[p.kind] }}>{VAN_LABEL[p.kind]}</span>
                 </button>
               </li>

@@ -2,7 +2,7 @@
 
 // Small dependency-free SVG charts in JC Roofing colours: red = main series, charcoal = second series, cream = expected.
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { gbp } from "@/lib/ops/format";
 
 type Series = { key: string; label: string; color: string };
@@ -14,6 +14,7 @@ export function BarChart({
   data: Row[]; series: Series[]; xLabel: (row: Row) => string; height?: number; format?: (n: number) => string;
 }) {
   const [hover, setHover] = useState<number | null>(null);
+  const gid = useId().replace(/:/g, "");
   // draw the chart at its real on-screen width, so the text is the same size on a phone as on a desktop
   const box = useRef<HTMLDivElement>(null);
   const [W, setW] = useState(640);
@@ -36,7 +37,7 @@ export function BarChart({
 
   return (
     <div className="relative" ref={box}>
-      <div className="mb-2 flex flex-wrap gap-4 text-xs text-mute">
+      <div className="mb-2 flex flex-wrap gap-4 text-xs text-steel">
         {series.map((s) => (
           <span key={s.key} className="flex items-center gap-1.5">
             <span aria-hidden className="h-2.5 w-2.5 rounded-sm" style={{ background: s.color }} />
@@ -45,12 +46,20 @@ export function BarChart({
         ))}
       </div>
       <svg viewBox={`0 0 ${W} ${H}`} width={W} height={H} className="block max-w-full" role="img" aria-label={series.map((s) => s.label).join(" and ")} onMouseLeave={() => setHover(null)}>
+        <defs>
+          {series.map((s, j) => (
+            <linearGradient key={s.key} id={`bar-${gid}-${j}`} x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stopColor={`color-mix(in srgb, ${s.color}, white 28%)`} />
+              <stop offset="100%" stopColor={s.color} />
+            </linearGradient>
+          ))}
+        </defs>
         {Array.from({ length: Math.round(nice / step) + 1 }, (_, i) => i * step).map((tick) => {
           const y = padT + innerH * (1 - tick / nice);
           return (
             <g key={tick}>
-              <line x1={padL} x2={W - 8} y1={y} y2={y} stroke="#e7e5da" />
-              <text x={padL - 6} y={y + 4} textAnchor="end" fontSize="11" fill="#5f5f57">{format(tick)}</text>
+              <line x1={padL} x2={W - 8} y1={y} y2={y} stroke="#dbe0e8" />
+              <text x={padL - 6} y={y + 4} textAnchor="end" fontSize="11" fill="#566073">{format(tick)}</text>
             </g>
           );
         })}
@@ -58,30 +67,30 @@ export function BarChart({
           const gx = padL + groupW * i + (groupW - barW * series.length - 2 * (series.length - 1)) / 2;
           return (
             <g key={i} onMouseEnter={() => setHover(i)} onClick={() => setHover(hover === i ? null : i)}>
-              <rect x={padL + groupW * i} y={padT} width={groupW} height={innerH} fill={hover === i ? "#f4f4eb" : "transparent"} />
+              <rect x={padL + groupW * i} y={padT} width={groupW} height={innerH} rx={6} fill={hover === i ? "rgba(203,210,221,0.45)" : "transparent"} />
               {series.map((s, j) => {
                 const v = Number(row[s.key]) || 0;
                 const h = (v / nice) * innerH;
-                return <rect key={s.key} x={gx + j * (barW + 2)} y={padT + innerH - h} width={barW} height={Math.max(h, v ? 1 : 0)} rx={3} fill={s.color} />;
+                return <rect key={s.key} x={gx + j * (barW + 2)} y={padT + innerH - h} width={barW} height={Math.max(h, v ? 1 : 0)} rx={4} fill={`url(#bar-${gid}-${j})`} style={{ filter: "drop-shadow(0 2px 2px rgba(18,24,38,0.22))" }} />;
               })}
-              {(data.length - 1 - i) % every === 0 && <text x={padL + groupW * i + groupW / 2} y={H - 8} textAnchor="middle" fontSize="11" fill="#5f5f57">{xLabel(row)}</text>}
+              {(data.length - 1 - i) % every === 0 && <text x={padL + groupW * i + groupW / 2} y={H - 8} textAnchor="middle" fontSize="11" fill="#566073">{xLabel(row)}</text>}
             </g>
           );
         })}
       </svg>
       {hover !== null && (
         <div
-          className="pointer-events-none absolute top-6 z-10 rounded-lg border border-sand bg-white px-3 py-2 text-xs shadow-lg"
+          className="pointer-events-none absolute top-6 z-10 rounded-lg border border-edge bg-white px-3 py-2 text-xs shadow-lg"
           style={{ left: `clamp(0px, ${((padL + groupW * hover + groupW / 2) / W) * 100}% - 70px, calc(100% - 150px))` }}
         >
-          <div className="mb-1 font-semibold text-ink">{xLabel(data[hover])}</div>
+          <div className="mb-1 font-semibold text-night">{xLabel(data[hover])}</div>
           {series.map((s) => (
             <div key={s.key} className="flex items-center justify-between gap-4">
-              <span className="flex items-center gap-1.5 text-mute">
+              <span className="flex items-center gap-1.5 text-steel">
                 <span aria-hidden className="h-2 w-2 rounded-sm" style={{ background: s.color }} />
                 {s.label}
               </span>
-              <span className="font-medium tabular-nums text-ink">{format(Number(data[hover][s.key]) || 0)}</span>
+              <span className="font-medium tabular-nums text-night">{format(Number(data[hover][s.key]) || 0)}</span>
             </div>
           ))}
         </div>
@@ -97,8 +106,8 @@ export function Donut({ parts, size = 140, center }: { parts: { label: string; v
   const offsets = parts.map((_, i) => parts.slice(0, i).reduce((s, p) => s + (p.value / total) * C, 0));
   return (
     <div className="relative shrink-0" style={{ width: size, height: size }}>
-      <svg viewBox="0 0 140 140" width={size} height={size} className="-rotate-90" aria-hidden>
-        <circle cx="70" cy="70" r={r} fill="none" stroke="#f4f4eb" strokeWidth="16" />
+      <svg viewBox="0 0 140 140" width={size} height={size} className="-rotate-90" aria-hidden style={{ filter: "drop-shadow(0 6px 8px rgba(18,24,38,0.22))" }}>
+        <circle cx="70" cy="70" r={r} fill="none" stroke="#e2e6ed" strokeWidth="16" />
         {parts.map((p, i) => {
           const len = (p.value / total) * C;
           return p.value ? <circle key={p.label} cx="70" cy="70" r={r} fill="none" stroke={p.color} strokeWidth="16" strokeDasharray={`${Math.max(0, len - 2)} ${C}`} strokeDashoffset={-offsets[i]} /> : null;
@@ -116,15 +125,15 @@ export function HBar({ items, format = gbp }: { items: { label: string; value: n
       {items.map((i) => (
         <div key={i.label}>
           <div className="mb-1 flex justify-between gap-2 text-xs">
-            <span className="truncate text-mute">{i.label}</span>
-            <span className="font-semibold tabular-nums text-ink">{format(i.value)}</span>
+            <span className="truncate text-steel">{i.label}</span>
+            <span className="font-semibold tabular-nums text-night">{format(i.value)}</span>
           </div>
-          <div className="h-2 overflow-hidden rounded-full bg-cream">
-            <div className="h-full rounded-full" style={{ width: `${(i.value / max) * 100}%`, background: i.color ?? "#34342b" }} />
+          <div className="well h-2.5 overflow-hidden rounded-full bg-silver">
+            <div className="h-full rounded-full shadow-[inset_0_1px_0_rgba(255,255,255,0.35)]" style={{ width: `${(i.value / max) * 100}%`, background: `linear-gradient(90deg, ${i.color ?? "#2a3345"}, color-mix(in srgb, ${i.color ?? "#2a3345"}, white 25%))` }} />
           </div>
         </div>
       ))}
-      {items.length === 0 && <p className="text-sm text-mute">Nothing to show yet.</p>}
+      {items.length === 0 && <p className="text-sm text-steel">Nothing to show yet.</p>}
     </div>
   );
 }

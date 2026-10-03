@@ -32,20 +32,20 @@ export default function CrewMemberPage() {
 
   return (
     <div className="space-y-6">
-      <Link href="/admin/crew" className="inline-flex min-h-10 items-center gap-1 text-sm text-mute hover:text-ink"><ArrowLeft size={16} /> Team</Link>
+      <Link href="/admin/crew" className="inline-flex min-h-10 items-center gap-1 text-sm text-steel hover:text-night"><ArrowLeft size={16} /> Team</Link>
       <div className="flex flex-col gap-4 @3xl:flex-row @3xl:items-end @3xl:justify-between">
         <div className="flex items-center gap-4">
           <div aria-hidden className="grid h-14 w-14 place-items-center rounded-full bg-brand text-lg font-bold text-white">{c.name.split(" ").map((p) => p[0]).slice(0, 2).join("")}</div>
           <div>
             <h1 className="text-2xl font-bold tracking-tight">{c.name}</h1>
-            <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-mute">
+            <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-steel">
               <Badge tone={c.status === "active" ? "green" : "slate"} dot>{c.status === "active" ? "Current" : "Left"}</Badge>
               <span>{c.role}</span>·<span>since {fmtDate(c.startDate)}</span>
             </div>
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
-          {c.phone && <a href={`tel:${c.phone.replace(/\s/g, "")}`} className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border-[1.5px] border-line bg-white px-4 py-2 text-sm font-semibold hover:bg-cream"><Phone size={16} /> {c.phone}</a>}
+          {c.phone && <a href={`tel:${c.phone.replace(/\s/g, "")}`} className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border-[1.5px] border-ctrl bg-white px-4 py-2 text-sm font-semibold hover:bg-silver-soft"><Phone size={16} /> {c.phone}</a>}
           <Button variant="secondary" onClick={() => setEdit(true)}><Pencil size={16} /> Edit details</Button>
         </div>
       </div>
@@ -62,7 +62,7 @@ export default function CrewMemberPage() {
       <div className="grid gap-4 @3xl:grid-cols-2">
         <Card>
           <CardHeader title="Cards, training and checks" />
-          <ul className="divide-y divide-cream">
+          <ul className="divide-y divide-silver">
             {docs.map(([label, date]) => {
               const days = date ? daysBetween(today(), date) : null;
               return (
@@ -76,10 +76,10 @@ export default function CrewMemberPage() {
         </Card>
         <Card>
           <CardHeader title="Jobs and visits" sub={`${jobs.length} on record`} />
-          <ul className="max-h-80 divide-y divide-cream overflow-y-auto">
+          <ul className="max-h-80 divide-y divide-silver overflow-y-auto">
             {jobs.slice(0, 12).map((j) => (
               <li key={j.id} className="flex items-center justify-between gap-3 px-5 py-2.5 text-sm">
-                <div className="min-w-0"><div className="truncate font-medium">{j.title}</div><div className="text-xs text-mute">{fmtDay(j.date)} · {j.customer ?? j.address} {j.vanIds.map((v) => vanReg(db, v)).join(" ")}</div></div>
+                <div className="min-w-0"><div className="truncate font-medium">{j.title}</div><div className="text-xs text-steel">{fmtDay(j.date)} · {j.customer ?? j.address} {j.vanIds.map((v) => vanReg(db, v)).join(" ")}</div></div>
                 <Badge tone={jobStatus[j.status].tone}>{jobStatus[j.status].label}</Badge>
               </li>
             ))}
@@ -91,17 +91,17 @@ export default function CrewMemberPage() {
       {fines.length > 0 && (
         <Card>
           <CardHeader title="Fines and notices" />
-          <ul className="divide-y divide-cream">
+          <ul className="divide-y divide-silver">
             {fines.map((f) => (
               <li key={f.id} className="flex items-center justify-between gap-3 px-5 py-2.5 text-sm">
-                <div className="min-w-0"><div className="truncate font-medium">{f.description}</div><div className="text-xs text-mute">{fmtDate(f.date)} · {vanReg(db, f.vehicleId)} · {f.location}</div></div>
+                <div className="min-w-0"><div className="truncate font-medium">{f.description}</div><div className="text-xs text-steel">{fmtDate(f.date)} · {vanReg(db, f.vehicleId)} · {f.location}</div></div>
                 <div className="text-right"><div className="font-medium tabular-nums">{gbp(f.amount)}</div><Badge tone={fineStatus[f.status].tone}>{fineStatus[f.status].label}</Badge></div>
               </li>
             ))}
           </ul>
         </Card>
       )}
-      {vans.length > 0 && <p className="text-sm text-mute">Drives: {vans.map((v) => <Link key={v.id} href={`/admin/vans/${v.id}`}><Plate>{v.reg}</Plate> </Link>)}</p>}
+      {vans.length > 0 && <p className="text-sm text-steel">Drives: {vans.map((v) => <Link key={v.id} href={`/admin/vans/${v.id}`}><Plate>{v.reg}</Plate> </Link>)}</p>}
 
       {edit && <CrewForm member={c} onClose={() => setEdit(false)} />}
     </div>

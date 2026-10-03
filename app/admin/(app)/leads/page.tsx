@@ -56,10 +56,10 @@ function Leads() {
           options={[{ value: "all", label: "All", count: count("all") }, ...(["new", "contacted", "quoted", "won", "lost"] as const).map((s) => ({ value: s, label: leadStatus[s].label, count: count(s) }))]}
         />
         <div className="flex flex-wrap items-center gap-3">
-          <label className="flex min-h-10 items-center gap-2 text-sm text-mute"><input type="checkbox" checked={outOfArea} onChange={(e) => setOutOfArea(e.target.checked)} className="h-4 w-4 accent-[#b11017]" /> Show out-of-area</label>
+          <label className="flex min-h-10 items-center gap-2 text-sm text-steel"><input type="checkbox" checked={outOfArea} onChange={(e) => setOutOfArea(e.target.checked)} className="h-4 w-4 accent-[#b11017]" /> Show out-of-area</label>
           <div className="relative flex-1 @3xl:w-64">
-            <Search size={16} aria-hidden className="absolute left-3 top-1/2 -translate-y-1/2 text-mute" />
-            <input aria-label="Search enquiries" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search enquiries" className="min-h-11 w-full rounded-xl border-[1.5px] border-line bg-white py-2 pl-9 pr-3 text-base outline-none focus:border-ink" />
+            <Search size={16} aria-hidden className="absolute left-3 top-1/2 -translate-y-1/2 text-steel" />
+            <input aria-label="Search enquiries" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search enquiries" className="min-h-11 w-full rounded-xl border-[1.5px] border-ctrl bg-white py-2 pl-9 pr-3 text-base outline-none focus:border-night" />
           </div>
         </div>
       </div>
@@ -82,29 +82,29 @@ function Leads() {
               const open = () => router.replace(`/admin/leads?lead=${l.id}`);
               const det = detailsText(l, biz.settings.materials.find((m) => m.id === l.material)?.label);
               return (
-                <tr key={l.id} onClick={open} className="cursor-pointer hover:bg-cream">
+                <tr key={l.id} onClick={open} className="cursor-pointer hover:bg-silver-soft">
                   <Td>
                     <button type="button" onClick={open} className="min-h-10 text-left">
                       <span className="block font-medium">{l.name}</span>
-                      <span className="block max-w-[16rem] truncate text-xs text-mute">{l.address.replace(/, (UK|United Kingdom)$/, "")}</span>
+                      <span className="block max-w-[16rem] truncate text-xs text-steel">{l.address.replace(/, (UK|United Kingdom)$/, "")}</span>
                     </button>
                   </Td>
                   <Td>
                     <div>{SERVICE_INFO[l.service ?? "roof"].label}</div>
-                    <div className="max-w-[14rem] truncate text-xs text-mute">{det}</div>
+                    <div className="max-w-[14rem] truncate text-xs text-steel">{det}</div>
                   </Td>
-                  <Td right>{l.noPrice ? <span className="text-mute">No price</span> : `${gbp(l.low)} – ${gbp(l.high)}`}</Td>
-                  <Td><Badge tone={scoreTone[l.score]}>{l.score === "not-a-fit" ? "Out of area" : l.score}</Badge>{l.waitlist && <div className="mt-0.5 text-xs text-mute">waiting list</div>}</Td>
+                  <Td right>{l.noPrice ? <span className="text-steel">No price</span> : `${gbp(l.low)} – ${gbp(l.high)}`}</Td>
+                  <Td><Badge tone={scoreTone[l.score]}>{l.score === "not-a-fit" ? "Out of area" : l.score}</Badge>{l.waitlist && <div className="mt-0.5 text-xs text-steel">waiting list</div>}</Td>
                   <Td><Badge tone={leadStatus[l.status].tone}>{leadStatus[l.status].label}</Badge></Td>
-                  <Td className="text-xs">{l.inspectionBooked ? fmtSlot(l.inspectionBooked) : <span className="text-mute">—</span>}</Td>
-                  <Td className="text-xs text-mute">{fmtDate(ukDate(l.createdAt))}</Td>
+                  <Td className="text-xs">{l.inspectionBooked ? fmtSlot(l.inspectionBooked) : <span className="text-steel">—</span>}</Td>
+                  <Td className="text-xs text-steel">{fmtDate(ukDate(l.createdAt))}</Td>
                 </tr>
               );
             })}
           </tbody>
         </Table>
-        {shown.length > limit && <div className="p-4 text-center"><button type="button" onClick={() => setLimit(limit + 60)} className="min-h-11 rounded-xl border-[1.5px] border-line bg-white px-4 py-2 text-sm font-semibold hover:bg-cream">Show more ({shown.length - limit} left)</button></div>}
-        {shown.length === 0 && <div className="px-5 py-10 text-center text-sm text-mute">{biz.leads.length === 0 ? "No enquiries yet. They'll appear here as customers use the quote form on your website." : "No enquiries match."}</div>}
+        {shown.length > limit && <div className="p-4 text-center"><button type="button" onClick={() => setLimit(limit + 60)} className="min-h-11 rounded-xl border-[1.5px] border-ctrl bg-white px-4 py-2 text-sm font-semibold hover:bg-silver-soft">Show more ({shown.length - limit} left)</button></div>}
+        {shown.length === 0 && <div className="px-5 py-10 text-center text-sm text-steel">{biz.leads.length === 0 ? "No enquiries yet. They'll appear here as customers use the quote form on your website." : "No enquiries match."}</div>}
       </Card>
 
       <Card>
@@ -115,7 +115,7 @@ function Leads() {
             return (
               <li key={k} className="text-sm">
                 <div className="flex justify-between"><span>{label}</span><b className="tabular-nums">{n}</b></div>
-                <div className="h-2 rounded bg-cream" aria-hidden><div className="h-2 rounded bg-brand" style={{ width: `${Math.min(100, (n / funnelTop) * 100)}%` }} /></div>
+                <div className="h-2 rounded bg-silver-soft" aria-hidden><div className="h-2 rounded bg-brand" style={{ width: `${Math.min(100, (n / funnelTop) * 100)}%` }} /></div>
               </li>
             );
           })}

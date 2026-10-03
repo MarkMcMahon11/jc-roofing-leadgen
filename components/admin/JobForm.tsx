@@ -132,29 +132,29 @@ export function JobForm({ open, onClose, job, lead, kind: kindIn, prefill }: { o
         )}
 
         <fieldset className="sm:col-span-2">
-          <legend className="text-sm font-medium text-ink">Van{kind === "job" ? "s" : ""}</legend>
+          <legend className="text-sm font-medium text-night">Van{kind === "job" ? "s" : ""}</legend>
           <div className="mt-1 grid gap-2 sm:grid-cols-2">
             {db.vehicles.filter((v) => v.status !== "off_road").map((v) => (
-              <label key={v.id} className={`flex min-h-11 cursor-pointer items-center gap-3 rounded-xl border-[1.5px] px-3 py-2 text-sm ${vanIds.includes(v.id) ? "border-brand bg-brand-tint" : "border-line bg-white"}`}>
+              <label key={v.id} className={`flex min-h-11 cursor-pointer items-center gap-3 rounded-xl border-[1.5px] px-3 py-2 text-sm ${vanIds.includes(v.id) ? "border-brand bg-brand-tint" : "border-ctrl bg-white"}`}>
                 <input type="checkbox" checked={vanIds.includes(v.id)} onChange={() => toggle(vanIds, v.id, setVanIds)} className="h-4 w-4 accent-[#b11017]" />
-                <span className="min-w-0 flex-1"><Plate>{v.reg}</Plate> <span className="text-mute">{v.make} {v.model}</span></span>
+                <span className="min-w-0 flex-1"><Plate>{v.reg}</Plate> <span className="text-steel">{v.make} {v.model}</span></span>
                 {v.status !== "in_use" && v.status !== "at_yard" && <span className="text-xs text-brand">{vehicleStatus[v.status].label}</span>}
               </label>
             ))}
-            {db.vehicles.length === 0 && <p className="text-sm text-mute">Add your vans first under Vans.</p>}
+            {db.vehicles.length === 0 && <p className="text-sm text-steel">Add your vans first under Vans.</p>}
           </div>
         </fieldset>
         <fieldset className="sm:col-span-2">
-          <legend className="text-sm font-medium text-ink">Crew</legend>
+          <legend className="text-sm font-medium text-night">Crew</legend>
           <div className="mt-1 grid gap-2 sm:grid-cols-2">
             {crewList.map((c) => (
-              <label key={c.id} className={`flex min-h-11 cursor-pointer items-center gap-3 rounded-xl border-[1.5px] px-3 py-2 text-sm ${crewIds.includes(c.id) ? "border-brand bg-brand-tint" : "border-line bg-white"}`}>
+              <label key={c.id} className={`flex min-h-11 cursor-pointer items-center gap-3 rounded-xl border-[1.5px] px-3 py-2 text-sm ${crewIds.includes(c.id) ? "border-brand bg-brand-tint" : "border-ctrl bg-white"}`}>
                 <input type="checkbox" checked={crewIds.includes(c.id)} onChange={() => toggle(crewIds, c.id, setCrewIds)} className="h-4 w-4 accent-[#b11017]" />
                 <span className="flex-1">{c.name}</span>
-                <span className="text-xs text-mute">{c.role}</span>
+                <span className="text-xs text-steel">{c.role}</span>
               </label>
             ))}
-            {crewList.length === 0 && <p className="text-sm text-mute">Add your team first under Team.</p>}
+            {crewList.length === 0 && <p className="text-sm text-steel">Add your team first under Team.</p>}
           </div>
         </fieldset>
 

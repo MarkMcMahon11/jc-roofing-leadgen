@@ -111,17 +111,17 @@ export function Shell({ children, ownerName }: { children: React.ReactNode; owne
   }
 
   const renderSidebar = (scrollAll: boolean) => (
-    <div className={`flex h-full flex-col bg-white ${scrollAll ? "overflow-y-auto" : ""}`}>
+    <div className={`side-surface flex h-full flex-col ${scrollAll ? "overflow-y-auto" : ""}`}>
       <div className="px-5 pb-3 pt-5">
         <Link href="/admin" onClick={() => setOpen(false)} aria-label="JC Roofing dashboard home">
-          <Image src="/logo.png" alt="JC Roofing" width={512} height={198} priority className="h-14 w-auto" />
+          <span className="elev inline-block rounded-xl px-3 py-1.5"><Image src="/logo.png" alt="JC Roofing" width={512} height={198} priority className="h-11 w-auto" /></span>
         </Link>
-        <div className="mt-1 text-[11px] text-mute">Owner dashboard · Dumfries</div>
+        <div className="mt-1 text-[11px] text-steel">Owner dashboard · Dumfries</div>
       </div>
       <nav aria-label="Dashboard sections" className={`flex-1 space-y-4 px-3 py-2 lg:space-y-3 ${scrollAll ? "" : "overflow-y-auto"}`}>
         {groups.map((g, gi) => (
           <div key={gi}>
-            {g.title && <div className="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wider text-mute">{g.title}</div>}
+            {g.title && <div className="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wider text-steel">{g.title}</div>}
             <div className="space-y-0.5">
               {g.items.map((n) => {
                 const active = isActive(n.href);
@@ -131,10 +131,10 @@ export function Shell({ children, ownerName }: { children: React.ReactNode; owne
                     href={n.href}
                     onClick={() => setOpen(false)}
                     aria-current={active ? "page" : undefined}
-                    className={`group relative flex min-h-10 items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors lg:min-h-9 lg:py-1.5 ${active ? "bg-brand-tint text-brand" : "text-ink hover:bg-cream"}`}
+                    className={`group relative flex min-h-10 items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors lg:min-h-9 lg:py-1.5 ${active ? "nav-active text-brand" : "text-night hover:bg-white/70 hover:shadow-[inset_0_1px_0_#fff,0_1px_2px_rgba(18,24,38,0.08)]"}`}
                   >
-                    {active && <span aria-hidden className="absolute inset-y-1.5 left-0 w-1 rounded-r bg-brand" />}
-                    <n.icon size={18} aria-hidden className={active ? "text-brand" : "text-mute group-hover:text-ink"} />
+                    {active && <span aria-hidden className="glow-red absolute inset-y-1.5 left-0 w-1 rounded-r bg-brand" />}
+                    <n.icon size={18} aria-hidden className={active ? "text-brand drop-shadow-[0_1px_2px_rgba(177,16,23,0.35)]" : "text-steel group-hover:text-night"} />
                     <span className="flex-1">{n.label}</span>
                     {!!n.badge && (
                       <span className={`rounded-full px-1.5 text-[11px] font-semibold tabular-nums ${n.tone === "amber" ? "bg-amber-100 text-amber-900" : "bg-brand text-white"}`}>
@@ -149,12 +149,12 @@ export function Shell({ children, ownerName }: { children: React.ReactNode; owne
           </div>
         ))}
       </nav>
-      <div className="border-t border-sand p-3">
+      <div className="border-t border-edge p-3">
         <GuideToggle />
-        <Link href="/" target="_blank" className="flex min-h-10 items-center gap-3 rounded-lg px-3 py-2 text-sm text-mute hover:bg-cream hover:text-ink">
+        <Link href="/" target="_blank" className="flex min-h-10 items-center gap-3 rounded-lg px-3 py-2 text-sm text-steel hover:bg-silver-soft hover:text-night">
           <ExternalLink size={16} aria-hidden /> View customer quote form
         </Link>
-        <button type="button" onClick={signOut} className="flex min-h-10 w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-mute hover:bg-cream hover:text-ink">
+        <button type="button" onClick={signOut} className="flex min-h-10 w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-steel hover:bg-silver-soft hover:text-night">
           <LogOut size={16} aria-hidden /> Sign out
         </button>
       </div>
@@ -163,26 +163,26 @@ export function Shell({ children, ownerName }: { children: React.ReactNode; owne
 
   return (
     <GuideProvider>
-      <div className="admin-root min-h-screen bg-cream transition-[padding] duration-200 lg:pl-64 print:pl-0">
+      <div className="admin-root admin-bg min-h-screen transition-[padding] duration-200 lg:pl-64 print:pl-0">
         <a href="#main" className="sr-only z-[2000] rounded-lg bg-white px-4 py-2 font-semibold text-brand focus:not-sr-only focus:fixed focus:left-3 focus:top-3">Skip to content</a>
-        <aside className="fixed inset-y-0 left-0 hidden w-64 border-r border-sand lg:block print:hidden">{renderSidebar(false)}</aside>
+        <aside className="fixed inset-y-0 left-0 hidden w-64 border-r border-edge shadow-[8px_0_30px_-18px_rgba(18,24,38,0.35)] lg:block print:hidden">{renderSidebar(false)}</aside>
 
         {open && (
           <div ref={drawer} id="mobile-menu" role="dialog" aria-modal="true" aria-label="Menu" className="fixed inset-0 z-[1250] lg:hidden">
-            <div className="absolute inset-0 bg-ink/50" onClick={() => { setOpen(false); menuBtn.current?.focus(); }} />
+            <div className="absolute inset-0 bg-night/50" onClick={() => { setOpen(false); menuBtn.current?.focus(); }} />
             <aside className="absolute inset-y-0 left-0 w-72 max-w-[85%] shadow-xl">{renderSidebar(true)}</aside>
-            <button type="button" onClick={() => { setOpen(false); menuBtn.current?.focus(); }} className="absolute right-3 top-3 grid h-11 w-11 place-items-center rounded-full bg-white text-ink shadow" aria-label="Close menu">
+            <button type="button" onClick={() => { setOpen(false); menuBtn.current?.focus(); }} className="absolute right-3 top-3 grid h-11 w-11 place-items-center rounded-full bg-white text-night shadow" aria-label="Close menu">
               <X size={20} />
             </button>
           </div>
         )}
 
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-sand bg-white/90 px-4 backdrop-blur sm:px-6 print:hidden">
-          <button ref={menuBtn} type="button" onClick={() => setOpen(true)} aria-expanded={open} aria-controls={open ? "mobile-menu" : undefined} className="-ml-2 grid h-11 w-11 place-items-center rounded-lg text-ink hover:bg-cream lg:hidden" aria-label="Open menu">
+        <header className="glass sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-edge/80 px-4 shadow-[0_10px_30px_-22px_rgba(18,24,38,0.5)] sm:px-6 print:hidden">
+          <button ref={menuBtn} type="button" onClick={() => setOpen(true)} aria-expanded={open} aria-controls={open ? "mobile-menu" : undefined} className="-ml-2 grid h-11 w-11 place-items-center rounded-lg text-night hover:bg-silver-soft lg:hidden" aria-label="Open menu">
             <Menu size={20} />
           </button>
           <div className="lg:hidden">
-            <Image src="/logo.png" alt="JC Roofing" width={512} height={198} className="h-8 w-auto" />
+            <span className="elev inline-block rounded-lg px-2 py-0.5"><Image src="/logo.png" alt="JC Roofing" width={512} height={198} className="h-7 w-auto" /></span>
           </div>
           <div className="ml-auto flex items-center gap-3">
             <SyncPill state={sync} />
@@ -192,15 +192,15 @@ export function Shell({ children, ownerName }: { children: React.ReactNode; owne
               </span>
             )}
             <div className="hidden items-center gap-2 sm:flex">
-              <div aria-hidden className="grid h-8 w-8 place-items-center rounded-full bg-brand text-xs font-bold text-white">{ownerName.slice(0, 1).toUpperCase()}</div>
-              <span className="max-w-[12rem] truncate text-sm font-medium text-ink">{ownerName}</span>
+              <div aria-hidden className="btn-red grid h-8 w-8 place-items-center rounded-full text-xs font-bold text-white">{ownerName.slice(0, 1).toUpperCase()}</div>
+              <span className="max-w-[12rem] truncate text-sm font-medium text-night">{ownerName}</span>
             </div>
           </div>
         </header>
 
         <main id="main" tabIndex={-1} className="@container mx-auto max-w-[1400px] px-4 py-6 outline-none sm:px-6 lg:py-8 print:max-w-none print:p-0">
           {db.sample && (
-            <div className="mb-5 flex flex-col gap-3 rounded-2xl border border-gold/70 bg-amber-50 p-4 text-sm text-ink sm:flex-row sm:items-center sm:justify-between print:hidden">
+            <div className="mb-5 flex flex-col gap-3 rounded-2xl border border-gold/70 bg-gradient-to-b from-amber-50 to-amber-100/60 p-4 text-sm text-night shadow-[inset_0_1px_0_#fff,0_10px_24px_-16px_rgba(180,110,0,0.5)] sm:flex-row sm:items-center sm:justify-between print:hidden">
               <p>
                 <b>Sample data.</b> The vans, team, jobs and costs below are made up so you can see how the dashboard works. Your enquiries and quote prices are real.
               </p>

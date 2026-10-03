@@ -69,18 +69,18 @@ export default function FinesPage() {
                 <tr key={f.id}>
                   <Td>
                     <div className="font-mono text-xs font-semibold">{f.ref}</div>
-                    <div className="text-xs text-mute">{fineType[f.type]} · {fmtDate(f.date)}{f.time ? ` ${f.time}` : ""}</div>
+                    <div className="text-xs text-steel">{fineType[f.type]} · {fmtDate(f.date)}{f.time ? ` ${f.time}` : ""}</div>
                   </Td>
                   <Td>
                     {v ? <Link href={`/admin/vans/${v.id}`} className="inline-flex min-h-10 items-center hover:underline"><Plate>{v.reg}</Plate></Link> : "—"}
-                    <div className="mt-0.5 text-xs">{c ? <Link href={`/admin/crew/${c.id}`} className="inline-flex min-h-10 items-center hover:underline">{c.name}</Link> : <span className="text-mute">driver not set</span>}</div>
+                    <div className="mt-0.5 text-xs">{c ? <Link href={`/admin/crew/${c.id}`} className="inline-flex min-h-10 items-center hover:underline">{c.name}</Link> : <span className="text-steel">driver not set</span>}</div>
                   </Td>
-                  <Td><div className="max-w-[16rem]">{f.description}</div><div className="text-xs text-mute">{f.location}{f.points ? ` · ${f.points} points` : ""}</div></Td>
+                  <Td><div className="max-w-[16rem]">{f.description}</div><div className="text-xs text-steel">{f.location}{f.points ? ` · ${f.points} points` : ""}</div></Td>
                   <Td right>{gbp(f.amount)}</Td>
                   <Td className="text-xs">
                     {f.status === "to_name" && <div className={nameDays <= 7 ? "font-semibold text-brand" : ""}>Name driver by {fmtDate(f.nameBy)} ({relDays(nameDays)})</div>}
                     {live && discDays !== null && discDays >= 0 && <div className="text-amber-800">Reduced amount until {fmtDate(f.discountBy)}</div>}
-                    {!live && <span className="text-mute">—</span>}
+                    {!live && <span className="text-steel">—</span>}
                   </Td>
                   <Td><Badge tone={fineStatus[f.status].tone}>{fineStatus[f.status].label}</Badge></Td>
                   <Td>
@@ -99,7 +99,7 @@ export default function FinesPage() {
         </Table>
         {shown.length === 0 && <Empty>{db.fines.length === 0 ? "No notices recorded. Add one when a letter arrives." : "Nothing here."}</Empty>}
       </Card>
-      <p className="text-xs text-mute">
+      <p className="text-xs text-steel">
         Rules of thumb: a parking or speeding notice sent to the company usually has to be answered within 28 days by naming who was driving, and a reduced amount is often offered for paying within 14 days. Always follow the dates on the notice itself.
       </p>
       {adding && <FineForm onClose={() => setAdding(false)} />}

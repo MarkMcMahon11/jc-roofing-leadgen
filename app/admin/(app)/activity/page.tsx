@@ -26,13 +26,13 @@ export default function ActivityPage() {
       <PageHeader title="Activity log" sub="What has changed in the dashboard, newest first" />
       <Segmented value={kind} onChange={setKind} options={KINDS.map((k) => ({ ...k, count: k.value === "all" ? db.activity.length : db.activity.filter((a) => a.kind === k.value).length }))} />
       <Card>
-        <ul className="divide-y divide-cream">
+        <ul className="divide-y divide-silver">
           {rows.map((a) => (
             <li key={a.id}>
-              <Link href={a.href ?? "/admin/activity"} className="flex min-h-11 flex-wrap items-center gap-3 px-5 py-3 text-sm hover:bg-cream">
+              <Link href={a.href ?? "/admin/activity"} className="flex min-h-11 flex-wrap items-center gap-3 px-5 py-3 text-sm hover:bg-silver-soft">
                 <Badge>{KINDS.find((k) => k.value === a.kind)?.label ?? a.kind}</Badge>
                 <span className="min-w-0 flex-1">{a.text}</span>
-                <span className="text-xs text-mute">{fmtDateTime(a.at)}</span>
+                <span className="text-xs text-steel">{fmtDateTime(a.at)}</span>
               </Link>
             </li>
           ))}

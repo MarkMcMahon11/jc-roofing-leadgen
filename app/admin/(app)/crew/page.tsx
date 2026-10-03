@@ -12,7 +12,7 @@ import { useOps } from "@/lib/ops/store";
 const cardTone = { Green: "green", Red: "red", Blue: "blue", Gold: "amber", Black: "slate" } as const;
 
 function Expiry({ date }: { date?: string }) {
-  if (!date) return <span className="text-mute">—</span>;
+  if (!date) return <span className="text-steel">—</span>;
   const days = daysBetween(today(), date);
   return <Badge tone={days < 0 ? "red" : days <= 30 ? "amber" : "green"}>{fmtDate(date)}</Badge>;
 }
@@ -43,21 +43,21 @@ export default function CrewPage() {
             {list.map((c) => {
               const van = db.vehicles.find((v) => v.assignedCrewId === c.id);
               return (
-                <tr key={c.id} onClick={() => router.push(`/admin/crew/${c.id}`)} className="cursor-pointer hover:bg-cream">
+                <tr key={c.id} onClick={() => router.push(`/admin/crew/${c.id}`)} className="cursor-pointer hover:bg-silver-soft">
                   <Td>
                     <Link href={`/admin/crew/${c.id}`} onClick={(e) => e.stopPropagation()} className="block min-h-10">
                       <span className="block font-medium">{c.name}</span>
-                      <span className="block text-xs text-mute">{c.phone}</span>
+                      <span className="block text-xs text-steel">{c.phone}</span>
                     </Link>
                   </Td>
                   <Td>{c.role}</Td>
-                  <Td>{van ? <Plate>{van.reg}</Plate> : <span className="text-mute">—</span>}</Td>
+                  <Td>{van ? <Plate>{van.reg}</Plate> : <span className="text-steel">—</span>}</Td>
                   <Td>
                     {c.drives ? (
-                      <div className="space-y-0.5"><Expiry date={c.licenceExpiry} />{(c.licencePoints ?? 0) > 0 && <div className="text-xs text-mute">{c.licencePoints} points</div>}</div>
-                    ) : <span className="text-mute">Doesn&apos;t drive</span>}
+                      <div className="space-y-0.5"><Expiry date={c.licenceExpiry} />{(c.licencePoints ?? 0) > 0 && <div className="text-xs text-steel">{c.licencePoints} points</div>}</div>
+                    ) : <span className="text-steel">Doesn&apos;t drive</span>}
                   </Td>
-                  <Td>{c.cscsCard ? <div className="space-y-0.5"><Badge tone={cardTone[c.cscsCard]}>{c.cscsCard}</Badge><div><Expiry date={c.cscsExpiry} /></div></div> : <span className="text-mute">—</span>}</Td>
+                  <Td>{c.cscsCard ? <div className="space-y-0.5"><Badge tone={cardTone[c.cscsCard]}>{c.cscsCard}</Badge><div><Expiry date={c.cscsExpiry} /></div></div> : <span className="text-steel">—</span>}</Td>
                   <Td><Expiry date={c.heightExpiry} /></Td>
                   <Td><Expiry date={c.firstAidExpiry} /></Td>
                 </tr>
@@ -65,7 +65,7 @@ export default function CrewPage() {
             })}
           </tbody>
         </Table>
-        {list.length === 0 && <div className="px-5 py-10 text-center text-sm text-mute">{db.crew.length === 0 ? "No team members yet. Press “Add team member”." : "Nobody here."}</div>}
+        {list.length === 0 && <div className="px-5 py-10 text-center text-sm text-steel">{db.crew.length === 0 ? "No team members yet. Press “Add team member”." : "Nobody here."}</div>}
       </Card>
       {adding && <CrewForm onClose={() => setAdding(false)} />}
     </div>

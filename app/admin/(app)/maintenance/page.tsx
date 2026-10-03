@@ -51,7 +51,7 @@ export default function MaintenancePage() {
         {open.length === 0 ? (
           <Empty>Nothing booked in.</Empty>
         ) : (
-          <ul className="divide-y divide-cream">
+          <ul className="divide-y divide-silver">
             {open.map((m) => {
               const v = db.vehicles.find((x) => x.id === m.vehicleId);
               const days = daysBetween(m.openedAt, today());
@@ -60,12 +60,12 @@ export default function MaintenancePage() {
                   <Badge tone={maintStatus[m.status].tone}>{maintStatus[m.status].label}</Badge>
                   <div className="min-w-0 flex-1">
                     <div className="font-medium">{m.description}</div>
-                    <div className="text-xs text-mute">
+                    <div className="text-xs text-steel">
                       {v && <Link href={`/admin/vans/${v.id}`} className="inline-flex min-h-10 items-center hover:underline"><Plate>{v.reg}</Plate></Link>} {v?.make} {v?.model} · {m.garage || "garage not set"} · {maintType[m.type]} ·{" "}
                       {m.status === "scheduled" ? `${fmtDate(m.openedAt)} (${relDays(-days)})` : `${days} day${days === 1 ? "" : "s"} in the garage`}
                     </div>
                   </div>
-                  <div className="text-sm font-medium tabular-nums">{gbp(m.cost)}<span className="ml-1 text-xs font-normal text-mute">est.</span></div>
+                  <div className="text-sm font-medium tabular-nums">{gbp(m.cost)}<span className="ml-1 text-xs font-normal text-steel">est.</span></div>
                   {m.status === "scheduled" ? (
                     <Button size="sm" variant="secondary" onClick={() => mutate((d) => startMaintenance(d, m.id))}>Van is in</Button>
                   ) : (
@@ -81,17 +81,17 @@ export default function MaintenancePage() {
       <div className="grid gap-4 @3xl:grid-cols-3">
         <Card>
           <CardHeader title="Service due" sub="By mileage or date" />
-          <ul className="divide-y divide-cream">
+          <ul className="divide-y divide-silver">
             {due.map((v) => {
               const left = v.nextServiceMiles - v.mileage;
               const dd = v.nextServiceDate ? daysBetween(today(), v.nextServiceDate) : null;
               return (
                 <li key={v.id}>
-                  <Link href={`/admin/vans/${v.id}`} className="flex min-h-11 items-center justify-between gap-2 px-5 py-2.5 text-sm hover:bg-cream">
-                    <span><Plate>{v.reg}</Plate> <span className="text-mute">{v.model}</span></span>
+                  <Link href={`/admin/vans/${v.id}`} className="flex min-h-11 items-center justify-between gap-2 px-5 py-2.5 text-sm hover:bg-silver-soft">
+                    <span><Plate>{v.reg}</Plate> <span className="text-steel">{v.model}</span></span>
                     <span className="text-right">
                       <Badge tone={left < 0 || (dd !== null && dd < 0) ? "red" : "amber"}>{left < 0 ? `${num(-left)} mi overdue` : `${num(left)} mi left`}</Badge>
-                      {dd !== null && dd <= 30 && <div className="mt-0.5 text-xs text-mute">{relDays(dd)}</div>}
+                      {dd !== null && dd <= 30 && <div className="mt-0.5 text-xs text-steel">{relDays(dd)}</div>}
                     </span>
                   </Link>
                 </li>
@@ -106,7 +106,7 @@ export default function MaintenancePage() {
         </Card>
         <Card>
           <CardHeader title="Costliest vans, 90 days" />
-          <div className="p-5"><HBar items={byVan.map((x) => ({ label: `${x.v.reg} · ${x.v.make} ${x.v.model}`, value: Math.round(x.cost), color: "#34342b" }))} /></div>
+          <div className="p-5"><HBar items={byVan.map((x) => ({ label: `${x.v.reg} · ${x.v.make} ${x.v.model}`, value: Math.round(x.cost), color: "#2a3345" }))} /></div>
         </Card>
       </div>
 
@@ -121,7 +121,7 @@ export default function MaintenancePage() {
                 <tr key={m.id}>
                   <Td className="whitespace-nowrap">{fmtDate(m.closedAt)}</Td>
                   <Td>{v ? <Link href={`/admin/vans/${v.id}`} className="inline-flex min-h-10 items-center hover:underline"><Plate>{v.reg}</Plate></Link> : "—"}</Td>
-                  <Td>{m.description} <span className="text-xs text-mute">· {maintType[m.type]}</span></Td>
+                  <Td>{m.description} <span className="text-xs text-steel">· {maintType[m.type]}</span></Td>
                   <Td>{m.garage}</Td>
                   <Td right>{Math.max(0, daysBetween(m.openedAt, m.closedAt ?? m.openedAt))}</Td>
                   <Td right>{gbp(m.cost)}</Td>
@@ -147,7 +147,7 @@ export default function MaintenancePage() {
             }}
             className="space-y-4"
           >
-            <p className="text-sm text-mute">{order.description}</p>
+            <p className="text-sm text-steel">{order.description}</p>
             <Field label="Final cost (£)" hint="It becomes a cost against this van. A service moves the next service on; an MOT moves the MOT date on a year."><Input name="cost" type="number" min={0} step="any" defaultValue={order.cost} required /></Field>
             <div className="flex justify-end"><Button type="submit">Finish</Button></div>
           </form>

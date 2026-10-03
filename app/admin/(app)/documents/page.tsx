@@ -46,14 +46,14 @@ export default function DocumentsPage() {
               ]}
             />
           </div>
-          <ul className="divide-y divide-cream">
+          <ul className="divide-y divide-silver">
             {shown.map((a) => (
               <li key={a.id}>
-                <Link href={a.href} className="flex min-h-11 items-center gap-3 px-5 py-2.5 text-sm hover:bg-cream">
+                <Link href={a.href} className="flex min-h-11 items-center gap-3 px-5 py-2.5 text-sm hover:bg-silver-soft">
                   <span aria-hidden className={`h-2 w-2 shrink-0 rounded-full ${a.severity === "high" ? "bg-brand" : a.severity === "medium" ? "bg-amber-500" : "bg-sky-500"}`} />
                   <span className="sr-only">{a.severity} priority: </span>
                   <span className="flex-1">{a.text}</span>
-                  <ArrowRight size={14} aria-hidden className="text-line" />
+                  <ArrowRight size={14} aria-hidden className="text-ctrl" />
                 </Link>
               </li>
             ))}
@@ -70,7 +70,7 @@ export default function DocumentsPage() {
                 const days = daysBetween(t, r.date);
                 return (
                   <tr key={r.key}>
-                    <Td><Badge tone={days < 0 ? "red" : days <= 15 ? "amber" : "slate"}>{fmtDate(r.date)}</Badge><div className="mt-0.5 text-xs text-mute">{relDays(days)}</div></Td>
+                    <Td><Badge tone={days < 0 ? "red" : days <= 15 ? "amber" : "slate"}>{fmtDate(r.date)}</Badge><div className="mt-0.5 text-xs text-steel">{relDays(days)}</div></Td>
                     <Td>{r.label}</Td>
                     <Td><Link href={r.href} className="font-semibold hover:underline">{r.who}</Link></Td>
                   </tr>

@@ -65,10 +65,10 @@ export default function JobsPage() {
       {overdue.length > 0 && (
         <Card className="border-amber-300">
           <CardHeader title="Needs updating" sub="These dates have passed but they aren't marked done" />
-          <ul className="divide-y divide-cream">
+          <ul className="divide-y divide-silver">
             {overdue.map((j) => (
               <li key={j.id} className="flex flex-wrap items-center gap-3 px-5 py-2.5 text-sm">
-                <span className="min-w-0 flex-1"><b>{j.title}</b> <span className="text-mute">· {j.customer ?? j.address} · {fmtDay(j.endDate ?? j.date)}</span></span>
+                <span className="min-w-0 flex-1"><b>{j.title}</b> <span className="text-steel">· {j.customer ?? j.address} · {fmtDay(j.endDate ?? j.date)}</span></span>
                 <Button size="sm" onClick={() => mutate((d) => setJobStatus(d, j.id, "done"))}><CheckCircle2 size={14} /> Mark done</Button>
                 <Button size="sm" variant="secondary" onClick={() => setForm({ job: j })}>Edit</Button>
               </li>
@@ -89,26 +89,26 @@ export default function JobsPage() {
           {days.map((day) => (
             <Card key={day}>
               <CardHeader title={day === t ? `Today, ${fmtDay(day)}` : fmtDay(day)} sub={`${items.filter((i) => dayOf(i) === day).length} booked`} />
-              <ul className="divide-y divide-cream">
+              <ul className="divide-y divide-silver">
                 {items.filter((i) => dayOf(i) === day).map((it) => {
                   const job = it.jobId ? db.jobs.find((j) => j.id === it.jobId) : undefined;
                   const issues = job ? jobIssues(db, job) : [];
                   return (
                     <li key={it.key} className="px-5 py-3">
                       <div className="flex flex-wrap items-start gap-3">
-                        <div className="w-14 shrink-0 text-sm font-semibold tabular-nums">{it.time ?? <span className="text-xs font-normal text-mute">all day</span>}</div>
+                        <div className="w-14 shrink-0 text-sm font-semibold tabular-nums">{it.time ?? <span className="text-xs font-normal text-steel">all day</span>}</div>
                         <div className="min-w-0 flex-1">
                           <div className="flex flex-wrap items-center gap-2">
                             <span className="font-medium">{it.title}</span>
                             <Badge tone={it.kind === "inspection" ? "amber" : "blue"}>{jobKind[it.kind]}</Badge>
                             {job && <Badge tone={jobStatus[job.status].tone}>{jobStatus[job.status].label}</Badge>}
-                            {it.endDate && <span className="text-xs text-mute">{it.date < t ? `since ${fmtShort(it.date)} · ` : ""}until {fmtShort(it.endDate)}</span>}
+                            {it.endDate && <span className="text-xs text-steel">{it.date < t ? `since ${fmtShort(it.date)} · ` : ""}until {fmtShort(it.endDate)}</span>}
                           </div>
-                          <div className="text-sm text-mute">{it.customer ? `${it.customer} · ` : ""}{it.address}</div>
+                          <div className="text-sm text-steel">{it.customer ? `${it.customer} · ` : ""}{it.address}</div>
                           <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs">
                             {it.vanIds.map((id) => <Plate key={id}>{vanReg(db, id)}</Plate>)}
-                            {it.crewIds.length > 0 && <span className="text-mute">{it.crewIds.map((id) => crewName(db, id)).join(", ")}</span>}
-                            {it.vanIds.length === 0 && it.crewIds.length === 0 && <span className="text-mute">No van or crew assigned</span>}
+                            {it.crewIds.length > 0 && <span className="text-steel">{it.crewIds.map((id) => crewName(db, id)).join(", ")}</span>}
+                            {it.vanIds.length === 0 && it.crewIds.length === 0 && <span className="text-steel">No van or crew assigned</span>}
                             {it.value ? <span className="font-semibold">{gbp(it.value)}</span> : null}
                           </div>
                         </div>
@@ -153,8 +153,8 @@ export default function JobsPage() {
               ]}
             />
             <div className="relative @3xl:w-64">
-              <Search size={16} aria-hidden className="absolute left-3 top-1/2 -translate-y-1/2 text-mute" />
-              <input aria-label="Search jobs" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Title, customer or address" className="min-h-11 w-full rounded-xl border-[1.5px] border-line bg-white py-2 pl-9 pr-3 text-base outline-none focus:border-ink" />
+              <Search size={16} aria-hidden className="absolute left-3 top-1/2 -translate-y-1/2 text-steel" />
+              <input aria-label="Search jobs" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Title, customer or address" className="min-h-11 w-full rounded-xl border-[1.5px] border-ctrl bg-white py-2 pl-9 pr-3 text-base outline-none focus:border-night" />
             </div>
           </div>
           <Card>
@@ -164,17 +164,17 @@ export default function JobsPage() {
               </thead>
               <tbody>
                 {allJobs.slice(0, limit).map((j) => (
-                  <tr key={j.id} onClick={() => setForm({ job: j })} className="cursor-pointer hover:bg-cream">
+                  <tr key={j.id} onClick={() => setForm({ job: j })} className="cursor-pointer hover:bg-silver-soft">
                     <Td className="whitespace-nowrap text-xs">{fmtDay(j.date)}{j.endDate ? ` → ${fmtShort(j.endDate)}` : ""}{j.time ? ` ${j.time}` : ""}</Td>
                     <Td>
                       <button type="button" onClick={() => setForm({ job: j })} className="min-h-10 text-left">
                         <span className="block font-medium">{j.title}</span>
-                        <span className="block max-w-[18rem] truncate text-xs text-mute">{jobKind[j.kind]} · {j.customer ? `${j.customer} · ` : ""}{j.address}</span>
+                        <span className="block max-w-[18rem] truncate text-xs text-steel">{jobKind[j.kind]} · {j.customer ? `${j.customer} · ` : ""}{j.address}</span>
                       </button>
                     </Td>
                     <Td><div className="flex flex-wrap gap-1">{j.vanIds.map((id) => <Plate key={id}>{vanReg(db, id)}</Plate>)}</div></Td>
                     <Td className="text-xs">{j.crewIds.map((id) => crewName(db, id).split(" ")[0]).join(", ")}</Td>
-                    <Td right>{j.value ? gbp(j.value) : <span className="text-mute">—</span>}</Td>
+                    <Td right>{j.value ? gbp(j.value) : <span className="text-steel">—</span>}</Td>
                     <Td><Badge tone={jobStatus[j.status].tone}>{jobStatus[j.status].label}</Badge></Td>
                   </tr>
                 ))}
@@ -201,7 +201,7 @@ function Planner({ onOpen }: { onOpen: (f: FormState) => void }) {
   return (
     <Card>
       <CardHeader title="Van planner" sub="Next 14 days. Tap an empty day to book that van, or a booking to edit it." />
-      <div className="flex flex-wrap gap-x-4 gap-y-1 border-b border-cream px-5 py-2 text-xs text-mute">
+      <div className="flex flex-wrap gap-x-4 gap-y-1 border-b border-silver px-5 py-2 text-xs text-steel">
         {[["bg-sky-100 border-l-4 border-sky-600", "Job"], ["bg-orange-100 border-l-4 border-orange-600", "Job in progress"], ["bg-amber-50 border-l-4 border-dashed border-amber-500", "Inspection"], ["bg-emerald-50 border-l-4 border-emerald-600", "Done"], ["bg-red-100 ring-1 ring-inset ring-red-300", "Garage"], ["bg-stone-200", "Off the road"]].map(([c, l]) => (
           <span key={l} className="flex items-center gap-1.5"><span aria-hidden className={`h-4 w-5 rounded-sm ${c}`} />{l}</span>
         ))}
@@ -211,11 +211,11 @@ function Planner({ onOpen }: { onOpen: (f: FormState) => void }) {
         <table className="w-full border-collapse text-xs" style={{ minWidth: 900, tableLayout: "fixed" }}>
           <thead>
             <tr>
-              <th scope="col" className="sticky left-0 z-10 w-24 border-b border-cream bg-white px-2 py-2 text-left font-semibold text-mute sm:w-36 sm:px-3">Van</th>
+              <th scope="col" className="sticky left-0 z-10 w-24 border-b border-silver bg-white px-2 py-2 text-left font-semibold text-steel sm:w-36 sm:px-3">Van</th>
               {days.map((d) => {
                 const wk = [0, 6].includes(parseDate(d).getDay());
                 return (
-                  <th key={d} scope="col" className={`border-b border-cream px-1 py-2 text-center font-semibold ${wk ? "bg-cream/70 text-mute" : "text-ink"} ${d === t ? "text-brand" : ""}`}>
+                  <th key={d} scope="col" className={`border-b border-silver px-1 py-2 text-center font-semibold ${wk ? "bg-silver-soft/70 text-steel" : "text-night"} ${d === t ? "text-brand" : ""}`}>
                     <div>{parseDate(d).toLocaleDateString("en-GB", { weekday: "short" })}</div>
                     <div className="font-normal">{fmtShort(d)}</div>
                   </th>
@@ -226,9 +226,9 @@ function Planner({ onOpen }: { onOpen: (f: FormState) => void }) {
           <tbody>
             {vans.map((v) => (
               <tr key={v.id}>
-                <th scope="row" className="sticky left-0 z-10 border-b border-cream bg-white px-2 py-2 text-left font-normal sm:px-3">
+                <th scope="row" className="sticky left-0 z-10 border-b border-silver bg-white px-2 py-2 text-left font-normal sm:px-3">
                   <Plate>{v.reg}</Plate>
-                  <div className="mt-0.5 hidden truncate text-mute sm:block">{v.make} {v.model}</div>
+                  <div className="mt-0.5 hidden truncate text-steel sm:block">{v.make} {v.model}</div>
                 </th>
                 {days.map((d) => {
                   const wk = [0, 6].includes(parseDate(d).getDay());
@@ -237,7 +237,7 @@ function Planner({ onOpen }: { onOpen: (f: FormState) => void }) {
                   const off = v.status === "off_road";
                   const job = here[0];
                   return (
-                    <td key={d} className={`h-14 border-b border-l border-cream p-0.5 align-top ${wk ? "bg-cream/70" : ""}`}>
+                    <td key={d} className={`h-14 border-b border-l border-silver p-0.5 align-top ${wk ? "bg-silver-soft/70" : ""}`}>
                       {garage ? (
                         <div className="h-full min-h-[3rem] rounded bg-red-100 px-1 py-0.5 text-[11px] font-semibold text-red-900 ring-1 ring-inset ring-red-300" title="In the garage">Garage</div>
                       ) : job ? (
@@ -253,7 +253,7 @@ function Planner({ onOpen }: { onOpen: (f: FormState) => void }) {
                       ) : off ? (
                         <div className="h-full min-h-[3rem] rounded bg-stone-200" title="Off the road" />
                       ) : (
-                        <button type="button" onClick={() => onOpen({ kind: "job", prefill: { date: d, vanId: v.id } })} aria-label={`Book ${v.reg} on ${fmtDay(d)}`} className="h-full min-h-[3rem] w-full rounded text-line hover:bg-cream hover:text-ink">+</button>
+                        <button type="button" onClick={() => onOpen({ kind: "job", prefill: { date: d, vanId: v.id } })} aria-label={`Book ${v.reg} on ${fmtDay(d)}`} className="h-full min-h-[3rem] w-full rounded text-ctrl hover:bg-silver-soft hover:text-night">+</button>
                       )}
                     </td>
                   );

@@ -42,12 +42,13 @@ function LoginForm() {
   }
 
   return (
-    <div className="grid min-h-screen bg-cream lg:grid-cols-[1.1fr_1fr]">
-      <aside className="relative hidden overflow-hidden bg-brand p-12 text-white lg:flex lg:flex-col lg:justify-between">
+    <div className="admin-bg grid min-h-screen lg:grid-cols-[1.1fr_1fr]">
+      <aside className="relative hidden overflow-hidden bg-gradient-to-br from-[#c8161e] via-brand to-[#6f0a10] p-12 text-white shadow-[12px_0_40px_-20px_rgba(18,24,38,0.6)] lg:flex lg:flex-col lg:justify-between">
+        <div aria-hidden className="absolute inset-0 opacity-25 [background-image:linear-gradient(rgba(255,255,255,0.25)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.25)_1px,transparent_1px)] [background-size:36px_36px] [mask-image:radial-gradient(70%_60%_at_30%_30%,black,transparent)]" />
         <div aria-hidden className="absolute -right-24 -top-24 h-96 w-96 rounded-full bg-white/10 blur-3xl" />
         <div aria-hidden className="absolute -bottom-32 -left-16 h-96 w-96 rounded-full bg-black/20 blur-3xl" />
         <div className="relative">
-          <span className="inline-block rounded-2xl bg-white px-5 py-3 shadow-lg">
+          <span className="elev inline-block rounded-2xl px-5 py-3 shadow-2xl">
             <Image src="/logo.png" alt="JC Roofing" width={512} height={198} priority className="h-16 w-auto" />
           </span>
           <div className="mt-3 text-xs text-white/80">JC Roofing Dumfries · Heathhall, Dumfries</div>
@@ -67,32 +68,32 @@ function LoginForm() {
       </aside>
 
       <main className="flex items-center justify-center p-6">
-        <div className="w-full max-w-sm">
+        <div className="elev w-full max-w-sm rounded-3xl p-7 sm:p-8">
           <div className="mb-8 lg:hidden">
             <Image src="/logo.png" alt="JC Roofing" width={512} height={198} priority className="h-14 w-auto" />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-ink">Sign in to the dashboard</h1>
-          <p className="mt-1 text-sm text-mute">Owner access only.</p>
+          <h1 className="text-2xl font-bold tracking-tight text-night">Sign in to the dashboard</h1>
+          <p className="mt-1 text-sm text-steel">Owner access only.</p>
 
           <form onSubmit={submit} className="mt-8 space-y-4">
             <label className="block">
-              <span className="text-sm font-medium text-ink">Email</span>
-              <input name="email" type="email" required autoComplete="username" className="mt-1 w-full rounded-xl border-[1.5px] border-line bg-white px-3.5 py-3 text-base outline-none focus:border-ink" />
+              <span className="text-sm font-medium text-night">Email</span>
+              <input name="email" type="email" required autoComplete="username" className="field-3d mt-1 w-full rounded-xl border-[1.5px] border-ctrl bg-white px-3.5 py-3 text-base outline-none focus:border-night" />
             </label>
             <label className="block">
-              <span className="text-sm font-medium text-ink">Password</span>
-              <input name="password" type="password" required autoComplete="current-password" className="mt-1 w-full rounded-xl border-[1.5px] border-line bg-white px-3.5 py-3 text-base outline-none focus:border-ink" />
+              <span className="text-sm font-medium text-night">Password</span>
+              <input name="password" type="password" required autoComplete="current-password" className="field-3d mt-1 w-full rounded-xl border-[1.5px] border-ctrl bg-white px-3.5 py-3 text-base outline-none focus:border-night" />
             </label>
             {error && (
               <p role="alert" className="rounded-xl bg-brand-tint px-3 py-2 text-sm text-brand">
                 {error}
               </p>
             )}
-            <button disabled={pending} className="min-h-11 w-full rounded-xl bg-brand px-4 py-3 text-base font-semibold text-white transition-colors hover:bg-brand-dark disabled:opacity-60">
+            <button disabled={pending} className="btn-red min-h-11 w-full rounded-xl px-4 py-3 text-base font-semibold text-white transition disabled:opacity-60">
               {pending ? "Signing in…" : "Sign in"}
             </button>
           </form>
-          <p className="mt-6 text-xs text-mute">Forgotten your password? It&apos;s the owner password set up with the site. Ask whoever set it up to reset it.</p>
+          <p className="mt-6 text-xs text-steel">Forgotten your password? It&apos;s the owner password set up with the site. Ask whoever set it up to reset it.</p>
         </div>
       </main>
     </div>
