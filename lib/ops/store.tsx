@@ -227,7 +227,7 @@ export function OpsProvider({ children }: { children: React.ReactNode }) {
 
   if (failed) {
     return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3 p-6 text-center text-sm text-steel">
+      <div className="admin-bg flex min-h-screen flex-col items-center justify-center gap-3 p-6 text-center text-sm text-steel">
         <p>We couldn&apos;t load your dashboard. Check the connection and try again.</p>
         <button onClick={() => location.reload()} className="min-h-11 rounded-xl bg-brand px-5 py-2 font-semibold text-white hover:bg-brand-dark">
           Try again
@@ -238,7 +238,7 @@ export function OpsProvider({ children }: { children: React.ReactNode }) {
 
   if (!db || !biz) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center" role="status" aria-label="Loading">
+      <div className="admin-bg flex min-h-screen items-center justify-center" role="status" aria-label="Loading">
         <div className="h-6 w-6 animate-spin rounded-full border-2 border-edge border-t-brand" />
       </div>
     );

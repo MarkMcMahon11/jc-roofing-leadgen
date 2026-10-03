@@ -44,7 +44,6 @@ function LoginForm() {
   return (
     <div className="admin-bg grid min-h-screen lg:grid-cols-[1.1fr_1fr]">
       <aside className="relative hidden overflow-hidden bg-gradient-to-br from-[#c8161e] via-brand to-[#6f0a10] p-12 text-white shadow-[12px_0_40px_-20px_rgba(18,24,38,0.6)] lg:flex lg:flex-col lg:justify-between">
-        <div aria-hidden className="absolute inset-0 opacity-25 [background-image:linear-gradient(rgba(255,255,255,0.25)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.25)_1px,transparent_1px)] [background-size:36px_36px] [mask-image:radial-gradient(70%_60%_at_30%_30%,black,transparent)]" />
         <div aria-hidden className="absolute -right-24 -top-24 h-96 w-96 rounded-full bg-white/10 blur-3xl" />
         <div aria-hidden className="absolute -bottom-32 -left-16 h-96 w-96 rounded-full bg-black/20 blur-3xl" />
         <div className="relative">

@@ -94,13 +94,11 @@ body {
 
 /* ---------- owner dashboard surfaces: soft depth, glass and metal ---------- */
 .admin-bg {
-  background-color: #e2e6ed;
+  background-color: #e3e7ee;
   background-image:
-    radial-gradient(1100px 520px at 88% -8%, rgba(255, 255, 255, 0.9), transparent 62%),
-    radial-gradient(900px 520px at -8% 108%, rgba(177, 16, 23, 0.06), transparent 62%),
-    linear-gradient(rgba(115, 128, 150, 0.09) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(115, 128, 150, 0.09) 1px, transparent 1px);
-  background-size: auto, auto, 36px 36px, 36px 36px;
+    radial-gradient(1200px 560px at 90% -10%, rgba(255, 255, 255, 0.85), transparent 65%),
+    radial-gradient(1000px 560px at -10% 110%, rgba(177, 16, 23, 0.05), transparent 65%),
+    linear-gradient(180deg, #e9ecf2 0%, #dde2ea 100%);
 }
 .elev {
   background: linear-gradient(180deg, #ffffff 0%, #f5f7fa 100%);
