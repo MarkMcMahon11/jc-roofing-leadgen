@@ -30,6 +30,10 @@ export default function Dashboard() {
       newLeads: real.filter((l) => l.status === "new"),
       weekLeads: real.filter((l) => ukDate(l.createdAt) >= addDays(t, -6)).length,
       week,
+      days: Array.from({ length: 7 }, (_, i) => {
+        const d = addDays(t, i);
+        return { d, items: scheduleItems(db, leads, d, d) };
+      }),
       visits: week.filter((x) => x.kind === "inspection").length,
       jobsOn: week.filter((x) => x.kind === "job").length,
       costsThis,
@@ -59,11 +63,47 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <div>
+      <div className="glass -mx-2 w-fit max-w-full rounded-2xl px-3 py-2">
         <h1 className="text-2xl font-bold tracking-tight text-night">{greeting}</h1>
-        <p className="text-sm text-steel">
+        <p className="text-sm text-night/75">
           Your business at a glance · {parseDate(day).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })}
         </p>
+      </div>
+
+      <div className="grid gap-4 @3xl:grid-cols-5">
+        <Card className="@3xl:col-span-2">
+          <CardHeader
+            title={`Today · ${fmtDay(m.t)}`}
+            sub={m.days[0].items.length ? `${m.days[0].items.length} on today` : "Nothing booked today"}
+            action={<Link href="/admin/jobs" className="inline-flex min-h-10 items-center whitespace-nowrap text-xs font-medium text-steel hover:text-night">Open schedule →</Link>}
+          />
+          <ul className="divide-y divide-silver">
+            {m.days[0].items.map((it) => (
+              <ScheduleRow key={it.key} it={it} today={m.t} big />
+            ))}
+            {m.days[0].items.length === 0 && <li className="px-5 py-8 text-center text-sm text-steel">A clear day. Add a job or inspection from the schedule.</li>}
+          </ul>
+        </Card>
+
+        <Card className="@3xl:col-span-3">
+          <CardHeader title="This week" sub={`${m.visits} inspection${m.visits === 1 ? "" : "s"} · ${m.jobsOn} job${m.jobsOn === 1 ? "" : "s"} over the next 7 days`} action={<Link href="/admin/jobs" className="inline-flex min-h-10 items-center whitespace-nowrap text-xs font-medium text-steel hover:text-night">Full schedule →</Link>} />
+          <ol className="divide-y divide-silver">
+            {m.days.map(({ d, items }, i) => (
+              <li key={d} className={`flex gap-3 px-5 py-2.5 ${i === 0 ? "bg-brand-tint/40" : ""}`}>
+                <div className="w-20 shrink-0 pt-0.5">
+                  <div className={`text-xs font-bold ${i === 0 ? "text-brand" : "text-night"}`}>{i === 0 ? "Today" : i === 1 ? "Tomorrow" : parseDate(d).toLocaleDateString("en-GB", { weekday: "short" })}</div>
+                  <div className="text-[11px] text-steel">{parseDate(d).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}</div>
+                </div>
+                <div className="min-w-0 flex-1 space-y-1.5">
+                  {items.map((it) => (
+                    <ScheduleRow key={it.key} it={it} today={d} compact />
+                  ))}
+                  {items.length === 0 && <div className="pt-0.5 text-xs text-steel">{[0, 6].includes(parseDate(d).getDay()) ? "Weekend" : "Free"}</div>}
+                </div>
+              </li>
+            ))}
+          </ol>
+        </Card>
       </div>
 
       <div className="grid grid-cols-2 gap-3 @3xl:grid-cols-4 @3xl:gap-4">
@@ -159,45 +199,6 @@ export default function Dashboard() {
         </Card>
 
         <Card>
-          <CardHeader title="This week's schedule" sub="Inspections and jobs, next 7 days" action={<Link href="/admin/jobs" className="inline-flex min-h-10 items-center whitespace-nowrap text-xs font-medium text-steel hover:text-night">Open schedule →</Link>} />
-          <ul className="divide-y divide-silver">
-            {m.week.slice(0, 8).map((it) => {
-              const job = it.jobId ? db.jobs.find((j) => j.id === it.jobId) : undefined;
-              const issues = job ? jobIssues(db, job).length : 0;
-              return (
-                <li key={it.key}>
-                  <Link href="/admin/jobs" className="flex items-start gap-3 px-5 py-2.5 text-sm hover:bg-silver-soft">
-                    <div className="w-16 shrink-0 text-xs font-semibold text-steel">
-                      {it.date <= m.t ? "Today" : fmtDay(it.date)}
-                      {it.time && <div className="font-normal">{it.time}</div>}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="truncate font-medium">
-                        {it.title}
-                        {it.kind === "inspection" ? "" : it.endDate ? ` · until ${fmtShort(it.endDate)}` : ""}
-                      </div>
-                      <div className="truncate text-xs text-steel">
-                        {it.customer ? `${it.customer} · ` : ""}
-                        {it.address}
-                      </div>
-                      <div className="mt-0.5 flex flex-wrap gap-1 text-xs">
-                        {it.vanIds.map((id) => <Plate key={id}>{vanReg(db, id)}</Plate>)}
-                        {it.crewIds.length > 0 && <span className="text-steel">{it.crewIds.map((id) => crewName(db, id).split(" ")[0]).join(", ")}</span>}
-                        {it.vanIds.length === 0 && <Badge tone="amber">No van yet</Badge>}
-                        {issues > 0 && <Badge tone="red">{issues} warning{issues === 1 ? "" : "s"}</Badge>}
-                      </div>
-                    </div>
-                  </Link>
-                </li>
-              );
-            })}
-            {m.week.length === 0 && <li className="px-5 py-8 text-center text-sm text-steel">Nothing scheduled in the next 7 days.</li>}
-          </ul>
-        </Card>
-      </div>
-
-      <div className="grid gap-4 @3xl:grid-cols-3">
-        <Card>
           <CardHeader title="Pipeline" sub="Real enquiries, by where they've got to" action={<Link href="/admin/leads" className="inline-flex min-h-10 items-center whitespace-nowrap text-xs font-medium text-steel hover:text-night">Leads →</Link>} />
           <ul className="space-y-3.5 p-5">
             {([
@@ -220,7 +221,9 @@ export default function Dashboard() {
             </li>
           </ul>
         </Card>
+      </div>
 
+      <div className="grid gap-4 @3xl:grid-cols-3">
         <Card href="/admin/map">
           <CardHeader title="Projects on the map" sub={`${m.pinCount} customer projects with a location`} />
           <ul className="space-y-2.5 p-5 text-sm">
@@ -242,9 +245,6 @@ export default function Dashboard() {
             <HBar items={m.vanCosts.map(({ v, c }) => ({ label: `${v.reg} · ${v.make} ${v.model}`, value: Math.round(c), color: "#b11017" }))} />
           </div>
         </Card>
-      </div>
-
-      <div className="grid gap-4 @3xl:grid-cols-2">
         <Card>
           <CardHeader title="Van use, next 2 weeks" sub="Working days with a job or inspection booked" />
           <ul className="space-y-3.5 p-5">
@@ -260,7 +260,9 @@ export default function Dashboard() {
             {m.util.length === 0 && <li className="text-sm text-steel">Add your vans to see how busy they are.</li>}
           </ul>
         </Card>
+      </div>
 
+      <div>
         <Card>
           <CardHeader title="Recent activity" action={<Link href="/admin/activity" className="inline-flex min-h-10 items-center whitespace-nowrap text-xs font-medium text-steel hover:text-night">All →</Link>} />
           <ul className="divide-y divide-silver">
@@ -303,5 +305,41 @@ export default function Dashboard() {
         </div>
       </Card>
     </div>
+  );
+}
+
+function ScheduleRow({ it, today, big, compact }: { it: ReturnType<typeof scheduleItems>[number]; today: string; big?: boolean; compact?: boolean }) {
+  const { db } = useOps();
+  const job = it.jobId ? db.jobs.find((j) => j.id === it.jobId) : undefined;
+  const issues = job ? jobIssues(db, job).length : 0;
+  const content = (
+    <>
+      {it.time && <div className={`shrink-0 font-semibold tabular-nums text-night ${big ? "w-12 text-sm" : "w-11 text-xs"}`}>{it.time}</div>}
+      <div className="min-w-0 flex-1">
+        <div className={`${compact ? "truncate" : ""} font-medium ${big ? "text-sm" : "text-[13px]"}`}>
+          {it.kind === "inspection" && <span className="mr-1.5 rounded bg-sky-50 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-sky-800">Visit</span>}
+          {it.title}
+          {it.kind !== "inspection" && it.endDate && it.endDate > today ? <span className="font-normal text-steel"> · until {fmtShort(it.endDate)}</span> : null}
+        </div>
+        <div className="truncate text-xs text-steel">
+          {it.customer ? `${it.customer} · ` : ""}
+          {it.address}
+        </div>
+        <div className="mt-0.5 flex flex-wrap items-center gap-1 text-xs">
+          {it.vanIds.map((id) => <Plate key={id}>{vanReg(db, id)}</Plate>)}
+          {it.crewIds.length > 0 && <span className="text-steel">{it.crewIds.map((id) => crewName(db, id).split(" ")[0]).join(", ")}</span>}
+          {it.vanIds.length === 0 && <Badge tone="amber">No van yet</Badge>}
+          {issues > 0 && <Badge tone="red">{issues} warning{issues === 1 ? "" : "s"}</Badge>}
+        </div>
+      </div>
+    </>
+  );
+  const cls = `flex items-start gap-3 hover:bg-silver-soft ${big ? "px-5 py-3" : "-mx-2 rounded-lg px-2 py-1"}`;
+  return big ? (
+    <li>
+      <Link href="/admin/jobs" className={cls}>{content}</Link>
+    </li>
+  ) : (
+    <Link href="/admin/jobs" className={cls}>{content}</Link>
   );
 }
