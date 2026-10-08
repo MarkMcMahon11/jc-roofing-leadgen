@@ -207,7 +207,7 @@ function Chats({ s, act }: { s: State; act: (b: Record<string, unknown>) => Prom
           {list.map((x) => (
             <li key={x.phone}>
               <button type="button" onClick={() => { setSel(x.phone); if (window.innerWidth < 1024) setTimeout(() => threadRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50); }} aria-current={x.phone === phone} className={`flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-silver-soft ${x.phone === phone ? "bg-silver-soft" : ""}`}>
-                <span aria-hidden className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-night text-xs font-bold text-white">{who(x).replace("+", "").slice(0, 1).toUpperCase()}</span>
+                <span aria-hidden className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#1b2130] text-xs font-bold text-white">{who(x).replace("+", "").slice(0, 1).toUpperCase()}</span>
                 <span className="min-w-0">
                   <span className="block truncate text-sm font-semibold text-night">{who(x)}</span>
                   <span className="block truncate text-xs text-steel">{x.kind === "staff" ? "Team" : x.kind === "unknown" ? "New contact" : x.kind}{!x.bot ? " · you" : ""}{x.blocked ? " · stopped" : ""}</span>
@@ -235,7 +235,7 @@ function Chats({ s, act }: { s: State; act: (b: Record<string, unknown>) => Prom
           <div className="flex-1 space-y-2 overflow-y-auto p-4" style={{ maxHeight: "26rem" }}>
             {thread.map((m) => (
               <div key={m.id} className={`flex ${m.dir === "out" ? "justify-end" : "justify-start"}`}>
-                <div className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm ${m.dir === "out" ? (m.by === "owner" ? "bg-night text-white" : "bg-brand-tint text-night") : "bg-silver-soft text-night"}`}>
+                <div className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm ${m.dir === "out" ? (m.by === "owner" ? "bg-[#1b2130] text-white ring-1 ring-ctrl" : "bg-brand-tint text-night") : "bg-silver-soft text-night"}`}>
                   <p className="whitespace-pre-line break-words">{m.text}</p>
                   <p className={`mt-1 text-[11px] ${m.by === "owner" ? "text-white/75" : "text-steel"}`}>
                     {m.dir === "out" ? (m.by === "owner" ? "You" : "Assistant") : "Them"} · {fmtDateTime(m.at)}

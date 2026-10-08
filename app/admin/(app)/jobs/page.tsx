@@ -154,7 +154,7 @@ export default function JobsPage() {
             />
             <div className="relative @3xl:w-64">
               <Search size={16} aria-hidden className="absolute left-3 top-1/2 -translate-y-1/2 text-steel" />
-              <input aria-label="Search jobs" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Title, customer or address" className="min-h-11 w-full rounded-xl border-[1.5px] border-ctrl bg-white py-2 pl-9 pr-3 text-base outline-none focus:border-night" />
+              <input aria-label="Search jobs" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Title, customer or address" className="min-h-11 w-full rounded-xl border-[1.5px] border-ctrl bg-surface py-2 pl-9 pr-3 text-base outline-none focus:border-night" />
             </div>
           </div>
           <Card>
@@ -211,7 +211,7 @@ function Planner({ onOpen }: { onOpen: (f: FormState) => void }) {
         <table className="w-full border-collapse text-xs" style={{ minWidth: 900, tableLayout: "fixed" }}>
           <thead>
             <tr>
-              <th scope="col" className="sticky left-0 z-10 w-24 border-b border-silver bg-white px-2 py-2 text-left font-semibold text-steel sm:w-36 sm:px-3">Van</th>
+              <th scope="col" className="sticky left-0 z-10 w-24 border-b border-silver bg-surface px-2 py-2 text-left font-semibold text-steel sm:w-36 sm:px-3">Van</th>
               {days.map((d) => {
                 const wk = [0, 6].includes(parseDate(d).getDay());
                 return (
@@ -226,7 +226,7 @@ function Planner({ onOpen }: { onOpen: (f: FormState) => void }) {
           <tbody>
             {vans.map((v) => (
               <tr key={v.id}>
-                <th scope="row" className="sticky left-0 z-10 border-b border-silver bg-white px-2 py-2 text-left font-normal sm:px-3">
+                <th scope="row" className="sticky left-0 z-10 border-b border-silver bg-surface px-2 py-2 text-left font-normal sm:px-3">
                   <Plate>{v.reg}</Plate>
                   <div className="mt-0.5 hidden truncate text-steel sm:block">{v.make} {v.model}</div>
                 </th>

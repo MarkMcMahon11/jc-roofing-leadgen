@@ -37,7 +37,7 @@ export function Card({ children, className = "", href }: { children: React.React
 
 export function CardHeader({ title, sub, action }: { title: React.ReactNode; sub?: React.ReactNode; action?: React.ReactNode }) {
   return (
-    <div className="flex flex-wrap items-start justify-between gap-3 rounded-t-2xl border-b border-silver bg-gradient-to-b from-white/60 to-transparent px-5 py-4">
+    <div className="flex flex-wrap items-start justify-between gap-3 rounded-t-2xl border-b border-silver bg-gradient-to-b from-surface/60 to-transparent px-5 py-4">
       <div className="min-w-0 max-w-full">
         <h2 className="break-words font-semibold text-night [overflow-wrap:anywhere]">{title}</h2>
         {sub && <p className="mt-0.5 break-words text-xs text-steel [overflow-wrap:anywhere]">{sub}</p>}
@@ -111,7 +111,7 @@ export function Modal({ open, onClose, title, children, wide }: { open: boolean;
       aria-labelledby={titleId}
       onClose={onClose}
       onClick={(e) => e.target === ref.current && onClose()}
-      className={`elev m-auto w-[calc(100%-1.5rem)] ${wide ? "max-w-2xl" : "max-w-lg"} rounded-3xl p-0 text-night shadow-2xl backdrop:bg-night/45 backdrop:backdrop-blur-md`}
+      className={`elev m-auto w-[calc(100%-1.5rem)] ${wide ? "max-w-2xl" : "max-w-lg"} rounded-3xl p-0 text-night shadow-2xl backdrop:bg-black/50 backdrop:backdrop-blur-md`}
     >
       {open && (
         <div>
@@ -128,7 +128,7 @@ export function Modal({ open, onClose, title, children, wide }: { open: boolean;
   );
 }
 
-const inputCls = "field-3d mt-1 w-full rounded-xl border-[1.5px] border-ctrl bg-white px-3 py-2.5 text-base outline-none focus:border-night";
+const inputCls = "field-3d mt-1 w-full rounded-xl border-[1.5px] border-ctrl bg-surface px-3 py-2.5 text-base outline-none focus:border-night";
 
 export function Field({ label, children, hint, className = "" }: { label: React.ReactNode; children: React.ReactNode; hint?: string; className?: string }) {
   return (
@@ -203,7 +203,7 @@ export function Table({ children, minWidth = 640 }: { children: React.ReactNode;
 }
 
 export function Th({ children, right, className = "" }: { children?: React.ReactNode; right?: boolean; className?: string }) {
-  return <th scope="col" className={`border-b border-edge/70 bg-gradient-to-b from-white to-silver-soft px-4 py-2.5 text-xs font-semibold uppercase tracking-wider text-steel first:rounded-tl-2xl last:rounded-tr-2xl ${right ? "text-right" : "text-left"} ${className}`}>{children}</th>;
+  return <th scope="col" className={`border-b border-edge/70 bg-gradient-to-b from-surface to-silver-soft px-4 py-2.5 text-xs font-semibold uppercase tracking-wider text-steel first:rounded-tl-2xl last:rounded-tr-2xl ${right ? "text-right" : "text-left"} ${className}`}>{children}</th>;
 }
 
 export function Td({ children, right, className = "" }: { children?: React.ReactNode; right?: boolean; className?: string }) {
@@ -212,5 +212,5 @@ export function Td({ children, right, className = "" }: { children?: React.React
 
 /** A number plate chip. */
 export function Plate({ children }: { children: React.ReactNode }) {
-  return <span className="plate-metal inline-block whitespace-nowrap rounded-md px-2 py-0.5 font-mono text-xs font-bold tracking-wide text-night">{children}</span>;
+  return <span className="plate-metal inline-block whitespace-nowrap rounded-md px-2 py-0.5 font-mono text-xs font-bold tracking-wide text-[#1b2130]">{children}</span>;
 }

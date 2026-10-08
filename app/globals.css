@@ -1,6 +1,9 @@
 @import "tailwindcss";
 
 :root {
+  --chart-grid: #dbe0e8;
+  --chart-neutral: #2a3345;
+  --chart-boost: brightness(1);
   --background: #f4f4eb;
   --foreground: #34342b;
 }
@@ -13,6 +16,8 @@
   --color-steel: #566073;        /* secondary text: 4.9:1 on silver, 6:1 on white */
   --color-night: #1b2130;        /* main text and dark surfaces */
   --color-ctrl: #6f7a8e;         /* control borders: 4.3:1 on white, 3.3:1 on silver */
+  --color-surface: #ffffff;      /* cards, fields, popovers */
+  --color-brand-tint: #fbeeee;   /* soft red wash behind red text */
 }
 
 @theme inline {
@@ -20,7 +25,6 @@
   --color-foreground: var(--foreground);
   --color-brand: #b11017;
   --color-brand-dark: #8f0d13;
-  --color-brand-tint: #fbeeee;
   --color-ink: #34342b;
   --color-mute: #5f5f57;
   --color-sand: #d6d4c7; /* decorative dividers only */
@@ -91,6 +95,9 @@ body {
   .rounded-2xl { border-radius: 0 !important; box-shadow: none !important; }
   * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
 }
+
+/* colour of a map stage label: the stage's own text colour in light mode, a lightened tint of it in dark mode */
+.stage-text { color: var(--st); }
 
 /* ---------- owner dashboard surfaces: soft depth, glass and metal ---------- */
 .admin-bg {
@@ -176,4 +183,168 @@ body {
 @media (forced-colors: active) {
   .btn-red, .btn-silver, .chip-3d, .nav-active, .elev { border: 2px solid ButtonText; }
   .glow-red { background: Highlight; }
+}
+
+/* ---------- dark mode (owner dashboard only; screens only, so printed reports stay black on white) ---------- */
+@media screen and (not (forced-colors: active)) {
+  /* the page edge, scrollbars and bounce area follow the theme from the very first paint (only pages that contain a dark dashboard) */
+  html:has([data-theme="dark"]) { color-scheme: dark; background-color: #0b0f16; }
+  html:has([data-theme="dark"]) body { background-color: #0b0f16; }
+  [data-theme="dark"] {
+    color-scheme: dark;
+    --color-silver: #0f131b;
+    --color-silver-soft: #1b2230;
+    --color-edge: #2b3446;
+    --color-steel: #a6b0c4;
+    --color-night: #e9edf5;
+    --color-ctrl: #6d788d;
+    --color-surface: #171d29;
+    --color-brand-tint: #3a1a1e;
+    --chart-grid: #2b3446;
+    --chart-neutral: #8fa0c0;
+    --chart-boost: brightness(1.35);
+  --color-amber-50: oklch(27.9% 0.077 45.635);
+  --color-amber-100: oklch(41.4% 0.112 45.904);
+  --color-amber-200: oklch(47.3% 0.137 46.201);
+  --color-amber-300: oklch(55.5% 0.163 48.998);
+  --color-amber-400: oklch(66.6% 0.179 58.318);
+  --color-amber-500: oklch(76.9% 0.188 70.08);
+  --color-amber-600: oklch(82.8% 0.189 84.429);
+  --color-amber-700: oklch(87.9% 0.169 91.605);
+  --color-amber-800: oklch(92.4% 0.12 95.746);
+  --color-amber-900: oklch(96.2% 0.059 95.617);
+  --color-amber-950: oklch(98.7% 0.022 95.277);
+  --color-emerald-50: oklch(26.2% 0.051 172.552);
+  --color-emerald-100: oklch(37.8% 0.077 168.94);
+  --color-emerald-200: oklch(43.2% 0.095 166.913);
+  --color-emerald-300: oklch(50.8% 0.118 165.612);
+  --color-emerald-400: oklch(59.6% 0.145 163.225);
+  --color-emerald-500: oklch(69.6% 0.17 162.48);
+  --color-emerald-600: oklch(76.5% 0.177 163.223);
+  --color-emerald-700: oklch(84.5% 0.143 164.978);
+  --color-emerald-800: oklch(90.5% 0.093 164.15);
+  --color-emerald-900: oklch(95% 0.052 163.051);
+  --color-emerald-950: oklch(97.9% 0.021 166.113);
+  --color-sky-50: oklch(29.3% 0.066 243.157);
+  --color-sky-100: oklch(39.1% 0.09 240.876);
+  --color-sky-200: oklch(44.3% 0.11 240.79);
+  --color-sky-300: oklch(50% 0.134 242.749);
+  --color-sky-400: oklch(58.8% 0.158 241.966);
+  --color-sky-500: oklch(68.5% 0.169 237.323);
+  --color-sky-600: oklch(74.6% 0.16 232.661);
+  --color-sky-700: oklch(82.8% 0.111 230.318);
+  --color-sky-800: oklch(90.1% 0.058 230.902);
+  --color-sky-900: oklch(95.1% 0.026 236.824);
+  --color-sky-950: oklch(97.7% 0.013 236.62);
+  --color-red-50: oklch(25.8% 0.092 26.042);
+  --color-red-100: oklch(39.6% 0.141 25.723);
+  --color-red-200: oklch(44.4% 0.177 26.899);
+  --color-red-300: oklch(50.5% 0.213 27.518);
+  --color-red-400: oklch(57.7% 0.245 27.325);
+  --color-red-500: oklch(63.7% 0.237 25.331);
+  --color-red-600: oklch(70.4% 0.191 22.216);
+  --color-red-700: oklch(80.8% 0.114 19.571);
+  --color-red-800: oklch(88.5% 0.062 18.334);
+  --color-red-900: oklch(93.6% 0.032 17.717);
+  --color-red-950: oklch(97.1% 0.013 17.38);
+  --color-violet-50: oklch(28.3% 0.141 291.089);
+  --color-violet-100: oklch(38% 0.189 293.745);
+  --color-violet-200: oklch(43.2% 0.232 292.759);
+  --color-violet-300: oklch(49.1% 0.27 292.581);
+  --color-violet-400: oklch(54.1% 0.281 293.009);
+  --color-violet-500: oklch(60.6% 0.25 292.717);
+  --color-violet-600: oklch(70.2% 0.183 293.541);
+  --color-violet-700: oklch(81.1% 0.111 293.571);
+  --color-violet-800: oklch(89.4% 0.057 293.283);
+  --color-violet-900: oklch(94.3% 0.029 294.588);
+  --color-violet-950: oklch(96.9% 0.016 293.756);
+  --color-stone-50: oklch(14.7% 0.004 49.25);
+  --color-stone-100: oklch(21.6% 0.006 56.043);
+  --color-stone-200: oklch(26.8% 0.007 34.298);
+  --color-stone-300: oklch(37.4% 0.01 67.558);
+  --color-stone-400: oklch(44.4% 0.011 73.639);
+  --color-stone-500: oklch(55.3% 0.013 58.071);
+  --color-stone-600: oklch(70.9% 0.01 56.259);
+  --color-stone-700: oklch(86.9% 0.005 56.366);
+  --color-stone-800: oklch(92.3% 0.003 48.717);
+  --color-stone-900: oklch(97% 0.001 106.424);
+  --color-stone-950: oklch(98.5% 0.001 106.423);
+  --color-orange-50: oklch(26.6% 0.079 36.259);
+  --color-orange-100: oklch(40.8% 0.123 38.172);
+  --color-orange-200: oklch(47% 0.157 37.304);
+  --color-orange-300: oklch(55.3% 0.195 38.402);
+  --color-orange-400: oklch(64.6% 0.222 41.116);
+  --color-orange-500: oklch(70.5% 0.213 47.604);
+  --color-orange-600: oklch(75% 0.183 55.934);
+  --color-orange-700: oklch(83.7% 0.128 66.29);
+  --color-orange-800: oklch(90.1% 0.076 70.697);
+  --color-orange-900: oklch(95.4% 0.038 75.164);
+  --color-orange-950: oklch(98% 0.016 73.684);
+    color: var(--color-night);
+  }
+  .admin-bg[data-theme="dark"], [data-theme="dark"] .admin-bg {
+    background-color: #0b0f16;
+    background-image:
+      radial-gradient(1200px 560px at 90% -10%, rgba(120, 140, 180, 0.12), transparent 65%),
+      radial-gradient(1000px 560px at -10% 110%, rgba(177, 16, 23, 0.14), transparent 65%),
+      linear-gradient(180deg, #10151e 0%, #0b0f16 100%);
+  }
+  /* the owner's picture stays, under a much heavier dark veil so light text stays readable on top */
+  [data-theme="dark"] .admin-photo::after {
+    background: linear-gradient(180deg, rgba(14, 18, 26, calc(0.72 + var(--veil, 0.3) * 0.25)), rgba(9, 12, 18, calc(0.76 + var(--veil, 0.3) * 0.22)));
+  }
+  [data-theme="dark"] .stage-text { color: color-mix(in srgb, var(--st), #ffffff 58%); }
+  [data-theme="dark"] .elev {
+    background: linear-gradient(180deg, #1d2432 0%, #161c28 100%);
+    border-color: rgba(64, 77, 103, 0.75);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 1px 2px rgba(0, 0, 0, 0.5), 0 14px 30px -18px rgba(0, 0, 0, 0.85);
+  }
+  [data-theme="dark"] .elev-hover:hover {
+    border-color: #4b5a78;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 2px 4px rgba(0, 0, 0, 0.5), 0 22px 36px -16px rgba(0, 0, 0, 0.9);
+  }
+  [data-theme="dark"] .glass { background: rgba(18, 23, 33, 0.74); }
+  [data-theme="dark"] .side-surface { background: linear-gradient(180deg, #171d29 0%, #121722 100%); }
+  [data-theme="dark"] .btn-silver {
+    background: linear-gradient(180deg, #262f41 0%, #1c2332 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 1px 2px rgba(0, 0, 0, 0.5), 0 8px 16px -12px rgba(0, 0, 0, 0.8);
+  }
+  [data-theme="dark"] .btn-silver:hover:not(:disabled) { background: linear-gradient(180deg, #2d374b 0%, #222b3c 100%); }
+  [data-theme="dark"] .chip-3d {
+    background: linear-gradient(180deg, #262f41 0%, #1c2332 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+  [data-theme="dark"] .nav-active {
+    background: linear-gradient(180deg, #34202a 0%, #2a1a22 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07), 0 1px 3px rgba(0, 0, 0, 0.5), 0 8px 16px -10px rgba(177, 16, 23, 0.55);
+  }
+  [data-theme="dark"] .well { box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.6); }
+  [data-theme="dark"] .field-3d { box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.55); }
+  [data-theme="dark"] .field-3d:focus { box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.55), 0 0 0 3px rgba(255, 107, 114, 0.3); }
+  /* red text and links need a lighter red on a dark surface (4.5:1 or better) */
+  [data-theme="dark"] .text-brand, [data-theme="dark"] .hover\:text-brand:hover { color: #ff8a90; }
+  [data-theme="dark"] .border-brand { border-color: #ff8a90; }
+  [data-theme="dark"] ::placeholder { color: #8892a7; }
+  [data-theme="dark"] :focus-visible { outline-color: #e9edf5; }
+  [data-theme="dark"] .accent-brand, [data-theme="dark"] input[type="checkbox"], [data-theme="dark"] input[type="range"] { accent-color: #ff5a62; }
+  /* map */
+  [data-theme="dark"] .map-pin {
+    background: linear-gradient(180deg, #2a3347, #1c2332);
+    color: #e9edf5;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 3px 6px rgba(0, 0, 0, 0.6), 0 10px 14px -8px rgba(0, 0, 0, 0.8);
+  }
+  [data-theme="dark"] .map-pin.is-sel {
+    background: linear-gradient(180deg, color-mix(in srgb, var(--ct, var(--c)), white 12%), var(--ct, var(--c)));
+    color: #ffffff;
+  }
+  [data-theme="dark"] .map-pin .dot { box-shadow: 0 0 0 2px rgba(10, 14, 22, 0.9), 0 1px 3px rgba(0, 0, 0, 0.6); }
+  [data-theme="dark"] .leaflet-container { background: #0f131b; }
+  [data-theme="dark"] .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(0.92) contrast(0.9) saturate(0.75); }
+  [data-theme="dark"] .leaflet-bar a,
+  [data-theme="dark"] .leaflet-bar a:hover,
+  [data-theme="dark"] .leaflet-popup-content-wrapper,
+  [data-theme="dark"] .leaflet-popup-tip { background: #171d29; color: #e9edf5; border-color: #2b3446; }
+  [data-theme="dark"] .leaflet-container .leaflet-control-attribution { background: rgba(15, 19, 27, 0.8); color: #a6b0c4; }
+  [data-theme="dark"] .leaflet-container .leaflet-control-attribution a { color: #c9d1e0; }
+  [data-theme="dark"] .leaflet-container .leaflet-bar a.leaflet-disabled { background: #121722; color: #6d788d; }
 }

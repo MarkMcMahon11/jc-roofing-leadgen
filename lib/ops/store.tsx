@@ -46,7 +46,8 @@ function toLogin() {
   window.location.href = "/admin/login";
 }
 
-export function OpsProvider({ children }: { children: React.ReactNode }) {
+/** `theme` is only for the loading and error screens, drawn before the dashboard itself exists. */
+export function OpsProvider({ children, theme }: { children: React.ReactNode; theme?: "light" | "dark" }) {
   const [db, setDb] = useState<FleetDB | null>(null);
   const [biz, setBiz] = useState<Biz | null>(null);
   const [sync, setSync] = useState<SyncState>("saved");
@@ -227,7 +228,7 @@ export function OpsProvider({ children }: { children: React.ReactNode }) {
 
   if (failed) {
     return (
-      <div className="admin-bg flex min-h-screen flex-col items-center justify-center gap-3 p-6 text-center text-sm text-steel">
+      <div data-theme={theme} className="admin-bg flex min-h-screen flex-col items-center justify-center gap-3 p-6 text-center text-sm text-steel">
         <p>We couldn&apos;t load your dashboard. Check the connection and try again.</p>
         <button onClick={() => location.reload()} className="min-h-11 rounded-xl bg-brand px-5 py-2 font-semibold text-white hover:bg-brand-dark">
           Try again
@@ -238,7 +239,7 @@ export function OpsProvider({ children }: { children: React.ReactNode }) {
 
   if (!db || !biz) {
     return (
-      <div className="admin-bg flex min-h-screen items-center justify-center" role="status" aria-label="Loading">
+      <div data-theme={theme} className="admin-bg flex min-h-screen items-center justify-center" role="status" aria-label="Loading">
         <div className="h-6 w-6 motion-safe:animate-spin rounded-full border-2 border-edge border-t-brand" />
       </div>
     );

@@ -112,7 +112,7 @@ export function VanForm({ onClose, van }: { onClose: () => void; van?: Vehicle }
           <legend className="text-sm font-medium text-night">Fitted equipment</legend>
           <div className="mt-1 flex flex-wrap gap-2">
             {[...EQUIPMENT, ...equipment.filter((x) => !EQUIPMENT.includes(x))].map((x) => (
-              <label key={x} className={`flex min-h-10 cursor-pointer items-center gap-2 rounded-full border-[1.5px] px-3 py-1.5 text-sm ${equipment.includes(x) ? "border-brand bg-brand-tint" : "border-ctrl bg-white"}`}>
+              <label key={x} className={`flex min-h-10 cursor-pointer items-center gap-2 rounded-full border-[1.5px] px-3 py-1.5 text-sm ${equipment.includes(x) ? "border-brand bg-brand-tint" : "border-ctrl bg-surface"}`}>
                 <input type="checkbox" checked={equipment.includes(x)} onChange={() => setEquipment(equipment.includes(x) ? equipment.filter((y) => y !== x) : [...equipment, x])} className="h-4 w-4 accent-[#b11017]" />
                 {x}
               </label>

@@ -45,7 +45,7 @@ export default function CrewMemberPage() {
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
-          {c.phone && <a href={`tel:${c.phone.replace(/\s/g, "")}`} className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border-[1.5px] border-ctrl bg-white px-4 py-2 text-sm font-semibold hover:bg-silver-soft"><Phone size={16} /> {c.phone}</a>}
+          {c.phone && <a href={`tel:${c.phone.replace(/\s/g, "")}`} className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border-[1.5px] border-ctrl bg-surface px-4 py-2 text-sm font-semibold hover:bg-silver-soft"><Phone size={16} /> {c.phone}</a>}
           <Button variant="secondary" onClick={() => setEdit(true)}><Pencil size={16} /> Edit details</Button>
         </div>
       </div>

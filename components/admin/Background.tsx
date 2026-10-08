@@ -2,7 +2,8 @@
 
 import { ImageIcon, RotateCcw, Upload } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { Button, Modal } from "./ui";
+import { Button, Modal, Segmented } from "./ui";
+import type { Theme } from "@/lib/theme";
 import type { BackgroundMeta } from "@/lib/server/background";
 
 // the light "veil" that keeps text readable: the stronger the picture, the thinner the veil
@@ -32,7 +33,7 @@ async function shrink(file: File): Promise<string> {
   throw new Error("too big");
 }
 
-export function BackgroundButton({ bg, onChange }: { bg: BackgroundMeta; onChange: (b: BackgroundMeta) => void }) {
+export function BackgroundButton({ bg, onChange, theme, onTheme }: { bg: BackgroundMeta; onChange: (b: BackgroundMeta) => void; theme: Theme; onTheme: (t: Theme) => void }) {
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
@@ -85,8 +86,13 @@ export function BackgroundButton({ bg, onChange }: { bg: BackgroundMeta; onChang
         <span className="hidden sm:inline">Background</span>
         <span className="sr-only sm:hidden">Change background</span>
       </button>
-      <Modal open={open} onClose={() => setOpen(false)} title="Dashboard background">
+      <Modal open={open} onClose={() => setOpen(false)} title="Appearance">
         <div className="space-y-5">
+          <div>
+            <div className="mb-1.5 text-sm font-semibold text-night">Light or dark</div>
+            <Segmented<Theme> value={theme} onChange={onTheme} options={[{ value: "light", label: "Light" }, { value: "dark", label: "Dark" }, { value: "auto", label: "Match my device" }]} />
+          </div>
+          <div className="text-sm font-semibold text-night">Background picture</div>
           <div className="relative isolate h-36 overflow-hidden rounded-xl border border-edge bg-silver-soft">
             <div className="admin-photo absolute!" style={{ backgroundImage: `url("${bg.src}")`, ["--veil" as string]: veil(strength) }} />
             <span className="elev absolute bottom-2 left-2 rounded-md px-2 py-0.5 text-xs font-semibold text-night">{bg.mode === "custom" ? "Your picture" : "JC Roofing scene"}</span>

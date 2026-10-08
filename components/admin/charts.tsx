@@ -58,8 +58,8 @@ export function BarChart({
           const y = padT + innerH * (1 - tick / nice);
           return (
             <g key={tick}>
-              <line x1={padL} x2={W - 8} y1={y} y2={y} stroke="#dbe0e8" />
-              <text x={padL - 6} y={y + 4} textAnchor="end" fontSize="11" fill="#566073">{format(tick)}</text>
+              <line x1={padL} x2={W - 8} y1={y} y2={y} style={{ stroke: "var(--chart-grid)" }} />
+              <text x={padL - 6} y={y + 4} textAnchor="end" fontSize="11" style={{ fill: "var(--color-steel)" }}>{format(tick)}</text>
             </g>
           );
         })}
@@ -71,16 +71,16 @@ export function BarChart({
               {series.map((s, j) => {
                 const v = Number(row[s.key]) || 0;
                 const h = (v / nice) * innerH;
-                return <rect key={s.key} x={gx + j * (barW + 2)} y={padT + innerH - h} width={barW} height={Math.max(h, v ? 1 : 0)} rx={4} fill={`url(#bar-${gid}-${j})`} style={{ filter: "drop-shadow(0 2px 2px rgba(18,24,38,0.22))" }} />;
+                return <rect key={s.key} x={gx + j * (barW + 2)} y={padT + innerH - h} width={barW} height={Math.max(h, v ? 1 : 0)} rx={4} fill={`url(#bar-${gid}-${j})`} style={{ filter: "var(--chart-boost, none) drop-shadow(0 2px 2px rgba(18,24,38,0.22))" }} />;
               })}
-              {(data.length - 1 - i) % every === 0 && <text x={padL + groupW * i + groupW / 2} y={H - 8} textAnchor="middle" fontSize="11" fill="#566073">{xLabel(row)}</text>}
+              {(data.length - 1 - i) % every === 0 && <text x={padL + groupW * i + groupW / 2} y={H - 8} textAnchor="middle" fontSize="11" style={{ fill: "var(--color-steel)" }}>{xLabel(row)}</text>}
             </g>
           );
         })}
       </svg>
       {hover !== null && (
         <div
-          className="pointer-events-none absolute top-6 z-10 rounded-lg border border-edge bg-white px-3 py-2 text-xs shadow-lg"
+          className="pointer-events-none absolute top-6 z-10 rounded-lg border border-edge bg-surface px-3 py-2 text-xs shadow-lg"
           style={{ left: `clamp(0px, ${((padL + groupW * hover + groupW / 2) / W) * 100}% - 70px, calc(100% - 150px))` }}
         >
           <div className="mb-1 font-semibold text-night">{xLabel(data[hover])}</div>
@@ -107,7 +107,7 @@ export function Donut({ parts, size = 140, center }: { parts: { label: string; v
   return (
     <div className="relative shrink-0" style={{ width: size, height: size }}>
       <svg viewBox="0 0 140 140" width={size} height={size} className="-rotate-90" aria-hidden style={{ filter: "drop-shadow(0 6px 8px rgba(18,24,38,0.22))" }}>
-        <circle cx="70" cy="70" r={r} fill="none" stroke="#e2e6ed" strokeWidth="16" />
+        <circle cx="70" cy="70" r={r} fill="none" style={{ stroke: "var(--chart-grid)" }} strokeWidth="16" />
         {parts.map((p, i) => {
           const len = (p.value / total) * C;
           return p.value ? <circle key={p.label} cx="70" cy="70" r={r} fill="none" stroke={p.color} strokeWidth="16" strokeDasharray={`${Math.max(0, len - 2)} ${C}`} strokeDashoffset={-offsets[i]} /> : null;
@@ -129,7 +129,7 @@ export function HBar({ items, format = gbp }: { items: { label: string; value: n
             <span className="font-semibold tabular-nums text-night">{format(i.value)}</span>
           </div>
           <div className="well h-2.5 overflow-hidden rounded-full bg-silver">
-            <div className="h-full rounded-full shadow-[inset_0_1px_0_rgba(255,255,255,0.35)]" style={{ width: `${(i.value / max) * 100}%`, background: `linear-gradient(90deg, ${i.color ?? "#2a3345"}, color-mix(in srgb, ${i.color ?? "#2a3345"}, white 25%))` }} />
+            <div className="h-full rounded-full shadow-[inset_0_1px_0_rgba(255,255,255,0.35)]" style={{ width: `${(i.value / max) * 100}%`, background: `linear-gradient(90deg, ${i.color ?? "var(--chart-neutral)"}, color-mix(in srgb, ${i.color ?? "var(--chart-neutral)"}, white 25%))`, filter: "var(--chart-boost, none)" }} />
           </div>
         </div>
       ))}

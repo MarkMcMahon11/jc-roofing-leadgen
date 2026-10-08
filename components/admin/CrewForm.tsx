@@ -76,7 +76,7 @@ export function CrewForm({ onClose, member }: { onClose: () => void; member?: Cr
         <Field label="Mobile"><Input name="phone" type="tel" defaultValue={m?.phone} maxLength={30} /></Field>
         <Field label="Email (optional)"><Input name="email" type="email" defaultValue={m?.email} maxLength={120} /></Field>
         <Field label="Started"><Input name="startDate" type="date" defaultValue={m?.startDate ?? today()} /></Field>
-        <label className="flex min-h-11 cursor-pointer items-center gap-3 self-end rounded-xl border-[1.5px] border-ctrl bg-white px-3 py-2 text-sm">
+        <label className="flex min-h-11 cursor-pointer items-center gap-3 self-end rounded-xl border-[1.5px] border-ctrl bg-surface px-3 py-2 text-sm">
           <input type="checkbox" checked={drives} onChange={(e) => setDrives(e.target.checked)} className="h-4 w-4 accent-[#b11017]" /> Drives company vans
         </label>
         {drives && (
@@ -99,7 +99,7 @@ export function CrewForm({ onClose, member }: { onClose: () => void; member?: Cr
         <Field label="CSCS card expires"><Input name="cscsExpiry" type="date" defaultValue={m?.cscsExpiry} /></Field>
         <Field label="Working at height training expires"><Input name="heightExpiry" type="date" defaultValue={m?.heightExpiry} /></Field>
         <Field label="First aid certificate expires"><Input name="firstAidExpiry" type="date" defaultValue={m?.firstAidExpiry} /></Field>
-        <label className="flex min-h-11 cursor-pointer items-start gap-3 rounded-xl border-[1.5px] border-ctrl bg-white px-3 py-2 text-sm sm:col-span-2">
+        <label className="flex min-h-11 cursor-pointer items-start gap-3 rounded-xl border-[1.5px] border-ctrl bg-surface px-3 py-2 text-sm sm:col-span-2">
           <input type="checkbox" checked={wa} onChange={(e) => setWa(e.target.checked)} className="mt-0.5 h-4 w-4 shrink-0 accent-[#b11017]" />
           <span>
             <b>WhatsApp reminders</b>

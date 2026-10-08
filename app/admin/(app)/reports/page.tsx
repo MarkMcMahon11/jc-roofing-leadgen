@@ -19,7 +19,7 @@ const td = "border-b border-edge px-2 py-1.5 align-top";
 
 function Sheet({ title, sub, children }: { title: string; sub: string; children: React.ReactNode }) {
   return (
-    <article className="rounded-2xl border border-edge bg-white p-6 print:border-0 print:p-0">
+    <article className="rounded-2xl border border-edge bg-surface p-6 print:border-0 print:p-0">
       <header className="mb-5 flex items-start justify-between gap-4 border-b-2 border-brand pb-3">
         <div>
           <h2 className="text-xl font-bold">{title}</h2>

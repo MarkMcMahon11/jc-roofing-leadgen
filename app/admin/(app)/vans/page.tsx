@@ -47,7 +47,7 @@ export default function VansPage() {
         />
         <div className="relative @3xl:w-72">
           <Search size={16} aria-hidden className="absolute left-3 top-1/2 -translate-y-1/2 text-steel" />
-          <input aria-label="Search vans" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Plate, model or driver" className="min-h-11 w-full rounded-xl border-[1.5px] border-ctrl bg-white py-2 pl-9 pr-3 text-base outline-none focus:border-night" />
+          <input aria-label="Search vans" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Plate, model or driver" className="min-h-11 w-full rounded-xl border-[1.5px] border-ctrl bg-surface py-2 pl-9 pr-3 text-base outline-none focus:border-night" />
         </div>
       </div>
 

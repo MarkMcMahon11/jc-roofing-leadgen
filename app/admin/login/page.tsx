@@ -77,11 +77,11 @@ function LoginForm() {
           <form onSubmit={submit} className="mt-8 space-y-4">
             <label className="block">
               <span className="text-sm font-medium text-night">Email</span>
-              <input name="email" type="email" required autoComplete="username" className="field-3d mt-1 w-full rounded-xl border-[1.5px] border-ctrl bg-white px-3.5 py-3 text-base outline-none focus:border-night" />
+              <input name="email" type="email" required autoComplete="username" className="field-3d mt-1 w-full rounded-xl border-[1.5px] border-ctrl bg-surface px-3.5 py-3 text-base outline-none focus:border-night" />
             </label>
             <label className="block">
               <span className="text-sm font-medium text-night">Password</span>
-              <input name="password" type="password" required autoComplete="current-password" className="field-3d mt-1 w-full rounded-xl border-[1.5px] border-ctrl bg-white px-3.5 py-3 text-base outline-none focus:border-night" />
+              <input name="password" type="password" required autoComplete="current-password" className="field-3d mt-1 w-full rounded-xl border-[1.5px] border-ctrl bg-surface px-3.5 py-3 text-base outline-none focus:border-night" />
             </label>
             {error && (
               <p role="alert" className="rounded-xl bg-brand-tint px-3 py-2 text-sm text-brand">

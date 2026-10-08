@@ -6,7 +6,7 @@ import { PRICE_LABELS, PRICE_UNITS } from "@/lib/services";
 import { useOps } from "@/lib/ops/store";
 import type { Settings } from "@/lib/types";
 
-const numCls = "w-24 rounded-xl border-[1.5px] border-ctrl bg-white px-2.5 py-2 text-base outline-none focus:border-night sm:w-28";
+const numCls = "w-24 rounded-xl border-[1.5px] border-ctrl bg-surface px-2.5 py-2 text-base outline-none focus:border-night sm:w-28";
 const toNum = (v: string) => (v === "" ? NaN : +v);
 const show = (n: number) => (Number.isNaN(n) ? "" : n);
 

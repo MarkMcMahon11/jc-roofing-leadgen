@@ -48,7 +48,7 @@ export default function VanPage() {
 
       <div className="flex flex-col gap-4 @3xl:flex-row @3xl:items-end @3xl:justify-between">
         <div className="flex items-center gap-4">
-          <div className="rounded-xl bg-gold px-3 py-2 font-mono text-lg font-bold text-night">{v.reg}</div>
+          <div className="rounded-xl bg-gold px-3 py-2 font-mono text-lg font-bold text-[#1b2130]">{v.reg}</div>
           <div>
             <h1 className="text-2xl font-bold tracking-tight">{v.make} {v.model} <span className="font-normal text-steel">{v.year}</span></h1>
             <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-steel">

@@ -7,8 +7,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Activity, CalendarClock, CalendarDays, ExternalLink, Inbox, LayoutDashboard, LogOut, MapPinned, Menu, MessageSquare, MessagesSquare, PoundSterling, Printer, ShieldAlert, Truck, Users, Wallet, Wrench, X } from "lucide-react";
 import { GuideProvider, GuideToggle, PageGuide } from "./Guide";
 import { BackgroundButton, BackgroundLayer } from "./Background";
+import { ThemeToggle, useTheme } from "./Theme";
 import { Button } from "./ui";
 import type { BackgroundMeta } from "@/lib/server/background";
+import type { Theme } from "@/lib/theme";
 import { guideFor } from "@/lib/ops/guides";
 import { buildAlerts, scheduleItems } from "@/lib/ops/selectors";
 import { today } from "@/lib/ops/format";
@@ -16,13 +18,14 @@ import { useOps, type SyncState } from "@/lib/ops/store";
 
 type Item = { href: string; icon: React.ComponentType<{ size?: number; className?: string; "aria-hidden"?: boolean }>; label: string; badge?: number; tone?: "red" | "amber" };
 
-export function Shell({ children, ownerName, background }: { children: React.ReactNode; ownerName: string; background: BackgroundMeta }) {
+export function Shell({ children, ownerName, background, theme: initialTheme, systemDark }: { children: React.ReactNode; ownerName: string; background: BackgroundMeta; theme: Theme; systemDark: boolean }) {
   const { db, biz, sync, notice, clearNotice, resetFleet, day } = useOps();
   const path = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [bg, setBg] = useState(background);
+  const { theme, resolved, choose } = useTheme(initialTheme, systemDark);
   const [wa, setWa] = useState({ open: 0, urgent: 0 });
   const menuBtn = useRef<HTMLButtonElement>(null);
   const drawer = useRef<HTMLDivElement>(null);
@@ -153,7 +156,7 @@ export function Shell({ children, ownerName, background }: { children: React.Rea
                     href={n.href}
                     onClick={() => setOpen(false)}
                     aria-current={active ? "page" : undefined}
-                    className={`group relative flex min-h-10 items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors lg:min-h-9 lg:py-1.5 ${active ? "nav-active text-brand" : "text-night hover:bg-white/70 hover:shadow-[inset_0_1px_0_#fff,0_1px_2px_rgba(18,24,38,0.08)]"}`}
+                    className={`group relative flex min-h-10 items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors lg:min-h-9 lg:py-1.5 ${active ? "nav-active text-brand" : "text-night hover:bg-surface/70 hover:shadow-[inset_0_1px_0_#fff,0_1px_2px_rgba(18,24,38,0.08)]"}`}
                   >
                     {active && <span aria-hidden className="glow-red absolute inset-y-1.5 left-0 w-1 rounded-r bg-brand" />}
                     <n.icon size={18} aria-hidden className={active ? "text-brand drop-shadow-[0_1px_2px_rgba(177,16,23,0.35)]" : "text-steel group-hover:text-night"} />
@@ -185,16 +188,16 @@ export function Shell({ children, ownerName, background }: { children: React.Rea
 
   return (
     <GuideProvider>
-      <div className="admin-root admin-bg isolate min-h-screen transition-[padding] duration-200 lg:pl-64 print:pl-0">
+      <div data-theme={resolved} className="admin-root admin-bg isolate min-h-screen transition-[padding] duration-200 lg:pl-64 print:pl-0">
         <BackgroundLayer bg={bg} />
-        <a href="#main" className="sr-only z-[2000] rounded-lg bg-white px-4 py-2 font-semibold text-brand focus:not-sr-only focus:fixed focus:left-3 focus:top-3">Skip to content</a>
+        <a href="#main" className="sr-only z-[2000] rounded-lg bg-surface px-4 py-2 font-semibold text-brand focus:not-sr-only focus:fixed focus:left-3 focus:top-3">Skip to content</a>
         <aside className="fixed inset-y-0 left-0 hidden w-64 border-r border-edge shadow-[8px_0_30px_-18px_rgba(18,24,38,0.35)] lg:block print:hidden">{renderSidebar(false)}</aside>
 
         {open && (
           <div ref={drawer} id="mobile-menu" role="dialog" aria-modal="true" aria-label="Menu" className="fixed inset-0 z-[1250] lg:hidden">
-            <div className="absolute inset-0 bg-night/50" onClick={() => { setOpen(false); menuBtn.current?.focus(); }} />
+            <div className="absolute inset-0 bg-black/50" onClick={() => { setOpen(false); menuBtn.current?.focus(); }} />
             <aside className="absolute inset-y-0 left-0 w-72 max-w-[85%] shadow-xl">{renderSidebar(true)}</aside>
-            <button type="button" onClick={() => { setOpen(false); menuBtn.current?.focus(); }} className="absolute right-3 top-3 grid h-11 w-11 place-items-center rounded-full bg-white text-night shadow" aria-label="Close menu">
+            <button type="button" onClick={() => { setOpen(false); menuBtn.current?.focus(); }} className="absolute right-3 top-3 grid h-11 w-11 place-items-center rounded-full bg-surface text-night shadow" aria-label="Close menu">
               <X size={20} />
             </button>
           </div>
@@ -208,7 +211,8 @@ export function Shell({ children, ownerName, background }: { children: React.Rea
             <span className="elev inline-block rounded-lg px-2 py-0.5"><Image src="/logo.png" alt="JC Roofing" width={512} height={198} className="h-7 w-auto" /></span>
           </div>
           <div className="ml-auto flex items-center gap-3">
-            <BackgroundButton bg={bg} onChange={setBg} />
+            <ThemeToggle resolved={resolved} onChoose={choose} />
+            <BackgroundButton bg={bg} onChange={setBg} theme={theme} onTheme={choose} />
             <SyncPill state={sync} />
             {biz.storage !== "database" && (
               <span title="Data isn't being kept permanently yet. Connect the database (see the README)." className="hidden whitespace-nowrap rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-900 ring-1 ring-amber-300 sm:inline">
@@ -236,7 +240,7 @@ export function Shell({ children, ownerName, background }: { children: React.Rea
           {notice && (
             <div role="alert" className="mb-5 flex items-start justify-between gap-3 rounded-2xl border border-brand bg-brand-tint p-4 text-sm text-brand print:hidden">
               <p>{notice}</p>
-              <button type="button" onClick={clearNotice} className="grid h-8 w-8 shrink-0 place-items-center rounded-lg hover:bg-white" aria-label="Dismiss">
+              <button type="button" onClick={clearNotice} className="grid h-8 w-8 shrink-0 place-items-center rounded-lg hover:bg-surface" aria-label="Dismiss">
                 <X size={16} />
               </button>
             </div>

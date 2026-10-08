@@ -59,7 +59,7 @@ function Leads() {
           <label className="flex min-h-10 items-center gap-2 text-sm text-steel"><input type="checkbox" checked={outOfArea} onChange={(e) => setOutOfArea(e.target.checked)} className="h-4 w-4 accent-[#b11017]" /> Show out-of-area</label>
           <div className="relative flex-1 @3xl:w-64">
             <Search size={16} aria-hidden className="absolute left-3 top-1/2 -translate-y-1/2 text-steel" />
-            <input aria-label="Search enquiries" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search enquiries" className="min-h-11 w-full rounded-xl border-[1.5px] border-ctrl bg-white py-2 pl-9 pr-3 text-base outline-none focus:border-night" />
+            <input aria-label="Search enquiries" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search enquiries" className="min-h-11 w-full rounded-xl border-[1.5px] border-ctrl bg-surface py-2 pl-9 pr-3 text-base outline-none focus:border-night" />
           </div>
         </div>
       </div>
@@ -103,7 +103,7 @@ function Leads() {
             })}
           </tbody>
         </Table>
-        {shown.length > limit && <div className="p-4 text-center"><button type="button" onClick={() => setLimit(limit + 60)} className="min-h-11 rounded-xl border-[1.5px] border-ctrl bg-white px-4 py-2 text-sm font-semibold hover:bg-silver-soft">Show more ({shown.length - limit} left)</button></div>}
+        {shown.length > limit && <div className="p-4 text-center"><button type="button" onClick={() => setLimit(limit + 60)} className="min-h-11 rounded-xl border-[1.5px] border-ctrl bg-surface px-4 py-2 text-sm font-semibold hover:bg-silver-soft">Show more ({shown.length - limit} left)</button></div>}
         {shown.length === 0 && <div className="px-5 py-10 text-center text-sm text-steel">{biz.leads.length === 0 ? "No enquiries yet. They'll appear here as customers use the quote form on your website." : "No enquiries match."}</div>}
       </Card>
 

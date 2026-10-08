@@ -111,7 +111,7 @@ export function LeadDetail({ lead, onClose }: { lead: LeadView; onClose: () => v
             <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-steel">Where is it up to?</div>
             <div role="group" aria-label="Enquiry status" className="flex flex-wrap gap-2">
               {STATUSES.map((s) => (
-                <button key={s} type="button" aria-pressed={lead.status === s} onClick={() => status(s)} className={`min-h-10 rounded-full px-4 py-1.5 text-sm font-medium ${lead.status === s ? "bg-brand text-white" : "bg-white text-night ring-1 ring-edge hover:bg-silver-soft"}`}>
+                <button key={s} type="button" aria-pressed={lead.status === s} onClick={() => status(s)} className={`min-h-10 rounded-full px-4 py-1.5 text-sm font-medium ${lead.status === s ? "bg-brand text-white" : "bg-surface text-night ring-1 ring-edge hover:bg-silver-soft"}`}>
                   {leadStatus[s].label}
                 </button>
               ))}

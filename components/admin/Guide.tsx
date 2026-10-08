@@ -88,21 +88,21 @@ export const useNextStep = () => useGuide().next;
 function NextStepCard({ step, onClose }: { step: NextStep; onClose: () => void }) {
   const here = typeof window !== "undefined" && step.href === window.location.pathname + window.location.search;
   return (
-    <div role="status" className="fixed bottom-4 left-4 right-4 z-[1150] mx-auto max-w-md rounded-2xl bg-night p-4 text-sm text-white shadow-2xl ring-1 ring-white/10 sm:left-auto sm:right-5 sm:mx-0 print:hidden">
+    <div role="status" className="fixed bottom-4 left-4 right-4 z-[1150] mx-auto max-w-md rounded-2xl bg-[#1b2130] p-4 text-sm text-white shadow-2xl ring-1 ring-white/10 sm:left-auto sm:right-5 sm:mx-0 print:hidden">
       <div className="flex items-start gap-3">
-        <span aria-hidden className="mt-0.5 rounded-full bg-emerald-500/20 p-1.5 text-emerald-300">✓</span>
+        <span aria-hidden className="mt-0.5 rounded-full bg-emerald-500/20 p-1.5 text-[#5ee9b5]">✓</span>
         <div className="min-w-0 flex-1">
           <div className="font-semibold">{step.title}</div>
-          <div className="mt-1 text-stone-300">{step.body}</div>
+          <div className="mt-1 text-[#d6d3d1]">{step.body}</div>
           {step.href && !here && step.action && (
             <div className="mt-3">
-              <Link href={step.href} onClick={onClose} className="inline-flex min-h-9 items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 font-semibold text-night hover:bg-silver-soft">
+              <Link href={step.href} onClick={onClose} className="inline-flex min-h-9 items-center gap-1.5 rounded-lg bg-surface px-3 py-1.5 font-semibold text-night hover:bg-silver-soft">
                 {step.action} <ArrowRight size={14} />
               </Link>
             </div>
           )}
         </div>
-        <button type="button" onClick={onClose} className="grid h-9 w-9 place-items-center rounded-lg text-stone-300 hover:bg-white/10 hover:text-white" aria-label="Close">
+        <button type="button" onClick={onClose} className="grid h-9 w-9 place-items-center rounded-lg text-[#d6d3d1] hover:bg-white/10 hover:text-white" aria-label="Close">
           <X size={16} />
         </button>
       </div>

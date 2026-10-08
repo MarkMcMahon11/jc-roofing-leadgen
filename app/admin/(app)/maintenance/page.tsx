@@ -106,7 +106,7 @@ export default function MaintenancePage() {
         </Card>
         <Card>
           <CardHeader title="Costliest vans, 90 days" />
-          <div className="p-5"><HBar items={byVan.map((x) => ({ label: `${x.v.reg} · ${x.v.make} ${x.v.model}`, value: Math.round(x.cost), color: "#2a3345" }))} /></div>
+          <div className="p-5"><HBar items={byVan.map((x) => ({ label: `${x.v.reg} · ${x.v.make} ${x.v.model}`, value: Math.round(x.cost) }))} /></div>
         </Card>
       </div>
 
