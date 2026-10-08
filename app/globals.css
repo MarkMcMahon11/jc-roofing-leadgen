@@ -96,6 +96,9 @@ body {
   * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
 }
 
+/* the dashboard logo: light-mode version by default, bright version in dark mode */
+.logo-dark { display: none; }
+
 /* colour of a map stage label: the stage's own text colour in light mode, a lightened tint of it in dark mode */
 .stage-text { color: var(--st); }
 
@@ -293,6 +296,8 @@ body {
   [data-theme="dark"] .admin-photo::after {
     background: linear-gradient(180deg, rgba(14, 18, 26, calc(0.72 + var(--veil, 0.3) * 0.25)), rgba(9, 12, 18, calc(0.76 + var(--veil, 0.3) * 0.22)));
   }
+  [data-theme="dark"] .logo-light { display: none; }
+  [data-theme="dark"] .logo-dark { display: inline-block; }
   [data-theme="dark"] .stage-text { color: color-mix(in srgb, var(--st), #ffffff 58%); }
   [data-theme="dark"] .elev {
     background: linear-gradient(180deg, #1d2432 0%, #161c28 100%);

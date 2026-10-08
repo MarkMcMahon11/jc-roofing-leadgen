@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
+import { Logo } from "@/components/admin/Logo";
 import { CalendarClock, MapPinned, Truck, Inbox } from "lucide-react";
 
 const POINTS: [React.ComponentType<{ size?: number; className?: string }>, string][] = [
@@ -69,7 +70,7 @@ function LoginForm() {
       <main className="flex items-center justify-center p-6">
         <div className="elev w-full max-w-sm rounded-3xl p-7 sm:p-8">
           <div className="mb-8 lg:hidden">
-            <Image src="/logo.png" alt="JC Roofing" width={512} height={198} priority className="h-14 w-auto" />
+            <Logo className="h-14 w-auto" priority />
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-night">Sign in to the dashboard</h1>
           <p className="mt-1 text-sm text-steel">Owner access only.</p>

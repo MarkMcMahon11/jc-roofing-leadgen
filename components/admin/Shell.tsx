@@ -1,12 +1,12 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Activity, CalendarClock, CalendarDays, ExternalLink, Inbox, LayoutDashboard, LogOut, MapPinned, Menu, MessageSquare, MessagesSquare, PoundSterling, Printer, ShieldAlert, Truck, Users, Wallet, Wrench, X } from "lucide-react";
 import { GuideProvider, GuideToggle, PageGuide } from "./Guide";
 import { BackgroundButton, BackgroundLayer } from "./Background";
+import { Logo } from "./Logo";
 import { ThemeToggle, useTheme } from "./Theme";
 import { Button } from "./ui";
 import type { BackgroundMeta } from "@/lib/server/background";
@@ -139,7 +139,7 @@ export function Shell({ children, ownerName, background, theme: initialTheme, sy
     <div className={`side-surface flex h-full flex-col ${scrollAll ? "overflow-y-auto" : ""}`}>
       <div className="px-5 pb-3 pt-5">
         <Link href="/admin" onClick={() => setOpen(false)} aria-label="JC Roofing dashboard home">
-          <span className="elev inline-block rounded-xl px-3 py-1.5"><Image src="/logo.png" alt="JC Roofing" width={512} height={198} priority className="h-11 w-auto" /></span>
+          <Logo className="h-16 w-auto" priority />
         </Link>
         <div className="mt-1 text-[11px] text-steel">Owner dashboard · Dumfries</div>
       </div>
@@ -208,7 +208,7 @@ export function Shell({ children, ownerName, background, theme: initialTheme, sy
             <Menu size={20} />
           </button>
           <div className="lg:hidden">
-            <span className="elev inline-block rounded-lg px-2 py-0.5"><Image src="/logo.png" alt="JC Roofing" width={512} height={198} className="h-7 w-auto" /></span>
+            <Logo className="h-10 w-auto" />
           </div>
           <div className="ml-auto flex items-center gap-3">
             <ThemeToggle resolved={resolved} onChoose={choose} />
