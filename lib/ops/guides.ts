@@ -7,7 +7,7 @@ export const PAGE_GUIDES: Record<string, Guide> = {
   "/admin": {
     title: "Dashboard: today at a glance",
     steps: [
-      "At the very top: today's jobs and visits, and the next 7 days day by day (free days are shown too). Click any job to open the schedule.",
+      "At the very top is the project map: click a site to see the job, or press Order materials to send a supplier a delivery request. Under it are today's jobs and visits and the next 7 days (free days are shown too). Click any job to open the schedule.",
       "The cards under it show new enquiries, vans working and this month's costs. Click a card for the detail.",
       "“Needs your attention” lists what to sort out today: new hot leads, MOTs, tax and insurance running out, services due, penalty notices to answer.",
       "The sample vans, crew and jobs are made up. When you're ready, use “Clear sample data” and enter your own.",

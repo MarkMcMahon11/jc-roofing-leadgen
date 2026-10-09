@@ -71,6 +71,19 @@ export default function Dashboard() {
         </p>
       </div>
 
+      <section aria-label="Project map">
+        <div className="glass mb-2 flex items-center justify-between gap-3 rounded-2xl px-3 py-2">
+          <div className="min-w-0">
+            <h2 className="font-semibold text-night">Project map</h2>
+            <p className="text-xs text-night/75">Click a site to see the job, or order materials to it</p>
+          </div>
+          <Link href="/admin/map" className="inline-flex min-h-10 shrink-0 items-center whitespace-nowrap text-xs font-medium text-night/75 hover:text-night">Full map →</Link>
+        </div>
+        <Suspense fallback={<div className="grid h-[380px] place-items-center text-sm text-steel">Loading map…</div>}>
+          <ProjectMap compact />
+        </Suspense>
+      </section>
+
       <div className="grid gap-4 @3xl:grid-cols-5">
         <Card className="@3xl:col-span-2">
           <CardHeader
@@ -106,19 +119,6 @@ export default function Dashboard() {
           </ol>
         </Card>
       </div>
-
-      <section aria-label="Project map">
-        <div className="glass mb-2 flex items-center justify-between gap-3 rounded-2xl px-3 py-2">
-          <div className="min-w-0">
-            <h2 className="font-semibold text-night">Project map</h2>
-            <p className="text-xs text-night/75">Click a site to see the job, or order materials to it</p>
-          </div>
-          <Link href="/admin/map" className="inline-flex min-h-10 shrink-0 items-center whitespace-nowrap text-xs font-medium text-night/75 hover:text-night">Full map →</Link>
-        </div>
-        <Suspense fallback={<div className="grid h-[380px] place-items-center text-sm text-steel">Loading map…</div>}>
-          <ProjectMap compact />
-        </Suspense>
-      </section>
 
       <div className="grid grid-cols-2 gap-3 @3xl:grid-cols-4 @3xl:gap-4">
         <Stat
