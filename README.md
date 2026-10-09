@@ -84,6 +84,22 @@ Messages, Quote prices and an Activity log.
   from jobs added with a postcode. Van positions are SAMPLES until a tracker/telematics feed is connected.
 - Set `SESSION_SECRET` (32+ random characters) on the live site; otherwise the cookie key is derived from the password.
 
+## Materials orders (`/admin/orders`, and "Order materials" on the Project map)
+Click any customer site on the Project map (dashboard or full map) and choose **Order materials**: pick a supplier, list the
+materials, a delivery date and time of day, and send. The supplier gets an **email** (replies go to the owner) and/or a **text**
+with the site address, a map link, the materials and a private one-tap page (`/supplier/order/<token>`, no sign-in) where they
+**confirm the delivery date or say they can't supply**. The owner is told by text/email (and WhatsApp) when they answer, the
+site's pin shows what has been ordered, and everything is tracked on the Materials orders page (resend, "confirmed by phone",
+delivered, cancel: cancelling tells the supplier). Orders can also be made by WhatsApp ("order slate from Slate & Tile to the
+Carruthers job for Friday"); like every WhatsApp change, they only happen on YES.
+- Suppliers (name, email and/or mobile, account number) are kept under Materials orders > Suppliers.
+- Emails need `RESEND_API_KEY` + `RESEND_FROM`, texts need the Twilio settings (same ones the quote form uses). Without them
+  orders are **previewed**: saved and visible under Texts and emails, but nothing reaches the supplier.
+- The supplier's link uses `SITE_URL` if set, otherwise the address the dashboard is opened on. The supplier sees only the site
+  reference, address, materials, date and an on-site contact the owner chose (never the customer's phone or email).
+- Safety: the supplier page can only confirm or decline that one order (while it is open, for 60 days); notes are cleaned of
+  links; double clicks can't create a second order; at most 40 orders an hour.
+
 ## WhatsApp assistant (`/admin/assistant`)
 One WhatsApp Business number that customers, suppliers, the team and Jamie all message. Who is talking is decided only by the
 sender's verified number (Meta signs every webhook call; unsigned calls are refused).

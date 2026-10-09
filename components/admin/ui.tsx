@@ -115,9 +115,9 @@ export function Modal({ open, onClose, title, children, wide }: { open: boolean;
     >
       {open && (
         <div>
-          <div className="flex items-center justify-between border-b border-silver px-5 py-4">
-            <h2 id={titleId} className="font-semibold">{title}</h2>
-            <button type="button" onClick={onClose} className="grid h-10 w-10 place-items-center rounded-lg text-steel hover:bg-silver-soft hover:text-night" aria-label="Close">
+          <div className="flex items-center justify-between gap-3 border-b border-silver px-5 py-4">
+            <h2 id={titleId} className="min-w-0 break-words font-semibold [overflow-wrap:anywhere]">{title}</h2>
+            <button type="button" onClick={onClose} className="grid h-10 w-10 shrink-0 place-items-center rounded-lg text-steel hover:bg-silver-soft hover:text-night" aria-label="Close">
               <X size={18} />
             </button>
           </div>

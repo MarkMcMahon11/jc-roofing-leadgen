@@ -148,7 +148,7 @@ export function LeadDetail({ lead, onClose }: { lead: LeadView; onClose: () => v
               <ul className="mt-2 space-y-2">
                 {messages.map((m) => (
                   <li key={m.id} className="rounded-xl bg-silver-soft p-3 text-xs">
-                    <div className="text-steel">{m.audience === "owner" ? "To you" : "To customer"} · {m.channel.toUpperCase()} · {m.status === "preview" ? "Preview (not sent)" : m.status}</div>
+                    <div className="text-steel">{m.audience === "owner" ? "To you" : m.audience === "supplier" ? "To supplier" : "To customer"} · {m.channel.toUpperCase()} · {m.status === "preview" ? "Preview (not sent)" : m.status}</div>
                     <p className="mt-1 whitespace-pre-line text-night">{m.body}</p>
                   </li>
                 ))}

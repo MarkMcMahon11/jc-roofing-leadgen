@@ -28,10 +28,15 @@ const e164 = (p: string) => (p.startsWith("0") ? `+44${p.slice(1)}` : p);
 type Base = Omit<Message, "id" | "at" | "status" | "error">;
 
 /** Send (or preview) one text, and record what REALLY happened. A failed send is never logged as sent. */
-async function sms(to: string, body: string, audience: Message["audience"], leadId: string) {
+export type SendStatus = "sent" | "preview" | "failed";
+
+async function sms(to: string, body: string, audience: Message["audience"], leadId: string): Promise<SendStatus> {
   const { TWILIO_ACCOUNT_SID: sid, TWILIO_AUTH_TOKEN: tok, TWILIO_FROM: from } = process.env;
   const base: Base = { channel: "sms", to: to || "(owner mobile not set)", audience, body, leadId };
-  if (!(sid && tok && from && to)) return addMessage({ ...base, status: "preview" });
+  if (!(sid && tok && from && to)) {
+    await addMessage({ ...base, status: "preview" });
+    return "preview";
+  }
   try {
     const r = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`, {
       method: "POST",
@@ -41,32 +46,47 @@ async function sms(to: string, body: string, audience: Message["audience"], lead
     });
     if (!r.ok) throw new Error(`Twilio responded ${r.status}`);
     await addMessage({ ...base, status: "sent" });
+    return "sent";
   } catch (e) {
     console.error("[sms failed]", (e as Error).message);
     await addMessage({ ...base, status: "failed", error: (e as Error).message });
+    return "failed";
   }
 }
 
-async function email(to: string, subject: string, text: string, audience: Message["audience"], leadId: string) {
+async function email(to: string, subject: string, text: string, audience: Message["audience"], leadId: string, replyTo?: string): Promise<SendStatus> {
   const key = process.env.RESEND_API_KEY, from = process.env.RESEND_FROM;
   const base: Base = { channel: "email", to: to || "(owner email not set)", audience, subject, body: text, leadId };
-  if (!(key && from && to)) return addMessage({ ...base, status: "preview" });
+  if (!(key && from && to)) {
+    await addMessage({ ...base, status: "preview" });
+    return "preview";
+  }
   try {
     const r = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ from, to, subject, text }),
+      body: JSON.stringify({ from, to, subject, text, ...(replyTo ? { reply_to: replyTo } : {}) }),
       signal: AbortSignal.timeout(8000),
     });
     if (!r.ok) throw new Error(`Resend responded ${r.status}`);
     await addMessage({ ...base, status: "sent" });
+    return "sent";
   } catch (e) {
     console.error("[email failed]", (e as Error).message);
     await addMessage({ ...base, status: "failed", error: (e as Error).message });
+    return "failed";
   }
 }
 
 /** Short, plain-character text for the owner (keeps it to one or two SMS segments). */
+/** Delivery requests to suppliers: an email (replies go to the owner) and/or a text. Previewed when the providers aren't switched on. */
+export const emailSupplier = (to: string, subject: string, text: string, leadId: string, replyTo?: string) => email(to, subject, text, "supplier", leadId, replyTo);
+export const textSupplier = (to: string, body: string, leadId: string) => sms(to, body, "supplier", leadId);
+/** Tell the owner something happened (a supplier answered an order): text and email, previewed if not switched on. */
+export async function alertOwner(s: Settings, subject: string, text: string) {
+  await Promise.allSettled([sms(s.ownerPhone, text, "owner", ""), email(s.ownerEmail, subject, text, "owner", "")]);
+}
+
 /** A plain text to the owner's mobile (used when WhatsApp can't carry an urgent alert). Previewed if texts aren't switched on. */
 export const textOwner = (to: string, body: string) => sms(to, body, "owner", "assistant");
 

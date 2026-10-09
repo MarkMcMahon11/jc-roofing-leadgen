@@ -58,6 +58,8 @@ export type OwnerAction =
   | { type: "reply"; phone: string; text: string }
   | { type: "message_staff"; crewIds: string[]; text: string }
   | { type: "contact_bot"; phone: string; bot: boolean }
+  | { type: "order_materials"; supplierId: string; supplierName: string; via: string; site: { name: string; address: string; postcode?: string; lat?: number; lng?: number; jobId?: string; leadId?: string }; items: { description: string; qty: number; unit: string }[]; deliverBy: string; window: "morning" | "afternoon" | "any"; notes?: string }
+  | { type: "order_status"; orderId: string; ref: string; status: "delivered" | "cancelled" }
   | { type: "book_service"; vehicleId: string; maintType: string; description: string; garage?: string; date: string; cost?: number };
 
 export type Pending = { id: string; at: string; actions: OwnerAction[]; summary: string[] };

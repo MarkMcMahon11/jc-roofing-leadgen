@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Activity, CalendarClock, CalendarDays, ExternalLink, Inbox, LayoutDashboard, LogOut, MapPinned, Menu, MessageSquare, MessagesSquare, PoundSterling, Printer, ShieldAlert, Truck, Users, Wallet, Wrench, X } from "lucide-react";
+import { Activity, CalendarClock, CalendarDays, ExternalLink, Inbox, LayoutDashboard, LogOut, MapPinned, Menu, MessageSquare, MessagesSquare, Package, PoundSterling, Printer, ShieldAlert, Truck, Users, Wallet, Wrench, X } from "lucide-react";
 import { GuideProvider, GuideToggle, PageGuide } from "./Guide";
 import { BackgroundButton, BackgroundLayer } from "./Background";
 import { Logo } from "./Logo";
@@ -27,6 +27,7 @@ export function Shell({ children, ownerName, background, theme: initialTheme, sy
   const [bg, setBg] = useState(background);
   const { theme, resolved, choose } = useTheme(initialTheme, systemDark);
   const [wa, setWa] = useState({ open: 0, urgent: 0 });
+  const [ord, setOrd] = useState({ awaiting: 0, declined: 0 });
   const menuBtn = useRef<HTMLButtonElement>(null);
   const drawer = useRef<HTMLDivElement>(null);
 
@@ -62,11 +63,21 @@ export function Shell({ children, ownerName, background, theme: initialTheme, sy
         .then((j) => live && j && setWa({ open: Number(j.open) || 0, urgent: Number(j.urgent) || 0 }))
         .catch(() => {});
     };
+    const loadOrders = () => {
+      if (document.hidden) return;
+      fetch("/api/admin/orders?brief=1", { cache: "no-store" })
+        .then((r) => (r.ok ? r.json() : null))
+        .then((j) => live && j && setOrd({ awaiting: Number(j.awaiting) || 0, declined: Number(j.declined) || 0 }))
+        .catch(() => {});
+    };
     load();
-    const t = setInterval(load, 60_000);
-    document.addEventListener("visibilitychange", load);
+    loadOrders();
+    const t = setInterval(() => { load(); loadOrders(); }, 90_000);
+    const both = () => { load(); loadOrders(); };
+    document.addEventListener("visibilitychange", both);
     window.addEventListener("assistant:changed", load);
-    return () => { live = false; clearInterval(t); document.removeEventListener("visibilitychange", load); window.removeEventListener("assistant:changed", load); };
+    window.addEventListener("orders:changed", loadOrders);
+    return () => { live = false; clearInterval(t); document.removeEventListener("visibilitychange", both); window.removeEventListener("assistant:changed", load); window.removeEventListener("orders:changed", loadOrders); };
   }, [path]);
 
   const counts = useMemo(() => {
@@ -90,6 +101,7 @@ export function Shell({ children, ownerName, background, theme: initialTheme, sy
         { href: "/admin/jobs", icon: CalendarDays, label: "Jobs and schedule", badge: counts.todayVisits, tone: "amber" },
         { href: "/admin/assistant", icon: MessagesSquare, label: "WhatsApp assistant", badge: wa.open, tone: wa.urgent ? "red" : "amber" },
         { href: "/admin/map", icon: MapPinned, label: "Project map" },
+        { href: "/admin/orders", icon: Package, label: "Materials orders", badge: ord.awaiting + ord.declined, tone: ord.declined ? "red" : "amber" },
       ],
     },
     {

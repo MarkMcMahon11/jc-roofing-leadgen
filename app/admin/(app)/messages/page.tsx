@@ -15,7 +15,7 @@ export default function MessagesPage() {
           {biz.outbox.map((m) => (
             <li key={m.id} className={`rounded-2xl p-3 text-sm ${m.audience === "owner" ? "bg-brand-tint" : "bg-silver-soft"}`}>
               <div className="flex justify-between gap-2 text-xs text-steel">
-                <span>{m.audience === "owner" ? "To you" : "To customer"} · {m.channel.toUpperCase()} · {m.to}</span>
+                <span>{m.audience === "owner" ? "To you" : m.audience === "supplier" ? "To supplier" : "To customer"} · {m.channel.toUpperCase()} · {m.to}</span>
                 <span>{fmtDateTime(m.at)}</span>
               </div>
               <p className={`text-xs font-semibold ${m.status === "failed" ? "text-brand" : m.status === "sent" ? "text-emerald-800" : "text-steel"}`}>

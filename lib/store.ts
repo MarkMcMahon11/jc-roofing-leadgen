@@ -106,6 +106,7 @@ class NoWrite<R> {
   constructor(readonly value: R) {}
 }
 export const noWrite = <R,>(value: R) => new NoWrite<R>(value);
+export const isNoWrite = (v: unknown) => v instanceof NoWrite;
 
 /** Read, let `fn` change the value in place, save. `fn` may run more than once (database retries): keep it free of side effects. */
 function mutateDoc<T, R>(name: string, fallback: () => T, valid: (v: unknown) => boolean, fn: (value: T) => R | NoWrite<R> | Promise<R | NoWrite<R>>): Promise<R> {
@@ -188,6 +189,11 @@ const isBackground = (v: unknown) => !!v && typeof v === "object" && typeof (v a
 export const getBackgroundDoc = <T>(fallback: T) => readDoc<T>("background", fallback, isBackground);
 export const mutateBackgroundDoc = <T, R>(fallback: () => T, fn: (doc: T) => R | Promise<R>) => mutateDoc<T, R>("background", fallback, isBackground, fn);
 
+// ---------- materials orders ----------
+const isProcurement = (v: unknown) => !!v && typeof v === "object" && typeof (v as { rev?: unknown }).rev === "number" && isArr((v as { orders?: unknown }).orders) && isArr((v as { suppliers?: unknown }).suppliers);
+export const getProcurementDoc = <T>(fallback: T) => readDoc<T>("procurement", fallback, isProcurement);
+export const mutateProcurementDoc = <T, R>(fallback: () => T, fn: (doc: T) => R | ReturnType<typeof noWrite<R>> | Promise<R | ReturnType<typeof noWrite<R>>>) => mutateDoc<T, R>("procurement", fallback, isProcurement, fn);
+
 const isAssistant = (v: unknown) => {
   const a = v as { rev?: unknown; messages?: unknown };
   return !!a && typeof a === "object" && typeof a.rev === "number" && isArr(a.messages);
@@ -202,7 +208,7 @@ export type Message = {
   at: string;
   channel: "sms" | "email";
   to: string;
-  audience: "owner" | "customer";
+  audience: "owner" | "customer" | "supplier";
   subject?: string;
   body: string;
   status: "preview" | "sent" | "failed";
@@ -225,6 +231,8 @@ export const deleteMessagesForLead = (lead: Pick<Lead, "id" | "phone" | "email">
 /** Erase everything a removed lead left behind: its stored messages, and any photos in Supabase Storage. */
 export async function deleteLeadArtifacts(lead: Pick<Lead, "id" | "phone" | "email" | "photos">) {
   await deleteMessagesForLead(lead);
+  // materials orders for this customer's site: unlink them, and wipe the site details from finished ones
+  await import("@/lib/orders/service").then((m) => m.scrubOrdersForLead(lead.id)).catch((e) => console.error("[store] could not scrub orders:", (e as Error).message));
   if (lead.photos?.length) await deletePhotos(lead.photos.map((p) => p.path)).catch((e) => console.error("[store] could not delete photos:", (e as Error).message));
 }
 
@@ -257,5 +265,6 @@ export async function purgeExpired() {
     return removed;
   });
   for (const l of gone) await deleteLeadArtifacts(l);
+  await import("@/lib/orders/service").then((m) => m.pruneOldOrders()).catch(() => {});
   return gone.length;
 }

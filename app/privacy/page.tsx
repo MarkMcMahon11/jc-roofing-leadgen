@@ -24,6 +24,7 @@ export default function Privacy() {
         <li><b>Address search:</b> the address or postcode you type is sent to an address service to suggest matches: OpenStreetMap-based search (Photon), the free Postcodes.io service to check postcodes, or Google Maps if we switch it on.</li>
         <li><b>Hosting and storage:</b> our website host and database.</li>
         <li><b>Messages:</b> text message and email providers that deliver your estimate and booking confirmation.</li>
+        <li><b>Suppliers:</b> when we order materials for your job we give the supplier the address of your property so they can deliver. We do not give them your phone number or email unless you ask us to.</li>
         <li><b>WhatsApp:</b> if you message our WhatsApp number, WhatsApp (Meta) carries the conversation. An automated assistant, powered by Anthropic&apos;s Claude, reads your message and replies on our behalf, and passes what you ask for to the team. It cannot agree prices or dates. Say STOP and it will not message you again. We keep these conversations for 90 days, then delete them.</li>
         <li><b>Booking:</b> our booking tool, if we use one.</li>
         <li><b>Photos:</b> if you add any, they are stored with our hosting provider. Where the AI read is switched on, a photo is also sent to Anthropic (the company behind Claude) to generate that read.</li>
