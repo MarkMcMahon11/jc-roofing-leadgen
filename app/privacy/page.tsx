@@ -8,6 +8,7 @@ export default function Privacy() {
     <main className="mx-auto max-w-xl space-y-4 px-4 py-8 leading-relaxed">
       <Link href="/" className="text-mute underline">← Back to your quote</Link>
       <h1 className="text-2xl font-bold">Privacy notice</h1>
+      <p className="text-sm">Your choices, your data and our sub-processors are on the <Link href="/legal" className="underline">Legal &amp; privacy page</Link>.</p>
       <p className="rounded-xl bg-amber-50 p-3 text-sm text-amber-900">Draft for preview. The wording must be reviewed and approved by JC Roofing (and ideally checked against ICO guidance) before this goes live.</p>
 
       <h2 className="text-lg font-bold">Who we are</h2>

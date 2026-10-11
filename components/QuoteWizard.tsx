@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { ShieldCheck } from "lucide-react";
 import { InlineWidget } from "react-calendly";
 import AddressField, { type Place } from "./AddressField";
 import BookingPicker from "./BookingPicker";
@@ -11,6 +12,7 @@ import { OPTIONS, SERVICE_IDS, SERVICE_INFO, type ServiceId } from "@/lib/servic
 import { BUSINESS, telHref } from "@/lib/config";
 import { fmtMonth, fmtSlot } from "@/lib/dates";
 import { normalisePhone, UK_POSTCODE, validEmail } from "@/lib/format";
+import { readAcceptance } from "@/lib/legal-client";
 
 type Mat = { id: string; label: string; blurb: string; colours: string[] };
 type Cfg = { businessName: string; paused: boolean; placesEnabled: boolean; materials: Mat[] };
@@ -125,7 +127,7 @@ export default function QuoteWizard() {
     setBusy(true);
     setSubmitErr(null);
     try {
-      const res = await fetch("/api/quote", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(d) });
+      const res = await fetch("/api/quote", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...d, legal: readAcceptance() }) });
       const j = await res.json().catch(() => ({}));
       if (!res.ok) {
         setSubmitErr({ msg: j.error ?? "Something went wrong. Please try again.", field: j.field });
@@ -419,7 +421,8 @@ export default function QuoteWizard() {
       <footer className="mx-auto w-full max-w-lg px-4 pb-6">
         <div className="border-t border-sand pt-3 text-center text-[0.75rem] leading-relaxed text-mute">
           {BUSINESS.name} · {BUSINESS.address}<br />
-          Your details are only used for this enquiry. <Link href="/privacy" className="inline-block px-1 py-2.5 underline">Privacy</Link>
+          Your details are only used for this enquiry.<br />
+          <Link href="/legal" className="inline-flex min-h-11 items-center gap-1 px-1 font-medium text-green-800 underline"><ShieldCheck size={14} aria-hidden /> Privacy protected · Legal &amp; privacy</Link>
         </div>
       </footer>
     </>

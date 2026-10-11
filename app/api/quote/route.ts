@@ -10,6 +10,7 @@ import { bad, isObj, readJson } from "@/lib/http";
 import { clientIp, limited } from "@/lib/limits";
 import { BUSINESS, CONSENT_VERSION } from "@/lib/config";
 import type { Lead } from "@/lib/types";
+import { cleanConsents, LEGAL_VERSION, requiredMet } from "@/lib/legal";
 
 // Public config for the form (no owner contact details).
 export async function GET() {
@@ -51,6 +52,12 @@ export async function POST(req: Request) {
   const { area, source } = input.service === "roof" ? await getRoofArea({ ...input, ...geo }) : { area: 0, source: "estimate" as const };
   const est = estimate(input, s, area, source);
   const now = new Date().toISOString();
+  // The privacy pop-up choices made in this browser (whitelisted). Kept on the lead so the owner sees exactly what was agreed.
+  const rawLegal = isObj(body.data) && isObj(body.data.legal) ? body.data.legal : null;
+  const legalConsents = rawLegal ? cleanConsents(rawLegal.consents) : null;
+  const legal = legalConsents && requiredMet(legalConsents)
+    ? { version: typeof rawLegal?.version === "string" ? rawLegal.version.slice(0, 20) : LEGAL_VERSION, at: typeof rawLegal?.at === "string" && !Number.isNaN(Date.parse(rawLegal.at)) ? new Date(rawLegal.at).toISOString() : now, consents: legalConsents }
+    : undefined;
   const lead: Lead = {
     ...input,
     ...geo,
@@ -68,6 +75,7 @@ export async function POST(req: Request) {
     score: scoreLead(input, s), // out of area stays "not-a-fit" even when paused
     ...(s.paused && inArea ? { waitlist: true } : {}),
     status: "new",
+    ...(legal ? { legal } : {}),
   };
   try {
     await addLead(lead);

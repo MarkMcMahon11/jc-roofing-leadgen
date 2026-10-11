@@ -5,6 +5,7 @@ import type { Lead, Settings } from "./types";
 import defaultSettings from "../data/settings.json";
 import { RETAIN_ALL_DAYS, RETAIN_UNBOOKED_DAYS } from "./config";
 import { deletePhotos } from "./photos";
+import { emptyLegalDoc, type LegalDoc } from "./legal";
 
 /**
  * Storage, three ways (same functions either way):
@@ -200,6 +201,26 @@ const isAssistant = (v: unknown) => {
 };
 export const getAssistantDoc = <T>(fallback: T) => readDoc<T>("assistant", fallback, isAssistant);
 export const mutateAssistantDoc = <T, R>(fallback: () => T, fn: (doc: T) => R | ReturnType<typeof noWrite<R>> | Promise<R | ReturnType<typeof noWrite<R>>>) => mutateDoc<T, R>("assistant", fallback, isAssistant, fn);
+
+// ---------- privacy & legal: acceptances, consent changes, deletion requests (one document) ----------
+const isLegal = (v: unknown) => {
+  const l = v as { rev?: unknown; records?: unknown; requests?: unknown };
+  return !!l && typeof l === "object" && typeof l.rev === "number" && isArr(l.records) && isArr(l.requests);
+};
+export const getLegalDoc = () => readDoc<LegalDoc>("legal", emptyLegalDoc(), isLegal);
+/** Read, change in place, save (retried on conflict, so `fn` must have no side effects). Bumps `rev` on every save. */
+export const mutateLegalDoc = <R,>(fn: (doc: LegalDoc) => R) =>
+  mutateDoc<LegalDoc, R>("legal", emptyLegalDoc, isLegal, (doc) => {
+    const r = fn(doc);
+    doc.rev += 1;
+    if (doc.records.length > 3000) {
+      // newest first; keep the document a sensible size, but never drop the owner's agreement records
+      let homeowners = 0;
+      doc.records = doc.records.filter((x) => x.role === "owner" || ++homeowners <= 2900);
+    }
+    if (doc.requests.length > 500) doc.requests.length = 500;
+    return r;
+  });
 
 // ---------- messages ----------
 // Outbox: what was (or would be) texted / emailed. "preview" = not really sent (no provider keys yet).

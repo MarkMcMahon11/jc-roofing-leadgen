@@ -96,4 +96,7 @@ export interface Lead extends QuoteInput {
   consentAt: string; // when the customer ticked the consent box
   consentVersion: string; // which consent wording they saw
   photos?: LeadPhoto[]; // optional, added on the result screen after the estimate is shown
+  // The homeowner's privacy pop-up choices (privacy, contact, aiPhotos, marketing) and the wording version they saw.
+  // Absent on enquiries made before the pop-up existed.
+  legal?: { version: string; at: string; consents: Record<string, boolean> };
 }

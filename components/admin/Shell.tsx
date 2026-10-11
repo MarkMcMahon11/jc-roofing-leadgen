@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Activity, CalendarClock, CalendarDays, ExternalLink, Inbox, LayoutDashboard, LogOut, MapPinned, Menu, MessageSquare, MessagesSquare, Package, PoundSterling, Printer, ShieldAlert, Truck, Users, Wallet, Wrench, X } from "lucide-react";
+import { Activity, CalendarClock, CalendarDays, ExternalLink, Inbox, LayoutDashboard, LogOut, MapPinned, Menu, MessageSquare, MessagesSquare, Package, PoundSterling, Printer, ShieldAlert, ShieldCheck, Truck, Users, Wallet, Wrench, X } from "lucide-react";
 import { GuideProvider, GuideToggle, PageGuide } from "./Guide";
 import { BackgroundButton, BackgroundLayer } from "./Background";
 import { Logo } from "./Logo";
@@ -18,7 +18,7 @@ import { useOps, type SyncState } from "@/lib/ops/store";
 
 type Item = { href: string; icon: React.ComponentType<{ size?: number; className?: string; "aria-hidden"?: boolean }>; label: string; badge?: number; tone?: "red" | "amber" };
 
-export function Shell({ children, ownerName, background, theme: initialTheme, systemDark }: { children: React.ReactNode; ownerName: string; background: BackgroundMeta; theme: Theme; systemDark: boolean }) {
+export function Shell({ children, ownerName, background, theme: initialTheme, systemDark, overlay }: { children: React.ReactNode; ownerName: string; background: BackgroundMeta; theme: Theme; systemDark: boolean; overlay?: React.ReactNode }) {
   const { db, biz, sync, notice, clearNotice, resetFleet, day } = useOps();
   const path = usePathname();
   const router = useRouter();
@@ -127,6 +127,7 @@ export function Shell({ children, ownerName, background, theme: initialTheme, sy
         { href: "/admin/pricing", icon: PoundSterling, label: "Quote prices" },
         { href: "/admin/messages", icon: MessageSquare, label: "Texts and emails" },
         { href: "/admin/activity", icon: Activity, label: "Activity log" },
+        { href: "/admin/legal", icon: ShieldCheck, label: "Legal & privacy" },
       ],
     },
   ];
@@ -202,6 +203,7 @@ export function Shell({ children, ownerName, background, theme: initialTheme, sy
     <GuideProvider>
       <div data-theme={resolved} className="admin-root admin-bg isolate min-h-screen transition-[padding] duration-200 lg:pl-64 print:pl-0">
         <BackgroundLayer bg={bg} />
+        {overlay}
         <a href="#main" className="sr-only z-[2000] rounded-lg bg-surface px-4 py-2 font-semibold text-brand focus:not-sr-only focus:fixed focus:left-3 focus:top-3">Skip to content</a>
         <aside className="fixed inset-y-0 left-0 hidden w-64 border-r border-edge shadow-[8px_0_30px_-18px_rgba(18,24,38,0.35)] lg:block print:hidden">{renderSidebar(false)}</aside>
 

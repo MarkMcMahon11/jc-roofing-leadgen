@@ -1,4 +1,4 @@
-import { updateLeads } from "@/lib/store";
+import { getLeads, updateLeads } from "@/lib/store";
 import { downloadPhoto } from "@/lib/photos";
 import { MAX_PHOTOS_PER_LEAD } from "@/lib/photos-shared";
 import { assessPhoto, positionHint, visionEnabled } from "@/lib/vision";
@@ -23,7 +23,11 @@ export async function POST(req: Request) {
   const file = await downloadPhoto(b.path);
   if (!file) return bad("That upload doesn't seem to have completed. Please try again.", 404);
 
-  const assessment = visionEnabled() ? await assessPhoto(file.bytes, file.contentType) : null;
+  // The AI read only runs if the homeowner opted in ("Let AI read my roof photos") in the privacy pop-up.
+  // No recorded opt-in (or an older enquiry) means no AI read: the photo is still stored for the owner.
+  const owner = visionEnabled() ? (await getLeads()).find((l) => l.id === b.leadId) : undefined;
+  const aiAllowed = owner?.legal?.consents.aiPhotos === true;
+  const assessment = visionEnabled() && aiAllowed ? await assessPhoto(file.bytes, file.contentType) : null;
   const photo: LeadPhoto = { path: b.path, assessment };
 
   const result = await updateLeads((leads): { ok: true } | { error: string; status: number } => {

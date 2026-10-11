@@ -157,6 +157,13 @@ export function LeadDetail({ lead, onClose }: { lead: LeadView; onClose: () => v
           )}
 
           <p className="text-xs text-steel">Consent given {fmtDateTime(lead.consentAt ?? lead.createdAt)} (wording {lead.consentVersion ?? "v1"}).</p>
+          {lead.legal ? (
+            <p className="text-xs text-steel">
+              Privacy choices (version {lead.legal.version}, {fmtDateTime(lead.legal.at)}): contact {lead.legal.consents.contact ? "yes" : "no"} · AI photo read {lead.legal.consents.aiPhotos ? "yes" : "no"} · offers and reminders {lead.legal.consents.marketing ? "yes" : "no"}. <Link href="/admin/legal" className="underline">Legal &amp; privacy</Link>
+            </p>
+          ) : (
+            <p className="text-xs text-steel">No privacy pop-up record (enquiry made before it existed): no offers or reminders.</p>
+          )}
 
           <div className="flex flex-wrap justify-between gap-2 border-t border-silver pt-4">
             <Button variant="secondary" size="sm" onClick={exportLead}><Download size={14} /> Export data</Button>

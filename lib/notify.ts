@@ -1,5 +1,5 @@
 import type { Lead, Settings } from "./types";
-import { addMessage, type Message } from "./store";
+import { addMessage, getSettings, type Message } from "./store";
 import { BUSINESS } from "./config";
 import { fmtMonth, fmtSlot } from "./dates";
 import { detailsText, SERVICE_INFO } from "./services";
@@ -140,4 +140,10 @@ export async function notifyBooking(l: Lead, s: Settings, when: string) {
     sms(l.phone, `Hi ${firstName(l)}, your free ${BUSINESS.name} roof inspection is booked for ${nice}. Need to change it? Call ${BUSINESS.phone}.`, "customer", l.id),
     email(l.email, `Your ${BUSINESS.name} inspection: ${nice}`, `Hi ${firstName(l)},\n\nYour free roof inspection is booked for ${nice} at ${where}.\n\nIf you can, have your loft hatch and any old roof paperwork to hand. Need to change the time? Call ${BUSINESS.phone}.\n\n${BUSINESS.name}`, "customer", l.id),
   ]);
+}
+
+/** A privacy request (e.g. "delete my data") for the owner: emailed, or previewed under Texts and emails when email isn't switched on. */
+export async function emailOwnerPrivacyRequest(subject: string, text: string) {
+  const s = await getSettings();
+  return email(s.ownerEmail || BUSINESS.email, subject, text, "owner", "");
 }
