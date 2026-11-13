@@ -135,6 +135,7 @@ export function Shell({
             <GlobalSearch />
           </div>
           <div className="ml-auto flex items-center gap-2">
+            <div className="md:hidden"><GlobalSearch compact /></div>
             <Notifications items={notifications} />
             <Link href="/settings/profile" className="hidden items-center gap-2 rounded-lg px-2.5 py-1.5 text-[13px] text-muted hover:bg-raised hover:text-fg sm:flex">
               <UserRound className="size-4" aria-hidden />

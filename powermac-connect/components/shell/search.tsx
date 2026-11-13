@@ -15,7 +15,7 @@ const KIND: Record<string, { label: string; icon: typeof Search }> = {
   person: { label: "Person", icon: UserRound },
 };
 
-export function GlobalSearch() {
+export function GlobalSearch({ compact = false }: { compact?: boolean }) {
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
   const [hits, setHits] = useState<SearchHit[]>([]);
@@ -25,6 +25,7 @@ export function GlobalSearch() {
   const input = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    if (compact) return; // the full-size instance owns the keyboard shortcut
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
@@ -33,7 +34,7 @@ export function GlobalSearch() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  }, [compact]);
 
   useEffect(() => {
     if (q.trim().length < 2) return;
@@ -46,6 +47,11 @@ export function GlobalSearch() {
 
   return (
     <>
+      {compact ? (
+        <button onClick={() => setOpen(true)} className="rounded-lg p-2 text-muted hover:bg-raised hover:text-fg" aria-label="Search">
+          <Search className="size-[18px]" />
+        </button>
+      ) : (
       <button
         onClick={() => setOpen(true)}
         className="flex h-9 w-full max-w-md items-center gap-2 rounded-[10px] border border-line bg-surface px-3 text-[13px] text-subtle hover:border-line-strong hover:text-muted"
@@ -55,6 +61,7 @@ export function GlobalSearch() {
         <span className="flex-1 truncate text-left">Search jobs, properties, clients…</span>
         <kbd className="hidden rounded border border-line-strong px-1.5 font-mono text-[10px] sm:inline">Ctrl K</kbd>
       </button>
+      )}
       <Modal open={open} onClose={() => setOpen(false)} title="Search" size="lg">
         <div className="relative">
           <Search className={cx("absolute top-1/2 left-3 size-4 -translate-y-1/2", pending ? "animate-pulse text-accent-hi" : "text-subtle")} aria-hidden />
