@@ -310,7 +310,7 @@ async function QualificationsTab({ ctx, employeeId }: { ctx: Ctx; employeeId: st
                 <TH>Number</TH>
                 <TH>Issued</TH>
                 <TH>Expires</TH>
-                {canWrite && <TH align="right"><span className="sr-only">Actions</span></TH>}
+                {canWrite && <TH align="right" className="relative"><span className="sr-only">Actions</span></TH>}
               </tr>
             </THead>
             <tbody>
@@ -371,7 +371,7 @@ async function AvailabilityTab({ ctx, employeeId, workingHours, maxDaily, lookup
           <TH>Until</TH>
           <TH>Status</TH>
           <TH>Notes</TH>
-          {canWrite && isUpcoming && <TH align="right"><span className="sr-only">Actions</span></TH>}
+          {canWrite && isUpcoming && <TH align="right" className="relative"><span className="sr-only">Actions</span></TH>}
         </tr>
       </THead>
       <tbody>

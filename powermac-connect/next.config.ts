@@ -1,4 +1,8 @@
+import path from "node:path";
 import type { NextConfig } from "next";
+
+// This app lives in a sub-folder of a repository that has its own lockfile: pin the root.
+const appRoot = path.resolve(__dirname);
 
 const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
@@ -11,6 +15,8 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  turbopack: { root: appRoot },
+  outputFileTracingRoot: appRoot,
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

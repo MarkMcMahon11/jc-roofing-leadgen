@@ -400,7 +400,10 @@ export async function documentDownloadUrl(documentId: string): Promise<ActionRes
   const supabase = await createClient();
   const { data: doc } = await supabase.from("documents").select("name, storage_path").eq("id", id).eq("tenant_id", ctx.tenantId).maybeSingle();
   if (!doc) return { ok: false, message: "This document no longer exists." };
-  const { data, error } = await supabase.storage.from("documents").createSignedUrl(doc.storage_path, 60, { download: doc.name });
+  // keep the file's extension in the saved file name even when the display name has none
+  const ext = /\.[a-z0-9]{1,8}$/i.exec(doc.storage_path)?.[0] ?? "";
+  const filename = ext && !doc.name.toLowerCase().endsWith(ext.toLowerCase()) ? `${doc.name}${ext}` : doc.name;
+  const { data, error } = await supabase.storage.from("documents").createSignedUrl(doc.storage_path, 60, { download: filename });
   if (error || !data) return { ok: false, message: "The file could not be found in storage." };
   return { ok: true, url: data.signedUrl };
 }

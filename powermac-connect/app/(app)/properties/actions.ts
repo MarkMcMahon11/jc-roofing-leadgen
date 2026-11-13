@@ -156,9 +156,17 @@ export async function deleteProperty(_: ActionResult, formData: FormData): Promi
   const supabase = await createClient();
   const { count } = await supabase.from("work_orders").select("id", { count: "exact", head: true }).eq("tenant_id", ctx.tenantId).eq("property_id", id);
   if (count) return { ok: false, message: `This property has ${count} job${count === 1 ? "" : "s"} and cannot be deleted. Set its status to Inactive instead.` };
+  // the rows cascade with the property; collect the stored files first so they are not orphaned
+  const [{ data: docs }, { data: photos }] = await Promise.all([
+    supabase.from("documents").select("storage_path").eq("tenant_id", ctx.tenantId).eq("property_id", id),
+    supabase.from("photos").select("storage_path").eq("tenant_id", ctx.tenantId).eq("property_id", id),
+  ]);
+  if (docs?.length && !ctx.can("documents.delete")) return { ok: false, message: "This property has documents. Deleting it needs document delete access, or remove the documents first." };
   const { data, error } = await supabase.from("properties").delete().eq("tenant_id", ctx.tenantId).eq("id", id).select("id");
   if (error) return fromDb(error, "The property could not be deleted.");
   if (!data?.length) return { ok: false, message: "Nothing was deleted." };
+  if (docs?.length) await supabase.storage.from("documents").remove(docs.map((d) => d.storage_path));
+  if (photos?.length) await supabase.storage.from("photos").remove(photos.map((p) => p.storage_path));
   revalidatePath("/properties");
   redirect("/properties?deleted=1");
 }

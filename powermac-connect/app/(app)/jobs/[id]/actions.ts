@@ -5,6 +5,7 @@ import { z } from "zod";
 import { requireInternal } from "@/lib/auth/context";
 import { createClient } from "@/lib/supabase/server";
 import { fromDb, fromZod, formObject, type ActionResult } from "@/lib/actions";
+import { date as ukDate } from "@/lib/format";
 import { fromLondon, londonDate } from "../_lib/time";
 import { MAX_DAY_HOURS, MATERIAL_STATUS, PHOTO_STAGES } from "../_lib/constants";
 
@@ -138,7 +139,7 @@ export async function assignJob(input: z.input<typeof assignSchema>): Promise<As
     if (sub.status !== "approved") return { ok: false, message: `${sub.company_name} is not an approved subcontractor.` };
     who = sub.company_name;
     if (sub.insurance_expiry && sub.insurance_expiry < londonDate() && !a.confirm) {
-      return { ok: false, needsConfirm: true, message: `${sub.company_name}'s insurance expired on ${sub.insurance_expiry}. Confirm you have seen current cover before assigning.` };
+      return { ok: false, needsConfirm: true, message: `${sub.company_name}'s insurance expired on ${ukDate(sub.insurance_expiry)}. Confirm you have seen current cover before assigning.` };
     }
   }
 

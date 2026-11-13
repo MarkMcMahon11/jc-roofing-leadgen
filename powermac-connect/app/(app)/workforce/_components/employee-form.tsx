@@ -96,11 +96,11 @@ export function EmployeeForm({ values, trades, skills, vehicles }: { values: Emp
               )}
               <div className="grid gap-x-6 gap-y-2 md:grid-cols-2">
                 {DAYS.map((d) => (
-                  <div key={d} className="grid grid-cols-[96px_1fr_auto_1fr] items-center gap-2">
-                    <span className="text-sm text-muted">{DAY_LABEL[d]}</span>
-                    <Input type="time" name={`wh_${d}_start`} step={900} defaultValue={hoursToTime(hours[d]?.[0])} aria-label={`${DAY_LABEL[d]} start`} aria-invalid={Boolean(state.fieldErrors?.[`wh_${d}_start`])} />
+                  <div key={d} className="grid grid-cols-[minmax(0,84px)_minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2">
+                    <span className="truncate text-sm text-muted">{DAY_LABEL[d]}</span>
+                    <Input type="time" name={`wh_${d}_start`} step={900} className="min-w-0 px-2" defaultValue={hoursToTime(hours[d]?.[0])} aria-label={`${DAY_LABEL[d]} start`} aria-invalid={Boolean(state.fieldErrors?.[`wh_${d}_start`])} />
                     <span className="text-xs text-subtle">to</span>
-                    <Input type="time" name={`wh_${d}_end`} step={900} defaultValue={hoursToTime(hours[d]?.[1])} aria-label={`${DAY_LABEL[d]} finish`} />
+                    <Input type="time" name={`wh_${d}_end`} step={900} className="min-w-0 px-2" defaultValue={hoursToTime(hours[d]?.[1])} aria-label={`${DAY_LABEL[d]} finish`} />
                   </div>
                 ))}
               </div>

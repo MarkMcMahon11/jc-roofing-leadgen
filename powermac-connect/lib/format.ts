@@ -3,15 +3,26 @@ const TZ = "Europe/London";
 
 const gbp = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
 const gbp0 = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", maximumFractionDigits: 0 });
-const compact = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", notation: "compact", maximumFractionDigits: 1 });
 const num = new Intl.NumberFormat("en-GB");
 
 export function money(v: number | string | null | undefined, opts: { whole?: boolean; compact?: boolean } = {}) {
   if (v === null || v === undefined || v === "") return "-";
   const n = Number(v);
   if (!Number.isFinite(n)) return "-";
-  if (opts.compact && Math.abs(n) >= 10_000) return compact.format(n);
+  if (opts.compact && Math.abs(n) >= 10_000) return compactGBP(n);
   return (opts.whole ? gbp0 : gbp).format(n);
+}
+
+/**
+ * £12.5k / £1.2m. Hand-rolled on purpose: Intl's compact notation differs between Node and
+ * browsers (e.g. "k" vs "K"), which breaks hydration of server-rendered client components.
+ */
+export function compactGBP(n: number) {
+  const sign = n < 0 ? "-" : "";
+  const a = Math.abs(n);
+  const [v, unit] = a >= 1_000_000_000 ? [a / 1_000_000_000, "bn"] : a >= 1_000_000 ? [a / 1_000_000, "m"] : a >= 1_000 ? [a / 1_000, "k"] : [a, ""];
+  const digits = unit && v < 100 ? 1 : 0;
+  return `${sign}£${v.toFixed(digits).replace(/\.0$/, "")}${unit}`;
 }
 
 export function count(v: number | null | undefined) {

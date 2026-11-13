@@ -19,39 +19,11 @@ export const getPermissionLabels = cache(async (): Promise<Record<string, string
   return Object.fromEntries((data ?? []).map((p) => [p.key, p.label]));
 });
 
-/**
- * Internal staff who can be named as a job's manager. Users who manage users can list
- * internal memberships; for everyone else memberships are private, so we offer the staff
- * already acting as managers on jobs, contracts and accounts, plus the current user.
- */
+/** Active internal staff who can be named as a job's manager (minimal directory function). */
 export const getManagers = cache(async (ctx: TenantContext): Promise<Option[]> => {
   const supabase = await createClient();
-  const ids = new Set<string>([ctx.userId]);
-  if (ctx.can("users.manage")) {
-    const { data } = await supabase
-      .from("memberships")
-      .select("user_id, roles!inner(scope_type)")
-      .eq("tenant_id", ctx.tenantId)
-      .eq("status", "active")
-      .eq("roles.scope_type", "internal");
-    for (const m of data ?? []) ids.add(m.user_id);
-  } else {
-    const [w, c, o] = await Promise.all([
-      supabase.from("work_orders").select("manager_id").eq("tenant_id", ctx.tenantId).not("manager_id", "is", null).limit(1000),
-      supabase.from("contracts").select("contract_manager_id").eq("tenant_id", ctx.tenantId).not("contract_manager_id", "is", null),
-      supabase.from("organisations").select("account_manager_id, contract_manager_id").eq("tenant_id", ctx.tenantId),
-    ]);
-    for (const r of w.data ?? []) if (r.manager_id) ids.add(r.manager_id);
-    for (const r of c.data ?? []) if (r.contract_manager_id) ids.add(r.contract_manager_id);
-    for (const r of o.data ?? []) {
-      if (r.account_manager_id) ids.add(r.account_manager_id);
-      if (r.contract_manager_id) ids.add(r.contract_manager_id);
-    }
-  }
-  const { data: people } = await supabase.from("profiles").select("id, full_name, email").in("id", [...ids]);
-  return (people ?? [])
-    .map((p) => ({ value: p.id, label: p.full_name || p.email }))
-    .sort((a, b) => a.label.localeCompare(b.label));
+  const { data } = await supabase.rpc("internal_staff", { p_tenant: ctx.tenantId });
+  return (data ?? []).map((p) => ({ value: p.user_id, label: p.full_name }));
 });
 
 export const getClients = cache(async (tenantId: string): Promise<Option[]> => {

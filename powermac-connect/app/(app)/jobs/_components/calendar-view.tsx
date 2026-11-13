@@ -162,7 +162,7 @@ export async function CalendarView({
                   </Link>
                   {events.length > 0 && <span className="text-[10.5px] text-subtle tabular">{events.length}</span>}
                 </div>
-                <ul className="grid gap-1">
+                <ul className="grid grid-cols-1 gap-1">
                   {events.slice(0, 3).map((e) => (
                     <EventChip key={e.key} e={e} />
                   ))}
@@ -170,7 +170,7 @@ export async function CalendarView({
                 {events.length > 3 && (
                   <details className="mt-1">
                     <summary className="cursor-pointer list-none rounded px-1 text-[11px] font-medium text-accent-hi hover:bg-raised">+{events.length - 3} more</summary>
-                    <ul className="mt-1 grid gap-1">
+                    <ul className="mt-1 grid grid-cols-1 gap-1">
                       {events.slice(3).map((e) => (
                         <EventChip key={e.key} e={e} />
                       ))}
@@ -193,7 +193,7 @@ export async function CalendarView({
               <Link href={`/schedule?date=${d}`} className={cx("mb-2 block text-xs font-semibold tracking-wide uppercase", d === today ? "text-accent-hi" : "text-subtle")}>
                 {new Date(`${d}T12:00:00Z`).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" })}
               </Link>
-              <ul className="grid gap-1.5">
+              <ul className="grid grid-cols-1 gap-1.5">
                 {byDay.get(d)!.map((e) => (
                   <EventChip key={e.key} e={e} roomy />
                 ))}
@@ -211,7 +211,7 @@ function daysBetween(a: string, b: string) {
 
 function EventChip({ e, roomy }: { e: Event; roomy?: boolean }) {
   return (
-    <li>
+    <li className="min-w-0">
       <Link
         href={`/jobs/${e.jobId}`}
         title={`${e.reference} · ${e.title}${e.who ? ` · ${e.who.name}` : ""}`}

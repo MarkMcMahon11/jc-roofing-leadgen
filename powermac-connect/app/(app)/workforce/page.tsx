@@ -53,9 +53,9 @@ export default async function WorkforcePage({ searchParams }: PageProps<"/workfo
       />
       <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Stat label="Active employees" value={active.count ?? 0} hint={`${absentIds.size} absent today`} href="/workforce?status=active" icon={<HardHat className="size-4" />} />
-        <Stat label="Tickets expiring ≤30 days" value={expiring.count ?? 0} tone={expiring.count ? "warn" : "ok"} hint="Includes expired" href="/workforce?quals=expiring" />
+        <Stat label="Tickets to renew" value={expiring.count ?? 0} tone={expiring.count ? "warn" : "ok"} hint="Expired or due within 30 days" href="/workforce?quals=expiring" />
         <Stat label="Absence requests" value={pending.count ?? 0} tone={pending.count ? "warn" : "neutral"} hint="Awaiting a decision" href="/workforce?tab=absences" icon={<CalendarOff className="size-4" />} />
-        <Stat label="Vehicles due ≤30 days" value={vehiclesDue.count ?? 0} tone={vehiclesDue.count ? "warn" : "ok"} hint="MOT, insurance, service or tax" href="/workforce?tab=vehicles" icon={<Truck className="size-4" />} />
+        <Stat label="Vehicle renewals" value={vehiclesDue.count ?? 0} tone={vehiclesDue.count ? "warn" : "ok"} hint="MOT, insurance, service or tax in 30 days" href="/workforce?tab=vehicles" icon={<Truck className="size-4" />} />
       </div>
       <LinkTabs
         current={tab}
@@ -260,7 +260,7 @@ async function VehiclesTab({ ctx }: { ctx: Ctx }) {
               <TH>Insurance</TH>
               <TH>Service</TH>
               <TH>Tax</TH>
-              {canWrite && <TH align="right"><span className="sr-only">Actions</span></TH>}
+              {canWrite && <TH align="right" className="relative"><span className="sr-only">Actions</span></TH>}
             </tr>
           </THead>
           <tbody>
@@ -357,7 +357,7 @@ async function AbsencesTab({ ctx, lookups }: { ctx: Ctx; lookups: Lookups }) {
             <TH>Until</TH>
             <TH>Status</TH>
             <TH>Notes</TH>
-            {canWrite && <TH align="right"><span className="sr-only">Actions</span></TH>}
+            {canWrite && <TH align="right" className="relative"><span className="sr-only">Actions</span></TH>}
           </tr>
         </THead>
         <tbody>

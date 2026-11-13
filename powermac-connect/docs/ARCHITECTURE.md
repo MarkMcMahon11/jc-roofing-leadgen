@@ -64,10 +64,10 @@ For production it should move to its own repository (`git subtree split --prefix
 | Scope | Default roles | Data access |
 |---|---|---|
 | internal | Company Director, Operations Manager, Contract Manager, Office Administrator, Finance Manager | base tables via RLS, by permission |
-| client | Corporate Client | own organisation only, through narrow portal functions (Stage 4) |
-| operative | Field Operative | own assignments only, through field functions (Stage 4) |
-| subcontractor | Subcontractor | authorised assignments only (Stage 4) |
-| occupant | Tenant / Occupant | own property's repairs only, when enabled (Stage 4) |
+| client | Corporate Client | own organisation only, through narrow `portal_*` functions |
+| operative | Field Operative | own assignments only, through `field_*` functions |
+| subcontractor | Subcontractor | authorised assignments only, through `field_*` functions |
+| occupant | Tenant / Occupant | role and scope exist; resident repair tracking is switched off until a landlord enables it |
 
 Roles are editable in **Settings -> Roles & permissions**. Guards in the database: nobody can change their own
 role/status, grant a permission they do not hold, edit their own role's permissions, or remove the last user
@@ -134,7 +134,8 @@ Migrations (`supabase/migrations/`): `0100` platform & RBAC & audit · `0200` CR
 `0300` workforce, subcontractors, projects, work orders · `0400` suppliers, stock, purchasing, quotes, invoices, costs ·
 `0500` documents, certificates, communications, notifications, automation, intake, AI, integrations, retention ·
 `0600` RLS registry, grants, approvals, workflow enforcement, provisioning, storage, retention job · `0700`
-invitations · `0800` reporting & scheduling intelligence.
+invitations · `0800` reporting & scheduling intelligence · `0900` client-portal & field-app API (scope-checked definer functions) ·
+`1000` schedule people directory · `1100` safe company erasure · `1200` internal staff directory.
 
 Key rules implemented in the database:
 - **Configurable job workflow**: 13 default statuses (+ cancelled) and the allowed moves between them, each move
@@ -162,8 +163,8 @@ Key rules implemented in the database:
 | Workforce & vehicles, subcontractors | `/workforce`, `/subcontractors` | 3 | built |
 | Settings: profile, company, users, roles, workflow, picklists, integrations, retention, audit | `/settings/*` | 1 | built |
 | BPOAI.AI platform console | `/platform` | 1 | built |
-| Field operative mobile app (offline) | `/field` | 4 | next |
-| Corporate client & tenant portal | `/portal` | 4 | next |
+| Field operative mobile app (offline) | `/field`, `/field/[id]` | 4 | built |
+| Corporate client portal | `/portal/*` (jobs, request, properties, quotes, invoices, contracts) | 4 | built (resident view switched off until enabled) |
 | Suppliers, purchasing, stock, quotations, invoicing, finance | `/procurement`, `/finance` | 5 | schema ready |
 | PowerMac AI assistant, automation engine | `/ai`, `/settings/automations` | 6 | schema ready |
 | Accounting, email, WhatsApp integrations; security testing; deployment | - | 7 | interfaces ready |
@@ -201,7 +202,7 @@ The sidebar only shows modules the user's role can use; nothing links to an unbu
 1. **Project setup, architecture, database, authentication, design system** - done
 2. **Command centre, CRM, contracts, property management** - done
 3. **Work order engine, job management, scheduling, workforce** - done
-4. Mobile operative app (offline sync) and client portal
+4. **Mobile operative app (offline sync) and client portal** - done
 5. Suppliers, procurement, stock, quotations, invoicing, financial intelligence
 6. PowerMac AI assistant and automation engine
 7. Integrations, security testing, deployment

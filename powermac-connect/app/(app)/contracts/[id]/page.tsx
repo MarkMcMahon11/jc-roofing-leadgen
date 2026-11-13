@@ -177,7 +177,7 @@ export default async function ContractPage({ params, searchParams }: PageProps<"
           href={`${base}?tab=variations`}
           tone={proposed.length ? "warn" : "accent"}
         />
-        <Stat label="Term" value={live && e.days !== null && e.days >= 0 ? `${count(e.days)} days left` : e.text} hint={`${date(c.start_date)} to ${date(c.end_date)}`} tone={live ? e.tone : "neutral"} />
+        <Stat label="Term" value={live && e.days !== null && e.days >= 0 ? `${count(e.days)} days left` : e.text} hint={c.end_date ? `Ends ${date(c.end_date)}` : `Started ${date(c.start_date)}`} tone={live ? e.tone : "neutral"} />
         <Stat label="Open jobs" value={count(perf.jobs_open)} hint={perf.jobs_overdue ? `${perf.jobs_overdue} overdue` : "None overdue"} href={ctx.can("work_orders.read") ? `${base}?tab=jobs` : undefined} tone={perf.jobs_overdue ? "bad" : "info"} />
       </div>
 

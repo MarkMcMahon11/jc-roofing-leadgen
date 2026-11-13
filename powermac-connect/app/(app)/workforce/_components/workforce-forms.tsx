@@ -150,7 +150,7 @@ export function QualificationButton({ owner, values }: { owner: { employee_id: s
 
 export function DeleteQualificationButton({ id, name }: { id: string; name: string }) {
   return (
-    <ActionForm action={deleteQualification} className="inline-flex">
+    <ActionForm action={deleteQualification} className="relative inline-flex">
       <input type="hidden" name="id" value={id} />
       <ConfirmButton message={`Remove "${name}"?`}>
         <Trash2 className="size-3.5" aria-hidden />

@@ -107,7 +107,39 @@ export async function ListView({
       {rows.length === 0 ? (
         <EmptyState title="No jobs match these filters">Try clearing a filter or searching for a different reference.</EmptyState>
       ) : (
-        <Table>
+        <>
+        {/* phones: stacked cards */}
+        <ul className="divide-y divide-line md:hidden">
+          {rows.map((r) => {
+            const s = statuses.get(r.status);
+            const due = dueState(r.target_completion_at, s.counts_as_open);
+            return (
+              <li key={r.id}>
+                <Link href={`/jobs/${r.id}`} className="block px-4 py-3 hover:bg-raised/50">
+                  <div className="flex items-center gap-2">
+                    <Mono>{r.reference}</Mono>
+                    <Badge tone={priorityTone[r.priority] ?? "neutral"} className="ml-auto">{label(r.priority)}</Badge>
+                  </div>
+                  <p className="mt-0.5 truncate text-sm font-medium text-fg">{r.title}</p>
+                  <p className="truncate text-xs text-subtle">
+                    {r.properties?.address_line1}, {r.properties?.postcode} · {r.organisations?.name}
+                  </p>
+                  <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs">
+                    <ColourBadge colour={s.colour}>{s.label}</ColourBadge>
+                    {r.target_completion_at && (
+                      <span className={cx("tabular", due === "overdue" ? "font-semibold text-[#ff8a87]" : due === "soon" ? "text-[#ffc56b]" : "text-muted")}>
+                        {due === "overdue" ? "Overdue · " : "Due "}
+                        {shortDate(r.target_completion_at)}
+                      </span>
+                    )}
+                    <span className="ml-auto text-subtle">{assignees(r.job_assignments).map((a) => a.initials).join(", ") || "Unassigned"}</span>
+                  </div>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+        <Table className="hidden md:block">
           <THead>
             <tr>
               <TH>Job</TH>
@@ -168,6 +200,7 @@ export async function ListView({
             })}
           </tbody>
         </Table>
+        </>
       )}
       <Pagination page={page} pageSize={PAGE_SIZE} total={total} />
     </Card>

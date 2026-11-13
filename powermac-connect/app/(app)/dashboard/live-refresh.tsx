@@ -28,7 +28,8 @@ export function LiveRefresh({ seconds = 60 }: { seconds?: number }) {
         <span className="absolute inline-flex size-full animate-ping rounded-full bg-ok opacity-60" />
         <span className="relative inline-flex size-2 rounded-full bg-ok" />
       </span>
-      Live · {at.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
+      {/* the time is per-viewer by design: server and browser render it at different moments */}
+      Live · <span suppressHydrationWarning>{at.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/London" })}</span>
       <RefreshCw className={pending ? "size-3.5 animate-spin" : "size-3.5"} aria-hidden />
     </button>
   );

@@ -138,7 +138,7 @@ export default async function SubcontractorsPage({ searchParams }: PageProps<"/s
                       <TD><Badge tone={cis.tone}>{cis.label}</Badge></TD>
                       <TD align="right">
                         {s.rating !== null ? (
-                          <span className="inline-flex items-center gap-1 tabular">
+                          <span className="relative inline-flex items-center gap-1 tabular">
                             <Star className="size-3.5 fill-warn text-warn" aria-hidden />
                             {Number(s.rating).toFixed(1)}
                             <span className="sr-only">out of 5</span>

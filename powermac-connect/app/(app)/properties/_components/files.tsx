@@ -139,7 +139,7 @@ export function DownloadButton({ documentId, label = "Download" }: { documentId:
 
 export function DeleteDocumentButton({ documentId, name }: { documentId: string; name: string }) {
   return (
-    <ActionForm action={deleteDocument} className="inline-flex">
+    <ActionForm action={deleteDocument} className="relative inline-flex">
       <input type="hidden" name="document_id" value={documentId} />
       <ConfirmButton message={`Remove "${name}"? The file is deleted permanently.`}>
         <Trash2 className="size-3.5" aria-hidden />
@@ -151,7 +151,7 @@ export function DeleteDocumentButton({ documentId, name }: { documentId: string;
 
 export function DeletePhotoButton({ photoId }: { photoId: string }) {
   return (
-    <ActionForm action={deletePhoto} className="inline-flex">
+    <ActionForm action={deletePhoto} className="relative inline-flex">
       <input type="hidden" name="photo_id" value={photoId} />
       <ConfirmButton message="Remove this photo permanently?">
         <Trash2 className="size-3.5" aria-hidden />

@@ -406,7 +406,7 @@ export async function InspectionsTab({ ctx, propertyId }: { ctx: Ctx; propertyId
               <TH>Completed</TH>
               <TH>Result</TH>
               <TH>Findings</TH>
-              {canWrite && <TH align="right"><span className="sr-only">Actions</span></TH>}
+              {canWrite && <TH align="right" className="relative"><span className="sr-only">Actions</span></TH>}
             </tr>
           </THead>
           <tbody>
@@ -513,7 +513,7 @@ export async function CertificatesTab({ ctx, propertyId }: { ctx: Ctx; propertyI
                 <TH>Expires</TH>
                 <TH>Outcome</TH>
                 <TH>Document</TH>
-                {(canWrite || canDelete) && <TH align="right"><span className="sr-only">Actions</span></TH>}
+                {(canWrite || canDelete) && <TH align="right" className="relative"><span className="sr-only">Actions</span></TH>}
               </tr>
             </THead>
             <tbody>
@@ -628,7 +628,7 @@ export async function DocumentsTab({ ctx, propertyId }: { ctx: Ctx; propertyId: 
                   <TH>Expires</TH>
                   <TH>Size</TH>
                   <TH>Added</TH>
-                  <TH align="right"><span className="sr-only">Actions</span></TH>
+                  <TH align="right" className="relative"><span className="sr-only">Actions</span></TH>
                 </tr>
               </THead>
               <tbody>

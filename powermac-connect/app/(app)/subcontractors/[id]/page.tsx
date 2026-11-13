@@ -125,7 +125,7 @@ function Restricted({ title, children }: { title: string; children: React.ReactN
 function CheckRow({ ok, warn, title, detail }: { ok: boolean; warn?: boolean; title: string; detail: React.ReactNode }) {
   const Icon = ok ? ShieldCheck : ShieldX;
   return (
-    <li className="flex items-start gap-3 py-3 first:pt-0 last:pb-0">
+    <li className="relative flex items-start gap-3 py-3 first:pt-0 last:pb-0">
       <Icon className={cx("mt-0.5 size-5 shrink-0", ok ? (warn ? "text-warn" : "text-ok") : "text-bad")} aria-hidden />
       <div className="min-w-0 flex-1">
         <div className="text-sm font-medium">{title}</div>
@@ -273,7 +273,7 @@ async function AccreditationsTab({ ctx, subId }: { ctx: Ctx; subId: string }) {
               <TH>Number</TH>
               <TH>Issued</TH>
               <TH>Expires</TH>
-              {canWrite && <TH align="right"><span className="sr-only">Actions</span></TH>}
+              {canWrite && <TH align="right" className="relative"><span className="sr-only">Actions</span></TH>}
             </tr>
           </THead>
           <tbody>
@@ -407,7 +407,7 @@ async function DocumentsTab({ ctx, subId }: { ctx: Ctx; subId: string }) {
               <TH>Category</TH>
               <TH>Expires</TH>
               <TH>Added</TH>
-              <TH align="right"><span className="sr-only">Actions</span></TH>
+              <TH align="right" className="relative"><span className="sr-only">Actions</span></TH>
             </tr>
           </THead>
           <tbody>

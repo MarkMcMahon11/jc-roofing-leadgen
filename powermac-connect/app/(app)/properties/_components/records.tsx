@@ -116,7 +116,7 @@ export function EditCertificateButton({ propertyId, values, documents }: { prope
 
 export function DeleteCertificateButton({ propertyId, id }: { propertyId: string; id: string }) {
   return (
-    <ActionForm action={deleteCertificate} className="inline-flex">
+    <ActionForm action={deleteCertificate} className="relative inline-flex">
       <input type="hidden" name="id" value={id} />
       <input type="hidden" name="property_id" value={propertyId} />
       <ConfirmButton message="Remove this certificate record? Any attached document is kept.">

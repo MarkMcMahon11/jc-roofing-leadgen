@@ -121,12 +121,12 @@ export default async function ContractsPage({ searchParams }: PageProps<"/contra
                 const live = c.status === "active" || c.status === "on_hold";
                 return (
                   <TR key={c.id}>
-                    <TD className="max-w-xs">
+                    <TD className="max-w-xs min-w-56">
                       <Link href={`/contracts/${c.id}`} className="font-medium text-fg hover:text-accent-hi">
                         {c.title}
                       </Link>
                       <div className="mt-0.5 flex flex-wrap items-center gap-x-2 text-xs text-subtle">
-                        <Mono className="text-[11.5px]">{c.reference}</Mono>
+                        <Mono className="text-[11.5px] whitespace-nowrap">{c.reference}</Mono>
                         {c.client_reference && <span>Client ref {c.client_reference}</span>}
                       </div>
                     </TD>

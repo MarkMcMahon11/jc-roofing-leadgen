@@ -121,12 +121,12 @@ export default async function CrmPage({ searchParams }: PageProps<"/crm">) {
                 const jobs = o.open_jobs?.[0]?.count ?? 0;
                 return (
                   <TR key={o.id}>
-                    <TD>
+                    <TD className="min-w-56">
                       <Link href={`/crm/${o.id}`} className="font-medium text-fg hover:text-accent-hi">
                         {o.name}
                       </Link>
                       <div className="mt-0.5 flex items-center gap-2 text-xs text-subtle">
-                        <Mono className="text-[11.5px]">{o.reference}</Mono>
+                        <Mono className="text-[11.5px] whitespace-nowrap">{o.reference}</Mono>
                         {o.town && <span>{o.town}</span>}
                       </div>
                     </TD>

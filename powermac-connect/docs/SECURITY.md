@@ -4,7 +4,7 @@
 |---|---|---|
 | Tenant isolation | RLS on all 73 tables; composite tenant foreign keys; tested cross-tenant attacks | migrations 0100-0600, `supabase/tests/database/security.test.sql` |
 | Role-based permissions | 53 permissions, per-tenant configurable roles, scoped external roles | `permissions`, `roles`, Settings -> Roles |
-| Least privilege for external users | clients, operatives, subcontractors and occupants cannot read base tables; they use narrow functions with explicit column lists (Stage 4) | RLS registry (0600) |
+| Least privilege for external users | clients, operatives, subcontractors and occupants cannot read base tables; they use `portal_*` / `field_*` functions with explicit column lists and scope checks | 0900, `portal_field.test.sql` |
 | Privilege-escalation prevention | no self role/status changes; cannot grant permissions you lack; cannot edit your own role; last user manager protected; platform-admin flag and subscription columns not writable by users | `app.check_membership`, `app.check_role_permission`, column grants |
 | Approvals cannot be faked | approval stamps set by triggers from the signed-in user; approving requires the right permission | `app.guard_approvals`, workflow guard |
 | Audit logs | append-only, written by triggers for every business table plus sign-in/out, invitations, approvals | `audit_logs`, Settings -> Audit log |
@@ -18,6 +18,13 @@
 | Secrets server-side | service-role, AI and integration keys never reach the browser (`server-only` modules); integrations page shows status, never values | `lib/supabase/admin.ts`, `lib/integrations.ts` |
 | Security headers | CSP `frame-ancestors 'none'`, X-Frame-Options DENY, nosniff, referrer policy, permissions policy | `next.config.ts` |
 | AI safeguards (Stage 6) | AI output stored as suggestions in `ai_activity`; sensitive actions need human approval; facts vs predictions labelled | `ai_activity` |
+
+## Company offboarding (erasure)
+
+`platform_delete_tenant(id, slug)` (platform admin, typed confirmation) deletes a company and, by cascade, every
+record it owns; the erasure is logged at platform level. **Known gap:** files in the `documents` and `photos`
+buckets under the company's `<tenant_id>/` folder must also be removed through the Storage API (not SQL); add
+this to the platform console before the first real offboarding.
 
 ## Backup and recovery
 

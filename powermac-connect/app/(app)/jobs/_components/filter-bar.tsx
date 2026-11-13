@@ -1,13 +1,15 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
-import { X } from "lucide-react";
+import { SlidersHorizontal, X } from "lucide-react";
+import { cx } from "@/components/ui/primitives";
 import { FilterSelect, SearchBox } from "@/components/ui/url-controls";
 import type { Option } from "../_lib/types";
 import { DUE_FILTERS, PRIORITIES } from "../_lib/constants";
 
-const FILTER_KEYS = ["q", "status", "priority", "trade", "org", "contract", "assignee", "due", "filter"];
+const FILTER_KEYS = ["status", "priority", "trade", "org", "contract", "assignee", "due", "filter"];
 
 export function FilterBar({
   statuses,
@@ -24,8 +26,10 @@ export function FilterBar({
 }) {
   const params = useSearchParams();
   const pathname = usePathname();
+  const [open, setOpen] = useState(false);
   const org = params.get("org");
-  const active = FILTER_KEYS.filter((k) => params.get(k)).length;
+  const active = FILTER_KEYS.filter((k) => params.get(k)).length + (params.get("q") ? 1 : 0);
+  const selects = FILTER_KEYS.filter((k) => params.get(k)).length;
   const clear = new URLSearchParams();
   for (const k of ["view", "month", "sort", "dir"]) {
     const v = params.get(k);
@@ -33,8 +37,24 @@ export function FilterBar({
   }
   return (
     <div className="pm-card mb-4 p-3">
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:flex lg:flex-wrap lg:items-center">
-        <SearchBox placeholder="Search reference, title, client ref…" className="col-span-2 sm:col-span-3 lg:w-72" />
+      <div className="flex gap-2 lg:hidden">
+        <SearchBox placeholder="Search reference, title, client ref…" className="min-w-0 flex-1" />
+        <button
+          type="button"
+          onClick={() => setOpen((o) => !o)}
+          aria-expanded={open}
+          aria-controls="job-filters"
+          className={cx(
+            "inline-flex h-10 shrink-0 items-center gap-1.5 rounded-[10px] border px-3 text-sm",
+            selects ? "border-[#1d3d78] bg-accent-lo text-accent-hi" : "border-line-strong bg-raised text-muted",
+          )}
+        >
+          <SlidersHorizontal className="size-4" aria-hidden />
+          Filters{selects ? ` (${selects})` : ""}
+        </button>
+      </div>
+      <div id="job-filters" className={cx(open ? "mt-2 grid" : "hidden", "grid-cols-2 gap-2 sm:grid-cols-3 lg:mt-0 lg:flex lg:flex-wrap lg:items-center")}>
+        <SearchBox placeholder="Search reference, title, client ref…" className="hidden lg:block lg:w-72" />
         <FilterSelect param="status" label="Status" options={statuses} className="w-full lg:w-auto" />
         <FilterSelect param="priority" label="Priority" options={PRIORITIES.map((p) => ({ value: p.value, label: p.label }))} className="w-full lg:w-auto" />
         <FilterSelect param="trade" label="Trade" options={trades} className="w-full lg:w-auto" />
@@ -46,7 +66,7 @@ export function FilterBar({
           <Link
             href={`${pathname}${clear.size ? `?${clear}` : ""}`}
             scroll={false}
-            className="col-span-2 inline-flex h-10 items-center justify-center gap-1.5 rounded-[10px] px-3 text-sm text-muted hover:bg-raised hover:text-fg sm:col-span-1"
+            className="inline-flex h-10 items-center justify-center gap-1.5 rounded-[10px] px-3 text-sm text-muted hover:bg-raised hover:text-fg"
           >
             <X className="size-4" aria-hidden />
             Clear {active} filter{active === 1 ? "" : "s"}

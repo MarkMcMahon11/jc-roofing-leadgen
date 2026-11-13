@@ -88,11 +88,11 @@ function Row({ r, canAssign }: { r: AssignmentRow; canAssign: boolean }) {
 
   return (
     <li className="px-5 py-3.5" data-assignment={r.who}>
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+      <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 gap-y-2 sm:grid-cols-[auto_minmax(0,1fr)_auto]">
         <span className="flex size-8 items-center justify-center rounded-full text-white" style={{ backgroundColor: r.colour }} aria-hidden>
           <Icon className="size-4" />
         </span>
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <Link href={r.href} className="font-medium text-fg hover:text-accent-hi">
               {r.who}
@@ -116,7 +116,7 @@ function Row({ r, canAssign }: { r: AssignmentRow; canAssign: boolean }) {
           )}
         </div>
         {canAssign && OPEN.includes(r.status) && !editing && (
-          <div className="flex gap-2">
+          <div className="col-span-2 flex gap-2 pl-11 sm:col-span-1 sm:pl-0">
             <button type="button" className={buttonClass("secondary", "sm")} onClick={() => setEditing(true)} disabled={pending}>
               Reschedule
             </button>

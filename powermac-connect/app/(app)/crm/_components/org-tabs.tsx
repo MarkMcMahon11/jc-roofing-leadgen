@@ -141,7 +141,7 @@ export async function OverviewTab({ ctx, org }: { ctx: TenantContext; org: Org }
                   label="Outstanding issues"
                   value={count(issues)}
                   tone={issues ? "bad" : "ok"}
-                  hint={canFinance ? `${overdueJobs} jobs · ${overdueInv.length} invoices overdue` : `${overdueJobs} jobs overdue`}
+                  hint={`${overdueJobs} job${overdueJobs === 1 ? "" : "s"}${canFinance ? ` · ${overdueInv.length} invoice${overdueInv.length === 1 ? "" : "s"}` : ""} overdue`}
                   href={canFinance && overdueInv.length ? `/crm/${org.id}?tab=money` : `/jobs?org=${org.id}&due=overdue`}
                 />
               </div>

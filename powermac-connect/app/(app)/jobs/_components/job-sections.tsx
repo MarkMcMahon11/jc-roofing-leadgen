@@ -461,7 +461,7 @@ export async function CostsSection({ supabase, ctx, job }: Props) {
         <Stat label="Margin" value={money(margin, { whole: true })} tone={margin < 0 ? "bad" : revenue > 0 ? "ok" : "neutral"} hint={revenue > 0 ? `${pct((margin / revenue) * 100, 1)} of invoiced` : "Nothing invoiced yet"} />
         <Stat
           label="Against estimate"
-          value={variance === null ? "-" : `${variance > 0 ? "+" : ""}${money(variance, { whole: true })}`}
+          value={variance === null ? "-" : `${money(Math.abs(variance), { whole: true })} ${variance > 0 ? "over" : "under"}`}
           tone={variance === null ? "neutral" : variance > 0 ? "warn" : "ok"}
           hint={est === null ? "No estimate on the job" : `Estimate ${money(est, { whole: true })}${job.not_to_exceed ? ` · NTE ${money(job.not_to_exceed, { whole: true })}` : ""}`}
         />

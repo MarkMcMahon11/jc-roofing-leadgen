@@ -58,8 +58,8 @@ Mail sent by Supabase Auth (password resets) appears at http://127.0.0.1:54324.
 
 ```bash
 npx tsc --noEmit && npx eslint .
-npm run test:db          # 65 pgTAP tests: tenant isolation, roles, escalation, workflow, audit, portal & field scope
-npm run test:e2e         # role-based browser checks against a running app (BASE_URL, default http://localhost:3100)
+npm run test:db          # 68 pgTAP tests: tenant isolation, roles, escalation, workflow, audit, erasure, portal & field scope
+npm run test:e2e         # 36 role-based browser checks against a running app (BASE_URL, default http://localhost:3100)
 npm run build
 ```
 
