@@ -1,0 +1,113 @@
+# Local Supabase-compatible stack for development and automated tests where the Supabase CLI
+# (`supabase start`) is not available. Same images Supabase uses; Docker Hub registry.
+# Start with: npm run stack:up   (see dev/local-stack/README.md)
+name: powermac-local
+
+services:
+  db:
+    image: supabase/postgres:17.6.1.054
+    restart: unless-stopped
+    ports: ["127.0.0.1:54322:5432"]
+    command: ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf", "-c", "log_min_messages=fatal"]
+    environment:
+      POSTGRES_HOST: /var/run/postgresql
+      PGPORT: 5432
+      POSTGRES_PORT: 5432
+      PGPASSWORD: postgres
+      POSTGRES_PASSWORD: postgres
+      PGDATABASE: postgres
+      POSTGRES_DB: postgres
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXP: 3600
+    volumes:
+      - ./init/99-roles.sql:/docker-entrypoint-initdb.d/init-scripts/99-roles.sql:ro
+      - ./init/99-jwt.sql:/docker-entrypoint-initdb.d/init-scripts/99-jwt.sql:ro
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres", "-h", "localhost"]
+      interval: 2s
+      timeout: 5s
+      retries: 60
+
+  auth:
+    image: supabase/gotrue:v2.186.0
+    restart: unless-stopped
+    depends_on:
+      db: { condition: service_healthy }
+    ports: ["127.0.0.1:54329:9999"]
+    environment:
+      GOTRUE_API_HOST: 0.0.0.0
+      GOTRUE_API_PORT: 9999
+      API_EXTERNAL_URL: http://localhost:54321/auth/v1
+      GOTRUE_DB_DRIVER: postgres
+      GOTRUE_DB_DATABASE_URL: postgres://supabase_auth_admin:postgres@db:5432/postgres
+      GOTRUE_SITE_URL: ${SITE_URL:-http://localhost:3100}
+      GOTRUE_URI_ALLOW_LIST: ${SITE_URL:-http://localhost:3100}/**
+      GOTRUE_DISABLE_SIGNUP: "true"
+      GOTRUE_JWT_ADMIN_ROLES: service_role
+      GOTRUE_JWT_AUD: authenticated
+      GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
+      GOTRUE_JWT_EXP: 3600
+      GOTRUE_JWT_SECRET: ${JWT_SECRET}
+      GOTRUE_EXTERNAL_EMAIL_ENABLED: "true"
+      GOTRUE_MAILER_AUTOCONFIRM: "false"
+      GOTRUE_SMTP_ADMIN_EMAIL: no-reply@powermac.local
+      GOTRUE_SMTP_HOST: mail
+      GOTRUE_SMTP_PORT: 1025
+      GOTRUE_SMTP_USER: x
+      GOTRUE_SMTP_PASS: x
+      GOTRUE_SMTP_SENDER_NAME: PowerMac Connect
+      GOTRUE_MAILER_URLPATHS_INVITE: /auth/v1/verify
+      GOTRUE_MAILER_URLPATHS_CONFIRMATION: /auth/v1/verify
+      GOTRUE_MAILER_URLPATHS_RECOVERY: /auth/v1/verify
+      GOTRUE_MAILER_URLPATHS_EMAIL_CHANGE: /auth/v1/verify
+      GOTRUE_PASSWORD_MIN_LENGTH: 10
+      GOTRUE_SECURITY_REFRESH_TOKEN_ROTATION_ENABLED: "true"
+      GOTRUE_RATE_LIMIT_EMAIL_SENT: 1000
+
+  rest:
+    image: postgrest/postgrest:v14.1
+    restart: unless-stopped
+    depends_on:
+      db: { condition: service_healthy }
+    ports: ["127.0.0.1:54330:3000"]
+    environment:
+      PGRST_DB_URI: postgres://authenticator:postgres@db:5432/postgres
+      PGRST_DB_SCHEMAS: public
+      PGRST_DB_ANON_ROLE: anon
+      PGRST_JWT_SECRET: ${JWT_SECRET}
+      PGRST_DB_USE_LEGACY_GUCS: "false"
+      PGRST_APP_SETTINGS_JWT_SECRET: ${JWT_SECRET}
+      PGRST_APP_SETTINGS_JWT_EXP: 3600
+      PGRST_DB_MAX_ROWS: 5000
+
+  storage:
+    image: supabase/storage-api:v1.28.2
+    restart: unless-stopped
+    depends_on:
+      db: { condition: service_healthy }
+      rest: { condition: service_started }
+    ports: ["127.0.0.1:54331:5000"]
+    environment:
+      ANON_KEY: ${ANON_KEY}
+      SERVICE_KEY: ${SERVICE_KEY}
+      POSTGREST_URL: http://rest:3000
+      PGRST_JWT_SECRET: ${JWT_SECRET}
+      AUTH_JWT_SECRET: ${JWT_SECRET}
+      DATABASE_URL: postgres://supabase_storage_admin:postgres@db:5432/postgres
+      FILE_SIZE_LIMIT: 52428800
+      STORAGE_BACKEND: file
+      FILE_STORAGE_BACKEND_PATH: /var/lib/storage
+      TENANT_ID: stub
+      REGION: stub
+      GLOBAL_S3_BUCKET: stub
+      ENABLE_IMAGE_TRANSFORMATION: "false"
+    volumes:
+      - storage-data:/var/lib/storage
+
+  mail:
+    image: axllent/mailpit:v1.27
+    restart: unless-stopped
+    ports: ["127.0.0.1:54324:8025"]
+
+volumes:
+  storage-data:

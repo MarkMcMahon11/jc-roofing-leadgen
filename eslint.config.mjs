@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // separate app with its own package.json and lint config
+    "powermac-connect/**",
   ]),
 ]);
 
