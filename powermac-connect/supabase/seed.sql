@@ -26,6 +26,23 @@ create or replace function seed.pick(a text[]) returns text language sql volatil
 create or replace function seed.rnd(lo numeric, hi numeric) returns numeric language sql volatile as $$ select round(lo + seed.r() * (hi - lo), 2) $$;
 create or replace function seed.at_hour(d date, h numeric) returns timestamptz language sql immutable as $$ select (d::timestamp + make_interval(mins => (h * 60)::int)) at time zone 'Europe/London' $$;
 
+-- Books work into an operative's day sequentially from 08:00 (max 8 h/day), so demo data has
+-- no accidental double-bookings. Returns the start hour and length, or nulls when the day is full.
+create table seed.booked (emp uuid, day date, used numeric, primary key (emp, day));
+create or replace function seed.slot(p_emp uuid, p_day date, p_hours numeric, out start_hour numeric, out len numeric) language plpgsql as $$
+declare v_used numeric;
+begin
+  select used into v_used from seed.booked where emp = p_emp and day = p_day;
+  v_used := coalesce(v_used, 0);
+  len := round(least(p_hours, 8 - v_used) * 4) / 4;
+  if len < 1 then start_hour := null; len := null; return; end if;
+  insert into seed.booked values (p_emp, p_day, v_used + len) on conflict (emp, day) do update set used = excluded.used;
+  start_hour := 8 + v_used;
+end $$;
+create or replace function seed.weekday(d date, forward boolean default true) returns date language sql immutable as $$
+  select case extract(isodow from d)::int when 6 then d + case when forward then 2 else -1 end when 7 then d + case when forward then 1 else -2 end else d end
+$$;
+
 create or replace function seed.user(p_email text, p_name text, p_platform boolean default false) returns uuid
 language plpgsql as $$
 declare v_id uuid := gen_random_uuid();
@@ -55,7 +72,7 @@ declare
   o record; v_org uuid; v_con uuid; v_prop uuid; v_occ uuid; v_emp uuid; v_wo uuid; v_quo uuid; v_inv uuid; v_po uuid; v_sup uuid; v_loc uuid; v_mat uuid; v_veh uuid; v_rc uuid;
   orgs uuid[] := '{}'; contracts uuid[] := '{}'; props uuid[] := '{}'; emps uuid[] := '{}'; subs uuid[] := '{}'; sups uuid[] := '{}'; mats uuid[] := '{}'; locs uuid[] := '{}'; vans uuid[] := '{}';
   i int; j int; n int; d date; h numeric; v_status text; v_pri text; v_cat text; v_trade text; v_title text; v_rep timestamptz; v_due timestamptz; v_hours numeric; v_cost numeric;
-  v_start timestamptz; v_end timestamptz; v_done timestamptz; v_amt numeric; v_use_sub boolean;
+  v_start timestamptz; v_end timestamptz; v_done timestamptz; v_amt numeric; v_use_sub boolean; sl record; attempt int;
   streets text[] := array['Rowan Drive','Birch Grove','Thistle Street','Heather Avenue','Burnside Road','Glen Terrace','Mill Lane','Station Road','Park View','Castle Wynd','Hawthorn Court','Kirk Brae','Loch Place','Ashgrove Gardens','Bracken Way','Craigmore Road','Elder Street','Fernbank Avenue','Juniper Close','Moss Side Road'];
   wo_templates text[][] := array[
     array['Leaking kitchen tap','plumbing','plumber'], array['Front door not locking','windows_doors','joiner'], array['Replace failed extractor fan','electrical','electrician'],
@@ -356,17 +373,26 @@ begin
 
     -- finished jobs: actuals, assignments, timesheets, materials, satisfaction
     if v_status in ('completed','invoiced','closed') then
-      v_emp := emps[1 + floor(seed.r() * 12)::int];
-      v_start := v_rep + make_interval(hours => 4 + floor(seed.r() * 96)::int);
-      v_done := v_start + make_interval(mins => (v_hours * 60)::int);
-      if v_done > now() then v_done := now() - interval '2 hours'; v_start := v_done - make_interval(mins => (v_hours * 60)::int); end if;
+      -- a past weekday after the report, in a free slot of some operative's day
+      d := seed.weekday((v_rep at time zone 'Europe/London')::date + 1 + floor(seed.r() * 3)::int);
+      if d > current_date - 1 then d := seed.weekday(current_date - 1, false); end if;
+      for attempt in 1..40 loop
+        v_emp := emps[1 + floor(seed.r() * 12)::int];
+        sl := seed.slot(v_emp, d, v_hours);
+        exit when sl.start_hour is not null;
+        if attempt % 12 = 0 then d := seed.weekday(d - 1, false); end if;
+      end loop;
+      v_start := seed.at_hour(d, sl.start_hour);
+      -- multi-day works finish on a later day; the booking covers the first day
+      v_done := v_start + make_interval(mins => (sl.len * 60)::int) + make_interval(days => greatest(ceil(v_hours / 8)::int - 1, 0));
+      if v_done > now() then v_done := now() - interval '2 hours'; end if;
       update public.work_orders set actual_start = v_start, actual_end = v_done, completed_at = v_done,
              closed_at = case when v_status = 'closed' then v_done + interval '5 days' end,
              first_time_fix = seed.r() < 0.84, satisfaction_score = case when seed.r() < 0.7 then 3 + floor(seed.r() * 3)::int end,
              signoff_name = 'Occupant (demo)', signoff_at = v_done, completion_notes = 'Works completed as instructed. Area left clean and tidy.'
       where id = v_wo;
       insert into public.job_assignments (tenant_id, work_order_id, employee_id, scheduled_start, scheduled_end, status, arrived_at, started_at, finished_at)
-      values (t, v_wo, v_emp, v_start, greatest(v_done, v_start + interval '30 minutes'), 'completed', v_start - interval '10 minutes', v_start, v_done);
+      values (t, v_wo, v_emp, v_start, v_start + make_interval(mins => (sl.len * 60)::int), 'completed', v_start - interval '10 minutes', v_start, v_done);
       -- one timesheet per working day (max 8h each)
       for j in 0..(ceil(v_hours / 8) - 1)::int loop
         insert into public.timesheets (tenant_id, employee_id, work_order_id, work_date, hours, entry_type, status, approved_by, approved_at)
@@ -387,12 +413,16 @@ begin
         values (t, v_wo, 'subcontractor', 'Subcontract works', seed.rnd(180, 1400), (v_start at time zone 'Europe/London')::date, subs[1 + floor(seed.r() * 3)::int], 'manual');
       end if;
     elsif v_status in ('scheduled','in_progress','awaiting_inspection','awaiting_materials') then
-      v_emp := emps[1 + floor(seed.r() * 12)::int];
-      d := case when v_status = 'scheduled' then current_date + floor(seed.r() * 12)::int else current_date - floor(seed.r() * 2)::int end;
-      if extract(isodow from d) > 5 then d := d + (8 - extract(isodow from d)::int); end if;
-      h := 8 + floor(seed.r() * 6);
-      v_start := seed.at_hour(d, h);
-      v_end := v_start + make_interval(mins => (least(v_hours, 8) * 60)::int);
+      -- Callum (emps[1], the demo field user) gets a planned day below; others are booked into free slots
+      d := seed.weekday(case when v_status = 'scheduled' then current_date + floor(seed.r() * 12)::int else current_date - floor(seed.r() * 2)::int end);
+      for attempt in 1..40 loop
+        v_emp := emps[2 + floor(seed.r() * 11)::int];
+        sl := seed.slot(v_emp, d, v_hours);
+        exit when sl.start_hour is not null;
+        if attempt % 11 = 0 then d := seed.weekday(d + 1); end if;
+      end loop;
+      v_start := seed.at_hour(d, sl.start_hour);
+      v_end := v_start + make_interval(mins => (sl.len * 60)::int);
       v_use_sub := v_trade in ('electrician','roofer') and seed.r() < 0.6;
       insert into public.job_assignments (tenant_id, work_order_id, employee_id, subcontractor_id, scheduled_start, scheduled_end, status, arrived_at, started_at)
       values (t, v_wo, case when v_use_sub then null else v_emp end,
@@ -437,13 +467,14 @@ begin
   end loop;
 
   -- today's board: guarantee a realistic day for the operative demo user and the planner
-  for i in 0..3 loop
+  -- four visits today and two on the next working day, back to back with travel gaps
+  for i in 0..5 loop
     select id into v_wo from public.work_orders where tenant_id = t and status = 'approved' and not exists (select 1 from public.job_assignments a where a.work_order_id = work_orders.id) order by reported_at limit 1;
     exit when v_wo is null;
     update public.work_orders set status = 'scheduled' where id = v_wo;
-    d := current_date + case when extract(isodow from current_date) > 5 then 8 - extract(isodow from current_date)::int else 0 end;
+    d := case when i < 4 then seed.weekday(current_date) else seed.weekday(seed.weekday(current_date) + 1) end;
     insert into public.job_assignments (tenant_id, work_order_id, employee_id, scheduled_start, scheduled_end, status)
-    values (t, v_wo, emps[1], seed.at_hour(d, 8 + i * 2.25), seed.at_hour(d, 9.75 + i * 2.25), 'scheduled');
+    values (t, v_wo, emps[1], seed.at_hour(d, 8 + (i % 4) * 2.25), seed.at_hour(d, 9.75 + (i % 4) * 2.25), 'scheduled');
   end loop;
 
   -- ---------------------------------------------------------------- purchasing

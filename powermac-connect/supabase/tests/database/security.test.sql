@@ -8,7 +8,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set search_path = public, extensions;
 
-select plan(47);
+select plan(50);
 
 -- Helpers live in a throwaway schema (rolled back with the transaction).
 create schema tests;
@@ -188,6 +188,14 @@ select is(
 select is(
   (select changes->'phone' from audit_logs where entity = 'occupants' and action = 'update' order by id desc limit 1),
   '{"changed": true}'::jsonb, 'occupant personal data is redacted in the audit log');
+
+-- ---------------------------------------------------------------- company erasure (offboarding)
+select tests.login('director@powermac.test');
+select throws_ok($$select platform_delete_tenant((select id from tenants where slug = 'powermac-demo'), 'powermac-demo')$$, '42501', null, 'a company director cannot erase companies');
+select tests.login('admin@bpoai.test');
+select lives_ok($$select platform_delete_tenant((select id from tenants where slug = 'northgate-demo'), 'northgate-demo')$$, 'the platform admin can erase a company');
+select tests.logout();
+select is((select count(*)::int from work_orders where title like 'Northgate job%') + (select count(*)::int from organisations where name like 'Northgate%'), 0, 'all of the erased company''s records are gone');
 
 select * from finish();
 rollback;

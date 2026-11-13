@@ -6372,17 +6372,17 @@ export type Database = {
       }
       assignment_conflicts: {
         Args: {
-          p_exclude?: string
           p_end: string
           p_start: string
           p_employee: string
+          p_exclude?: string
         }
         Returns: {
-          starts_at: string
-          ref_id: string
-          kind: string
-          ends_at: string
           label: string
+          starts_at: string
+          ends_at: string
+          kind: string
+          ref_id: string
         }[]
       }
       dashboard_summary: {
@@ -6391,30 +6391,30 @@ export type Database = {
       }
       field_add_material: {
         Args: {
-          p_unit?: string
           p_tenant: string
+          p_client_ref?: string
           p_assignment: string
           p_description: string
           p_quantity: number
-          p_client_ref?: string
+          p_unit?: string
         }
         Returns: undefined
       }
       field_add_photo: {
         Args: {
           p_path: string
-          p_stage: string
-          p_caption?: string
           p_tenant: string
           p_assignment: string
+          p_stage: string
+          p_caption?: string
         }
         Returns: undefined
       }
       field_checklist: {
         Args: {
-          p_items: Json
-          p_checklist: string
           p_assignment: string
+          p_checklist: string
+          p_items: Json
           p_tenant: string
         }
         Returns: undefined
@@ -6424,9 +6424,9 @@ export type Database = {
         Returns: Json
       }
       field_my_jobs: {
-        Args: { p_to: string; p_from: string; p_tenant: string }
+        Args: { p_tenant: string; p_from: string; p_to: string }
         Returns: {
-          job_status_label: string
+          priority: string
           trade: string
           hazards: string[]
           access_notes: string
@@ -6437,45 +6437,45 @@ export type Database = {
           address: string
           scheduled_end: string
           scheduled_start: string
+          assignment_id: string
+          work_order_id: string
+          reference: string
+          title: string
           assignment_status: string
           status_colour: string
+          job_status_label: string
           job_status: string
-          priority: string
-          title: string
-          reference: string
-          work_order_id: string
-          assignment_id: string
         }[]
       }
       field_signoff: {
         Args: {
           p_assignment: string
-          p_satisfaction?: number
-          p_signature_path?: string
           p_tenant: string
+          p_signature_path?: string
+          p_satisfaction?: number
           p_name: string
         }
         Returns: undefined
       }
       field_submit_timesheet: {
         Args: {
-          p_client_ref?: string
-          p_tenant: string
-          p_assignment: string
           p_date: string
-          p_hours: number
-          p_type?: string
+          p_client_ref?: string
           p_notes?: string
+          p_type?: string
+          p_hours: number
+          p_assignment: string
+          p_tenant: string
         }
         Returns: undefined
       }
       field_update: {
         Args: {
-          p_assignment: string
-          p_action: string
           p_note?: string
-          p_client_ref?: string
           p_tenant: string
+          p_assignment: string
+          p_client_ref?: string
+          p_action: string
         }
         Returns: Json
       }
@@ -6493,10 +6493,10 @@ export type Database = {
         }[]
       }
       job_throughput: {
-        Args: { p_weeks?: number; p_tenant: string }
+        Args: { p_tenant: string; p_weeks?: number }
         Returns: {
-          week: string
           created: number
+          week: string
           completed: number
         }[]
       }
@@ -6515,11 +6515,11 @@ export type Database = {
         Args: { p_tenant: string }
         Returns: {
           link: string
-          detail: string
-          title: string
-          kind: string
-          severity: string
           due: string
+          severity: string
+          kind: string
+          title: string
+          detail: string
         }[]
       }
       platform_create_tenant: {
@@ -6558,7 +6558,7 @@ export type Database = {
         Returns: undefined
       }
       portal_add_message: {
-        Args: { p_job: string; p_tenant: string; p_body: string }
+        Args: { p_tenant: string; p_job: string; p_body: string }
         Returns: undefined
       }
       portal_can_view_photo: {
@@ -6568,65 +6568,58 @@ export type Database = {
       portal_contracts: {
         Args: { p_tenant: string }
         Returns: {
-          start_date: string
-          id: string
-          jobs_completed: number
-          jobs_open: number
-          title: string
-          contract_type: string
           on_time_pct: number
-          avg_satisfaction: number
-          reference: string
-          end_date: string
+          id: string
           status: string
+          contract_type: string
+          title: string
+          jobs_open: number
+          jobs_completed: number
+          reference: string
+          start_date: string
+          avg_satisfaction: number
+          end_date: string
         }[]
       }
       portal_decide_quote: {
         Args: {
+          p_reason?: string
+          p_tenant: string
+          p_name: string
           p_approve: boolean
           p_quote: string
-          p_tenant: string
-          p_reason?: string
-          p_name: string
         }
         Returns: undefined
       }
       portal_invoices: {
         Args: { p_tenant: string }
         Returns: {
-          subtotal: number
-          due_date: string
-          issue_date: string
           status: string
           reference: string
-          id: string
-          purchase_order_ref: string
           job_reference: string
+          purchase_order_ref: string
+          due_date: string
+          subtotal: number
+          id: string
+          issue_date: string
           amount_paid: number
-          total: number
           vat_total: number
+          total: number
         }[]
       }
       portal_job: {
-        Args: { p_tenant: string; p_job: string }
+        Args: { p_job: string; p_tenant: string }
         Returns: Json
       }
       portal_jobs: {
         Args: {
+          p_tenant: string
           p_limit?: number
           p_search?: string
           p_open_only?: boolean
-          p_tenant: string
         }
         Returns: {
           status_colour: string
-          status_label: string
-          client_reference: string
-          reference: string
-          id: string
-          title: string
-          completed_at: string
-          scheduled_start: string
           target_completion_at: string
           reported_at: string
           postcode: string
@@ -6634,6 +6627,13 @@ export type Database = {
           property_id: string
           priority: string
           is_open: boolean
+          status_label: string
+          title: string
+          client_reference: string
+          reference: string
+          id: string
+          completed_at: string
+          scheduled_start: string
         }[]
       }
       portal_overview: {
@@ -6641,45 +6641,45 @@ export type Database = {
         Returns: Json
       }
       portal_properties: {
-        Args: { p_tenant: string; p_search?: string }
+        Args: { p_search?: string; p_tenant: string }
         Returns: {
-          open_jobs: number
-          id: string
-          reference: string
-          postcode: string
           client_reference: string
           address: string
           town: string
-          status: string
+          postcode: string
           property_type: string
+          status: string
+          open_jobs: number
+          id: string
+          reference: string
         }[]
       }
       portal_quotes: {
         Args: { p_tenant: string }
         Returns: {
-          id: string
+          vat_total: number
+          job_id: string
+          job_reference: string
+          address: string
+          lines: Json
+          decided_at: string
+          sent_at: string
+          valid_until: string
+          subtotal: number
           total: number
           status: string
           title: string
           reference: string
-          lines: Json
-          address: string
-          job_reference: string
-          vat_total: number
-          subtotal: number
-          valid_until: string
-          sent_at: string
-          decided_at: string
-          job_id: string
+          id: string
         }[]
       }
       portal_submit_request: {
         Args: {
-          p_tenant: string
-          p_description: string
           p_title: string
+          p_tenant: string
           p_property: string
           p_client_reference?: string
+          p_description: string
           p_priority: string
         }
         Returns: string
@@ -6687,7 +6687,7 @@ export type Database = {
       recommend_operatives: {
         Args: { p_end: string; p_start: string; p_work_order: string }
         Returns: {
-          employee_id: string
+          skills: string[]
           reasons: string[]
           conflicts: number
           total_score: number
@@ -6698,9 +6698,9 @@ export type Database = {
           booked_hours_day: number
           distance_km: number
           colour: string
-          skills: string[]
           trade: string
           name: string
+          employee_id: string
         }[]
       }
       run_retention: {
@@ -6711,13 +6711,17 @@ export type Database = {
           entity: string
         }[]
       }
+      schedule_people: {
+        Args: { p_tenant: string; p_to: string; p_from: string }
+        Returns: Json
+      }
       search_everything: {
-        Args: { p_limit?: number; p_query: string; p_tenant: string }
+        Args: { p_query: string; p_tenant: string; p_limit?: number }
         Returns: {
           subtitle: string
+          kind: string
           id: string
           title: string
-          kind: string
           link: string
         }[]
       }
