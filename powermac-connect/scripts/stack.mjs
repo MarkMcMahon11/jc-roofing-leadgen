@@ -41,11 +41,17 @@ function waitFor(label, check, tries = 120) {
 }
 const authReady = () => out(`docker compose exec -T db psql -U postgres -tAc "select to_regclass('auth.users') is not null and to_regclass('storage.objects') is not null and exists(select 1 from auth.schema_migrations)"`) === "t";
 
+// Applies migrations not yet recorded in supabase_migrations.schema_migrations (same table the Supabase CLI uses).
 function migrate() {
   const dir = join(ROOT, "supabase/migrations");
+  out(`docker compose exec -T db psql -U postgres -tAc "create schema if not exists supabase_migrations; create table if not exists supabase_migrations.schema_migrations (version text primary key, name text, statements text[])"`);
+  const applied = new Set(out(`docker compose exec -T db psql -U postgres -tAc "select version from supabase_migrations.schema_migrations"`).split("\n").filter(Boolean));
   for (const f of readdirSync(dir).filter((f) => f.endsWith(".sql")).sort()) {
+    const version = f.split("_")[0];
+    if (applied.has(version)) continue;
     console.log(`[migrate] ${f}`);
     psql(join(dir, f));
+    out(`docker compose exec -T db psql -U postgres -tAc "insert into supabase_migrations.schema_migrations (version, name) values ('${version}', '${f.replace(/'/g, "")}')"`);
   }
   reloadRest();
 }
@@ -97,7 +103,7 @@ if (cmd === "up" || cmd === "reset") {
   console.log("\nLocal stack ready.\n  API      http://127.0.0.1:54321\n  Postgres postgresql://postgres:postgres@127.0.0.1:54322/postgres\n  Mail     http://127.0.0.1:54324\n");
 } else if (cmd === "migrate" || cmd === "seed") {
   sh("docker compose stop rest storage");
-  try { cmd === "migrate" ? migrate() : seed(); } finally { sh("docker compose start rest storage"); }
+  try { if (cmd === "migrate") migrate(); else seed(); } finally { sh("docker compose start rest storage"); }
 }
 else if (cmd === "down") sh("docker compose down");
 else if (cmd === "env") writeEnv();

@@ -1,0 +1,147 @@
+@import "tailwindcss";
+
+/* =====================================================================================
+   POWERMAC CONNECT design tokens
+   Deep navy + graphite surfaces, one electric-blue accent, status colours used only for
+   meaning. Text contrast: --color-fg 15:1, --color-muted 7.3:1, --color-subtle 4.6:1 on
+   the card surface (WCAG AA for all text sizes).
+   ===================================================================================== */
+@theme {
+  --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, "SFMono-Regular", monospace;
+
+  --color-canvas: #060a14;     /* app background */
+  --color-base: #0a101e;       /* sidebar, top bar */
+  --color-surface: #0f1729;    /* cards */
+  --color-raised: #152038;     /* hover, inputs, nested panels */
+  --color-sunken: #0b1222;     /* table heads, wells */
+  --color-line: #1f2a42;       /* hairlines */
+  --color-line-strong: #2c3a58;/* control borders (3.1:1 vs surface) */
+
+  --color-fg: #e8edf7;
+  --color-muted: #a3aec4;
+  --color-subtle: #8090ab;
+
+  --color-accent: #2f7dff;     /* electric blue */
+  --color-accent-hi: #66a3ff;  /* accent text on dark (6.6:1) */
+  --color-accent-lo: #10244d;  /* accent wash */
+
+  --color-ok: #2fbf71;
+  --color-ok-lo: #0c2a1d;
+  --color-warn: #f2a93b;
+  --color-warn-lo: #2f220b;
+  --color-bad: #f0524f;
+  --color-bad-lo: #34110f;
+  --color-info: #3ec1e6;
+  --color-info-lo: #0b2833;
+
+  --radius-card: 14px;
+  --shadow-card: 0 1px 0 0 rgb(255 255 255 / 0.03) inset, 0 10px 30px -12px rgb(0 0 0 / 0.6);
+  --shadow-pop: 0 20px 50px -12px rgb(0 0 0 / 0.75), 0 0 0 1px rgb(255 255 255 / 0.04);
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  background: var(--color-canvas);
+  color: var(--color-fg);
+}
+
+body {
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01", "cv01";
+  -webkit-font-smoothing: antialiased;
+  /* faint blueprint grid + a cool glow at the top: the command-centre backdrop */
+  background-image:
+    radial-gradient(1200px 500px at 70% -10%, rgb(47 125 255 / 0.10), transparent 60%),
+    linear-gradient(rgb(102 163 255 / 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(102 163 255 / 0.035) 1px, transparent 1px);
+  background-size: auto, 48px 48px, 48px 48px;
+  background-attachment: fixed;
+}
+
+::selection {
+  background: rgb(47 125 255 / 0.4);
+}
+
+/* numbers line up in tables and KPI tiles */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* visible, consistent keyboard focus everywhere */
+:focus-visible {
+  outline: 2px solid var(--color-accent-hi);
+  outline-offset: 2px;
+}
+
+/* thin, dark scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line-strong) transparent;
+}
+
+/* Surface used for cards: subtle top highlight, hairline border */
+.pm-card {
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.025), transparent 120px), var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+
+/* Leaflet in dark UI */
+.leaflet-container {
+  background: #0b1222;
+  font-family: var(--font-sans);
+}
+.leaflet-tile-pane {
+  filter: brightness(0.62) invert(1) contrast(0.9) hue-rotate(200deg) saturate(0.35) brightness(0.85);
+}
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: var(--color-raised);
+  color: var(--color-fg);
+  box-shadow: var(--shadow-pop);
+}
+.leaflet-popup-content {
+  margin: 12px 14px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+.leaflet-container a.leaflet-popup-close-button {
+  color: var(--color-muted);
+}
+.leaflet-control-attribution {
+  background: rgb(10 16 30 / 0.8) !important;
+  color: var(--color-subtle) !important;
+}
+.leaflet-control-attribution a {
+  color: var(--color-muted) !important;
+}
+.leaflet-bar a {
+  background: var(--color-raised);
+  color: var(--color-fg);
+  border-color: var(--color-line);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media print {
+  body {
+    background: #fff;
+    color: #000;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
