@@ -89,3 +89,8 @@ export function durationLabel(ms: number): string {
   if (h > 0) return `${h}h ${m}m`;
   return `${m}m`;
 }
+
+/** The current instant, read once per server render (keeps components pure). */
+export function nowMs(): number {
+  return Date.now();
+}

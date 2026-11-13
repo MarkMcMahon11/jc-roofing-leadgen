@@ -45,6 +45,7 @@ type Props = {
   config: PlannerConfig;
   operatives: Operative[];
   subs: Sub[];
+  subOptions: Sub[];
   bookings: Booking[];
   absences: Absence[];
   queue: QueueJob[];
@@ -55,7 +56,7 @@ type Props = {
   mobileDayLinks: { prev: string; next: string };
 };
 
-export function Planner({ config, operatives, subs, bookings, absences, queue, queueTotal, statuses, tradeOptions, dayLinks, mobileDayLinks }: Props) {
+export function Planner({ config, operatives, subs, subOptions, bookings, absences, queue, queueTotal, statuses, tradeOptions, dayLinks, mobileDayLinks }: Props) {
   const { canEdit } = config;
   const [board, change] = useOptimistic<Board, Change>({ bookings, queue }, reduce);
   const [saving, startSaving] = useTransition();
@@ -268,6 +269,7 @@ export function Planner({ config, operatives, subs, bookings, absences, queue, q
           today={config.today}
           operatives={operatives}
           subs={subs}
+          subOptions={subOptions}
           bookings={board.bookings}
           absences={absences}
           clashes={clashes}
@@ -276,15 +278,15 @@ export function Planner({ config, operatives, subs, bookings, absences, queue, q
           api={{ ...api, pick: null }}
           busy={busy}
           links={mobileDayLinks}
-          linkPeople={config.seesWorkforce}
-          linkSubs
+          linkPeople={config.linkPeople}
+          linkSubs={config.linkSubs}
           tradeLabel={tradeLabel}
           onBook={(jobId, who, s) => void run({ kind: "create", jobId, ...who, ...slotTimes(s) })}
         />
       </div>
 
       {/* tablets and desktops: queue + visual planner */}
-      <div className="hidden gap-5 md:grid lg:grid-cols-[316px_minmax(0,1fr)]">
+      <div className="hidden gap-5 md:grid lg:grid-cols-[288px_minmax(0,1fr)]">
         <aside className="min-w-0 lg:sticky lg:top-28 lg:self-start">
           <QueuePanel
             queue={board.queue}
@@ -358,8 +360,8 @@ export function Planner({ config, operatives, subs, bookings, absences, queue, q
               clashes={clashes}
               statuses={statuses}
               api={api}
-              linkPeople={config.seesWorkforce}
-              linkSubs
+              linkPeople={config.linkPeople}
+              linkSubs={config.linkSubs}
             />
           ) : (
             <DayGrid
@@ -373,8 +375,8 @@ export function Planner({ config, operatives, subs, bookings, absences, queue, q
               clashes={clashes}
               statuses={statuses}
               api={api}
-              linkPeople={config.seesWorkforce}
-              linkSubs
+              linkPeople={config.linkPeople}
+              linkSubs={config.linkSubs}
             />
           )}
         </Card>
@@ -384,11 +386,12 @@ export function Planner({ config, operatives, subs, bookings, absences, queue, q
         booking={openBooking}
         operatives={operatives}
         subs={subs}
+        subOptions={subOptions}
         statuses={statuses}
         clash={openBooking ? clashes.get(openBooking.id) : undefined}
         canEdit={canEdit}
-        linkPeople={config.seesWorkforce}
-        linkSubs
+        linkPeople={config.linkPeople}
+        linkSubs={config.linkSubs}
         busy={busy}
         onClose={() => setOpenId(null)}
         onSave={(p, opts) => void run(p, opts)}

@@ -172,7 +172,7 @@ export async function saveSla(_: ActionResult, formData: FormData): Promise<Acti
   );
   if (error) return fromDb(error);
   touch(d.contract_id);
-  return { ok: true, message: "Saved." };
+  return { ok: true };
 }
 
 export async function removeSla(contractId: string, priority: string): Promise<ActionResult> {

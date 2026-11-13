@@ -36,7 +36,7 @@ export function QueuePanel({
   }, [selectedId]);
 
   return (
-    <Card className="flex min-h-0 flex-col overflow-hidden max-h-[480px] lg:max-h-[calc(100dvh-8rem)]" aria-label="Unscheduled jobs">
+    <Card className="flex min-h-0 flex-col overflow-hidden max-h-[480px] lg:max-h-[calc(100dvh-150px)]" aria-label="Unscheduled jobs">
       <div className="border-b border-line px-4 pt-4 pb-3">
         <div className="flex items-baseline justify-between gap-2">
           <h2 className="text-[15px] font-semibold text-fg">Unscheduled</h2>
@@ -124,7 +124,7 @@ export function QueuePanel({
                   {st && <ColourBadge colour={st.colour}>{st.label}</ColourBadge>}
                 </div>
               </div>
-              {selected && <div className="mt-1.5 mb-2 rounded-xl border border-[#1d3d78] bg-chrome/70 p-3">{renderSelected(j)}</div>}
+              {selected && <div className="mt-1.5 mb-2 min-w-0 overflow-hidden rounded-xl border border-[#1d3d78] bg-chrome/70 p-3">{renderSelected(j)}</div>}
             </li>
           );
         })}

@@ -56,3 +56,8 @@ export function isoToLondonDate(iso: string | null | undefined) {
 export function isoToLondonTime(iso: string | null | undefined) {
   return isoToLondonInput(iso).slice(11, 16);
 }
+
+/** ISO timestamp `days` days before now (negative = in the future). */
+export function isoDaysAgo(days: number) {
+  return new Date(Date.now() - days * 86_400_000).toISOString();
+}

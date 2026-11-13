@@ -12,8 +12,8 @@ export const DAY_START = 7 * 60;
 export const DAY_END = 19 * 60;
 const SPAN = DAY_END - DAY_START;
 const SLOTS = SPAN / 30;
-const LABEL_W = 208;
-const SLOT_MIN_W = 34;
+const LABEL_W = 176;
+const SLOT_MIN_W = 26;
 const LANE_H = 40;
 
 const pct = (min: number) => ((Math.min(DAY_END, Math.max(DAY_START, min)) - DAY_START) / SPAN) * 100;
@@ -59,7 +59,7 @@ export function DayGrid({ date, today, nowIso, operatives, subs, bookings, absen
   const timeline = (key: string, name: string, base: Omit<Target, "minutes">, list: Booking[], colour: string, extras: { op?: Operative; abs?: Absence[] }) => {
     const { lane, count } = assignLanes(list);
     const height = Math.max(64, count * LANE_H + 16);
-    const win = extras.op && !extras.op.restricted ? workWindow(extras.op, date) : undefined;
+    const win = extras.op ? workWindow(extras.op, date) : undefined;
     const preview = hover?.key === key && api.drag ? hover.slot : null;
     return (
       <div
@@ -129,7 +129,6 @@ export function DayGrid({ date, today, nowIso, operatives, subs, bookings, absen
               clash={clashes.get(b.id)}
               api={api}
               variant="day"
-              className="absolute z-[2]"
               style={{ left: `calc(${left}% + 1px)`, width: `calc(${width}% - 2px)`, top: 8 + (lane.get(b.id) ?? 0) * LANE_H, height: LANE_H - 6 }}
             />
           );
@@ -192,13 +191,15 @@ export function DayGrid({ date, today, nowIso, operatives, subs, bookings, absen
             <div key={op.id} role="row" className="contents">
               <div role="rowheader" className={cx("sticky left-0 z-10 flex flex-col justify-center gap-1 border-b border-line/70 bg-surface px-3 py-2", reasons.length > 0 && "shadow-[inset_3px_0_0_#f0524f]")}>
                 <OperativeLabel op={op} linkable={linkPeople} />
-                <div className="flex items-center gap-2 pl-[42px]">
-                  {!op.restricted && (
-                    <div className="min-w-0 flex-1">
-                      <LoadBar booked={bookedHours(list, date)} cap={capacityHours(op, date, absences)} maxDaily={op.maxDaily} working={Boolean(workWindow(op, date))} />
+                <div className="grid gap-1 pl-[42px]">
+                  {reasons.length > 0 && (
+                    <div>
+                      <ClashChip reasons={reasons} />
                     </div>
                   )}
-                  {reasons.length > 0 && <ClashChip reasons={reasons} />}
+                  <div className="min-w-0">
+                      <LoadBar booked={bookedHours(list, date)} cap={capacityHours(op, date, absences)} maxDaily={op.maxDaily} working={Boolean(workWindow(op, date))} absent={abs.some((a) => a.status === "approved") && capacityHours(op, date, absences) === 0} />
+                    </div>
                 </div>
               </div>
               {timeline(`e:${op.id}`, op.name, { employeeId: op.id, subcontractorId: null, date }, list, op.colour, { op, abs })}

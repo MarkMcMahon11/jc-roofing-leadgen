@@ -23,8 +23,8 @@ type Props = {
   linkSubs: boolean;
 };
 
-const LABEL_W = 208;
-const DAY_MIN_W = 148;
+const LABEL_W = 176;
+const DAY_MIN_W = 122;
 
 export function WeekGrid({ days, today, operatives, subs, bookings, absences, clashes, statuses, api, linkPeople, linkSubs }: Props) {
   const [hover, setHover] = useState<string | null>(null);
@@ -81,7 +81,7 @@ export function WeekGrid({ days, today, operatives, subs, bookings, absences, cl
     const weekHours = days.reduce((s, d) => s + bookedHours(mine, d), 0);
     return (
       <div key={op.id} role="row" className="contents">
-        <div role="rowheader" className="sticky left-0 z-10 flex items-center border-b border-line/70 bg-surface px-3 py-2">
+        <div role="rowheader" className="sticky left-0 z-10 flex items-start border-b border-line/70 bg-surface px-3 pt-3 pb-2">
           <OperativeLabel op={op} weekHours={weekHours} linkable={linkPeople} />
         </div>
         {days.map((d) => {
@@ -108,14 +108,14 @@ export function WeekGrid({ days, today, operatives, subs, bookings, absences, cl
               {list.map((b) => (
                 <BookingBlock key={b.id} b={b} date={d} colour={op.colour} status={statuses[b.job.status]} clash={clashes.get(b.id)} api={api} />
               ))}
-              {!op.restricted && <LoadBar booked={booked} cap={cap} maxDaily={op.maxDaily} working={Boolean(win)} />}
+              <LoadBar booked={booked} cap={cap} maxDaily={op.maxDaily} working={Boolean(win)} absent={abs.some((a) => a.status === "approved") && cap === 0} />
             </>,
             {
               label: `${op.name}, ${fmtDay(d)}: ${list.length} booking${list.length === 1 ? "" : "s"}${abs.length ? `, ${abs.map((a) => a.label).join(", ")}` : ""}${reasons.length ? ", clash" : ""}`,
               title: reasons.length ? `Clash:\n${reasons.map((r) => `• ${r}`).join("\n")}` : undefined,
               className: cx(
                 d === today && "bg-accent-lo/[0.12]",
-                !op.restricted && !win && "bg-sunken/70",
+                !win && "bg-sunken/70",
                 reasons.length > 0 && "outline-2 -outline-offset-2 outline-bad",
                 requestedOnly && "shadow-[inset_0_0_0_1px_rgb(138_100_32/0.8)]",
               ),
@@ -131,7 +131,7 @@ export function WeekGrid({ days, today, operatives, subs, bookings, absences, cl
     const mine = bookings.filter((b) => b.subcontractorId === s.id);
     return (
       <div key={s.id} role="row" className="contents">
-        <div role="rowheader" className="sticky left-0 z-10 flex items-center border-b border-line/70 bg-surface px-3 py-2">
+        <div role="rowheader" className="sticky left-0 z-10 flex items-start border-b border-line/70 bg-surface px-3 pt-3 pb-2">
           <SubLabel sub={s} linkable={linkSubs} />
         </div>
         {days.map((d) => {
@@ -164,19 +164,21 @@ export function WeekGrid({ days, today, operatives, subs, bookings, absences, cl
             const href = api.dayHref(d);
             const body = (
               <>
-                <span className={cx("text-[11px] font-medium tracking-wide uppercase", isToday ? "text-accent-hi" : "text-subtle")}>{fmtDay(d, { weekday: "short" })}</span>
-                <span className={cx("text-[15px] font-semibold tabular", isToday ? "text-fg" : weekendDay ? "text-muted" : "text-fg")}>{fmtDay(d, { day: "numeric", month: "short" })}</span>
-                {isToday && <span className="rounded-full bg-accent px-1.5 text-[10px] font-semibold text-white">Today</span>}
+                <span className="flex items-center justify-between gap-1">
+                  <span className={cx("text-[11px] font-medium tracking-wide uppercase", isToday ? "text-accent-hi" : "text-subtle")}>{fmtDay(d, { weekday: "short" })}</span>
+                  {isToday && <span className="rounded-full bg-accent px-1.5 text-[10px] font-semibold text-white">Today</span>}
+                </span>
+                <span className={cx("block text-[15px] font-semibold tabular", isToday ? "text-fg" : weekendDay ? "text-muted" : "text-fg")}>{fmtDay(d, { day: "numeric", month: "short" })}</span>
               </>
             );
             return (
               <div key={d} role="columnheader" className={cx("sticky top-0 z-20 border-b border-l border-line bg-sunken", isToday && "bg-[#0f2147]")}>
                 {href ? (
-                  <Link href={href} scroll={false} className="flex items-baseline gap-2 px-3 py-2 hover:bg-raised" title={`Open ${fmtDay(d)} in the day view`}>
+                  <Link href={href} scroll={false} className="block px-3 py-2 hover:bg-raised" title={`Open ${fmtDay(d)} in the day view`}>
                     {body}
                   </Link>
                 ) : (
-                  <div className="flex items-baseline gap-2 px-3 py-2">{body}</div>
+                  <div className="px-3 py-2">{body}</div>
                 )}
               </div>
             );

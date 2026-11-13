@@ -99,8 +99,9 @@ export function BookingBlock({
       data-booking={b.id}
       data-ref={b.job.reference}
       className={cx(
-        "group/block relative min-w-0 overflow-hidden rounded-md border text-left transition-[opacity,box-shadow] outline-none select-none focus-visible:ring-2 focus-visible:ring-accent-hi",
+        "group/block min-w-0 overflow-hidden rounded-md border text-left transition-[opacity,box-shadow] outline-none select-none focus-visible:ring-2 focus-visible:ring-accent-hi",
         draggable ? "cursor-grab active:cursor-grabbing" : "cursor-pointer",
+        variant === "day" ? "absolute z-[2]" : "relative",
         variant === "week" && "px-2 py-1 text-[11.5px] leading-[1.3]",
         variant === "day" && "flex items-center gap-1.5 px-2 text-[11.5px] leading-tight",
         variant === "agenda" && "px-3 py-2 text-[13px]",
@@ -122,14 +123,16 @@ export function BookingBlock({
       ) : (
         <>
           <div className="flex items-center justify-between gap-1">
-            <span className={cx("font-medium tabular", variant === "agenda" ? "text-fg" : "text-fg/90")}>{when}</span>
-            <span className="flex min-w-0 items-center gap-1">
+            <span className={cx("font-medium whitespace-nowrap tabular", variant === "agenda" ? "text-fg" : "text-fg/90")}>{when}</span>
+            <span className="flex shrink-0 items-center gap-1">
               {b.pending && <Loader2 className="size-3 animate-spin text-accent-hi" aria-label="Saving" />}
-              {asg && <span className="truncate text-[10.5px] text-muted">{asg}</span>}
-              <span className="size-2 shrink-0 rounded-full" style={{ backgroundColor: status?.colour ?? "#64748b" }} title={`Job status: ${status?.label ?? b.job.status}`} />
+              <span className="size-2 rounded-full" style={{ backgroundColor: status?.colour ?? "#64748b" }} title={`Job status: ${status?.label ?? b.job.status}`} />
             </span>
           </div>
-          <div className="font-mono text-[11px] tracking-tight text-accent-hi">{b.job.reference}</div>
+          <div className="flex min-w-0 items-baseline justify-between gap-1">
+            <span className="shrink-0 font-mono text-[11px] tracking-tight text-accent-hi">{b.job.reference}</span>
+            {asg && <span className="min-w-0 truncate text-[10px] text-subtle">{asg}</span>}
+          </div>
           <div className={cx("truncate", variant === "agenda" ? "text-fg" : "text-muted")}>{b.job.title}</div>
           {variant === "agenda" && b.job.postcode && <div className="mt-0.5 text-xs text-subtle">{b.job.postcode}</div>}
         </>
@@ -167,8 +170,9 @@ export function loadTone(booked: number, cap: number, maxDaily: number) {
 const toneColour = { ok: "#2fbf71", warn: "#f2a93b", bad: "#f0524f" };
 
 /** Per-cell load: hours booked against that day's bookable hours. */
-export function LoadBar({ booked, cap, maxDaily, working }: { booked: number; cap: number; maxDaily: number; working: boolean }) {
+export function LoadBar({ booked, cap, maxDaily, working, absent }: { booked: number; cap: number; maxDaily: number; working: boolean; absent?: boolean }) {
   if (!working && booked === 0) return <div className="mt-auto pt-1 text-[10.5px] text-subtle">Day off</div>;
+  if (absent && booked === 0) return <div className="mt-auto pt-1 text-[10.5px] text-subtle">Unavailable</div>;
   const tone = loadTone(booked, cap, maxDaily);
   const pct = cap > 0 ? Math.min(100, (booked / cap) * 100) : booked > 0 ? 100 : 0;
   const label = `${hoursLabel(booked)} of ${hoursLabel(cap)} booked${booked > maxDaily + 0.01 ? ` (over the ${hoursLabel(maxDaily)} daily maximum)` : ""}`;
@@ -195,10 +199,10 @@ export function OperativeLabel({ op, weekHours, linkable }: { op: Operative; wee
         style={{ background: `linear-gradient(135deg, ${op.colour}, ${op.colour}99)` }}
         aria-hidden
       >
-        {op.restricted ? "?" : initials(op.name)}
+        {initials(op.name)}
       </span>
       <div className="min-w-0">
-        {linkable && !op.restricted ? (
+        {linkable ? (
           <Link href={`/workforce/${op.id}`} className="block truncate text-[13px] font-medium text-fg hover:text-accent-hi hover:underline">
             {op.name}
           </Link>
@@ -208,7 +212,7 @@ export function OperativeLabel({ op, weekHours, linkable }: { op: Operative; wee
         <span className="flex items-center gap-1.5 truncate text-[11.5px] text-subtle">
           <span className="truncate">{op.tradeLabel}</span>
           {op.employmentStatus === "on_leave" && <span className="rounded bg-warn-lo px-1 text-[10px] text-[#ffc56b]">On leave</span>}
-          {weekHours !== undefined && !op.restricted && <span className="tabular">· {hoursLabel(weekHours)}</span>}
+          {weekHours !== undefined && <span className="tabular">· {hoursLabel(weekHours)}</span>}
         </span>
       </div>
     </div>

@@ -184,7 +184,7 @@ export function PersonalDataButton({ employeeId, values, exists }: { employeeId:
         <ActionForm action={savePersonalData} onSuccess={close} className="grid gap-4 sm:grid-cols-2">
           <input type="hidden" name="employee_id" value={employeeId} />
           <TextField name="date_of_birth" label="Date of birth" type="date" defaultValue={values.date_of_birth ?? ""} />
-          <TextField name="ni_number" label="National Insurance number" defaultValue={values.ni_number ?? ""} maxLength={13} autoComplete="off" hint="Format QQ123456C" />
+          <TextField name="ni_number" label="National Insurance number" defaultValue={values.ni_number ?? ""} maxLength={13} autoComplete="off" hint="Two letters, six digits, one letter A-D, e.g. AB123456C" />
           <TextAreaField name="home_address" label="Home address" rows={2} maxLength={500} defaultValue={values.home_address ?? ""} className="sm:col-span-2" />
           <TextField name="personal_phone" label="Personal phone" type="tel" maxLength={40} defaultValue={values.personal_phone ?? ""} autoComplete="off" />
           <TextField name="hourly_cost" label="Hourly cost (£, pay rate)" type="number" min={0} step="0.01" defaultValue={values.hourly_cost ?? ""} hint="Used to cost timesheets. Never shown outside this card." />

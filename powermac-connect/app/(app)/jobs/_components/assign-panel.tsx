@@ -79,6 +79,7 @@ export function AssignPanel({
         setConfirming(null);
         setSuccess(res.message ?? "Assigned.");
         setRows(null);
+        if (role === "lead") setRole("support");
         setSub("");
       } else if (res.needsConfirm) setConfirming({ who, result: res });
       else setError(res.message ?? "The assignment could not be saved.");
@@ -86,6 +87,33 @@ export function AssignPanel({
   };
 
   const chosenSub = subcontractors.find((s) => s.id === sub);
+
+  const clashBox = () =>
+    confirming && (
+      <div className="rounded-xl border border-[#5a1f1d] bg-bad-lo/60 p-4" role="alertdialog" aria-labelledby="clash-title" ref={(el) => el?.scrollIntoView({ block: "nearest", behavior: "smooth" })}>
+        <p id="clash-title" className="flex items-center gap-2 font-semibold text-[#ffb3b1]">
+          <AlertTriangle className="size-4" aria-hidden /> {confirming.result.message}
+        </p>
+        {confirming.result.conflicts && confirming.result.conflicts.length > 0 && (
+          <ul className="mt-2 grid gap-1 text-sm text-[#ffd0ce]">
+            {confirming.result.conflicts.map((c: Clash, i) => (
+              <li key={i}>
+                <span className="font-medium">{c.kind === "absence" ? "Absence" : "Booked"}:</span> {c.label} · {fmt(c.starts_at)} - {time(c.ends_at)}
+              </li>
+            ))}
+          </ul>
+        )}
+        <div className="mt-3 flex flex-wrap gap-2">
+          <button type="button" className={buttonClass("danger", "sm")} disabled={pending} onClick={() => assign(confirming.who, true)}>
+            {pending && <Loader2 className="size-3.5 animate-spin" aria-hidden />}
+            {confirming.who.kind === "employee" ? `Assign ${confirming.who.name} anyway` : `I have checked their cover - assign ${confirming.who.name}`}
+          </button>
+          <button type="button" className={buttonClass("ghost", "sm")} onClick={() => setConfirming(null)}>
+            Choose someone else
+          </button>
+        </div>
+      </div>
+    );
 
   return (
     <Card>
@@ -129,32 +157,6 @@ export function AssignPanel({
               See the day on the schedule
             </Link>
           </Notice>
-        )}
-
-        {confirming && (
-          <div className="rounded-xl border border-[#5a1f1d] bg-bad-lo/60 p-4" role="alertdialog" aria-labelledby="clash-title">
-            <p id="clash-title" className="flex items-center gap-2 font-semibold text-[#ffb3b1]">
-              <AlertTriangle className="size-4" aria-hidden /> {confirming.result.message}
-            </p>
-            {confirming.result.conflicts && confirming.result.conflicts.length > 0 && (
-              <ul className="mt-2 grid gap-1 text-sm text-[#ffd0ce]">
-                {confirming.result.conflicts.map((c: Clash, i) => (
-                  <li key={i}>
-                    <span className="font-medium">{c.kind === "absence" ? "Absence" : "Booked"}:</span> {c.label} · {fmt(c.starts_at)} - {time(c.ends_at)}
-                  </li>
-                ))}
-              </ul>
-            )}
-            <div className="mt-3 flex flex-wrap gap-2">
-              <button type="button" className={buttonClass("danger", "sm")} disabled={pending} onClick={() => assign(confirming.who, true)}>
-                {pending && <Loader2 className="size-3.5 animate-spin" aria-hidden />}
-                {confirming.who.kind === "employee" ? `Assign ${confirming.who.name} anyway` : `I have checked their cover - assign ${confirming.who.name}`}
-              </button>
-              <button type="button" className={buttonClass("ghost", "sm")} onClick={() => setConfirming(null)}>
-                Choose someone else
-              </button>
-            </div>
-          </div>
         )}
 
         {rows && (
@@ -234,6 +236,7 @@ export function AssignPanel({
                         {busy === r.employee_id ? <Loader2 className="size-3.5 animate-spin" aria-hidden /> : <UserPlus className="size-3.5" aria-hidden />}
                         Assign
                       </button>
+                      {confirming?.who.kind === "employee" && confirming.who.id === r.employee_id && <div className="sm:col-span-3">{clashBox()}</div>}
                     </li>
                   );
                 })}
@@ -271,6 +274,7 @@ export function AssignPanel({
               </button>
             </div>
           )}
+          {confirming?.who.kind === "subcontractor" && <div className="mt-3">{clashBox()}</div>}
           <p className="mt-2 text-xs text-subtle">Uses the same date, start, duration and role as above.</p>
         </div>
       </CardBody>

@@ -14,6 +14,8 @@ type Props = {
   booking: Booking | null;
   operatives: Operative[];
   subs: Sub[];
+  /** subcontractors that can be booked (select menu) */
+  subOptions: Sub[];
   statuses: Record<string, StatusInfo>;
   clash?: string[];
   canEdit: boolean;
@@ -35,7 +37,7 @@ export function BookingDialog(props: Props) {
   );
 }
 
-function Body({ booking: b, operatives, subs, statuses, clash, canEdit, linkPeople, linkSubs, busy, onClose, onSave, onUnassign, onMove }: Props & { booking: Booking }) {
+function Body({ booking: b, operatives, subs, subOptions, statuses, clash, canEdit, linkPeople, linkSubs, busy, onClose, onSave, onUnassign, onMove }: Props & { booking: Booking }) {
   const resourceValue = b.employeeId ? `e:${b.employeeId}` : `s:${b.subcontractorId}`;
   const [start, setStart] = useState(toLocalInput(b.start));
   const [end, setEnd] = useState(toLocalInput(b.end));
@@ -47,7 +49,7 @@ function Body({ booking: b, operatives, subs, statuses, clash, canEdit, linkPeop
   const op = b.employeeId ? operatives.find((o) => o.id === b.employeeId) : null;
   const sub = b.subcontractorId ? subs.find((s) => s.id === b.subcontractorId) : null;
   const who = op?.name ?? sub?.name ?? "Unknown";
-  const whoHref = op && linkPeople && !op.restricted ? `/workforce/${op.id}` : sub && linkSubs ? `/subcontractors/${sub.id}` : null;
+  const whoHref = op && linkPeople ? `/workforce/${op.id}` : sub && linkSubs ? `/subcontractors/${sub.id}` : null;
   const st = statuses[b.job.status];
   const statusOptions = ASSIGNMENT_STATUSES.some((s) => s.value === b.status) ? ASSIGNMENT_STATUSES : [...ASSIGNMENT_STATUSES, { value: b.status, label: label(b.status) }];
 
@@ -124,20 +126,20 @@ function Body({ booking: b, operatives, subs, statuses, clash, canEdit, linkPeop
                   {operatives.map((o) => (
                     <option key={o.id} value={`e:${o.id}`}>
                       {o.name}
-                      {o.tradeLabel && !o.restricted ? ` · ${o.tradeLabel}` : ""}
+                      {` · ${o.tradeLabel}`}
                     </option>
                   ))}
                 </optgroup>
-                {subs.length > 0 && (
+                {subOptions.length > 0 && (
                   <optgroup label="Subcontractors">
-                    {subs.map((s) => (
+                    {subOptions.map((s) => (
                       <option key={s.id} value={`s:${s.id}`}>
                         {s.name}
                       </option>
                     ))}
                   </optgroup>
                 )}
-                {!operatives.some((o) => `e:${o.id}` === resourceValue) && !subs.some((s) => `s:${s.id}` === resourceValue) && <option value={resourceValue}>{who}</option>}
+                {!operatives.some((o) => `e:${o.id}` === resourceValue) && !subOptions.some((s) => `s:${s.id}` === resourceValue) && <option value={resourceValue}>{who}</option>}
               </Select>
             </div>
             <div>

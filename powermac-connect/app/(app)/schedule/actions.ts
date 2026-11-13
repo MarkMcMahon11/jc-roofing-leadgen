@@ -37,13 +37,25 @@ function firstIssue(e: z.ZodError) {
   return e.issues[0]?.message ?? "Invalid request.";
 }
 
+type People = {
+  employees?: { id: string; first_name: string; last_name: string; employment_status: string }[];
+  subcontractors?: { id: string; company_name: string; status: string }[];
+};
+
+/**
+ * Who is being booked, via schedule_people() (the same people the planner shows: field operatives
+ * that are active or on leave, approved or pending subcontractors). Anyone else cannot be booked.
+ */
 async function resourceName(supabase: Supabase, tenantId: string, r: { employeeId: string | null; subcontractorId: string | null }) {
+  const now = new Date().toISOString();
+  const { data } = await supabase.rpc("schedule_people", { p_tenant: tenantId, p_from: now, p_to: now });
+  const people = (data ?? {}) as People;
   if (r.employeeId) {
-    const { data } = await supabase.from("employees").select("first_name, last_name, employment_status").eq("tenant_id", tenantId).eq("id", r.employeeId).maybeSingle();
-    return data ? { name: `${data.first_name} ${data.last_name}`, ok: data.employment_status !== "left" && data.employment_status !== "suspended", status: data.employment_status } : null;
+    const e = people.employees?.find((x) => x.id === r.employeeId);
+    return e ? { name: `${e.first_name} ${e.last_name}`, ok: true, status: e.employment_status } : null;
   }
-  const { data } = await supabase.from("subcontractors").select("company_name, status").eq("tenant_id", tenantId).eq("id", r.subcontractorId!).maybeSingle();
-  return data ? { name: data.company_name, ok: data.status !== "suspended" && data.status !== "archived", status: data.status } : null;
+  const s = people.subcontractors?.find((x) => x.id === r.subcontractorId);
+  return s ? { name: s.company_name, ok: s.status === "approved", status: s.status === "pending" ? "not approved yet" : s.status } : null;
 }
 
 /* ------------------------------------------------------------------ clash check */
@@ -106,7 +118,7 @@ export async function bookJob(input: { workOrderId: string; employeeId: string |
   if (status && ["complete", "closed"].includes(status.category)) return { ok: false, message: `${job.reference} is ${status.label.toLowerCase()} and can no longer be booked.` };
 
   const who = await resourceName(supabase, ctx.tenantId, v);
-  if (!who) return { ok: false, message: "That operative could not be found." };
+  if (!who) return { ok: false, message: "Only active field operatives and approved subcontractors can be booked." };
   if (!who.ok) return { ok: false, message: `${who.name} is ${who.status} and cannot be booked.` };
 
   const { error } = await supabase.from("job_assignments").insert({
@@ -176,7 +188,7 @@ export async function updateBooking(input: {
   let who: Awaited<ReturnType<typeof resourceName>> = null;
   if (v.employeeId !== current.employee_id || v.subcontractorId !== current.subcontractor_id) {
     who = await resourceName(supabase, ctx.tenantId, v);
-    if (!who) return { ok: false, message: "That operative could not be found." };
+    if (!who) return { ok: false, message: "Only active field operatives and approved subcontractors can be booked." };
     if (!who.ok) return { ok: false, message: `${who.name} is ${who.status} and cannot be booked.` };
   }
 

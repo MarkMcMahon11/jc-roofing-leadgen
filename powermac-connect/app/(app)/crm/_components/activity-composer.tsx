@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { ActionForm, SelectField, SubmitButton, TextAreaField, TextField } from "@/components/ui/form";
 import { Card, CardBody, CardHeader } from "@/components/ui/primitives";
 import { addActivity } from "../actions";
@@ -9,11 +9,13 @@ import { ACTIVITY_TYPES, type Opt } from "../_lib/shared";
 export function ActivityComposer({ orgId, contacts, staff, me, opportunities = [] }: { orgId: string; contacts: Opt[]; staff: Opt[]; me: string; opportunities?: Opt[] }) {
   const [type, setType] = useState("note");
   const needsDue = type === "follow_up" || type === "task";
+  // stable: ActionForm calls onSuccess whenever it re-renders after a successful save
+  const reset = useCallback(() => setType("note"), []);
   return (
     <Card>
       <CardHeader title="Log activity" description="Record a call, meeting or note, or set a follow-up reminder." />
       <CardBody>
-        <ActionForm action={addActivity} resetOnSuccess onSuccess={() => setType("note")} className="grid gap-4 sm:grid-cols-6">
+        <ActionForm action={addActivity} resetOnSuccess onSuccess={reset} className="grid gap-4 sm:grid-cols-6">
           <input type="hidden" name="organisation_id" value={orgId} />
           <SelectField name="type" label="Type" required options={[...ACTIVITY_TYPES]} value={type} onChange={(e) => setType(e.target.value)} className="sm:col-span-2" />
           <TextField name="subject" label="Subject" required maxLength={200} className="sm:col-span-4" placeholder={needsDue ? "e.g. Chase signed variation" : "e.g. Quarterly review meeting"} />

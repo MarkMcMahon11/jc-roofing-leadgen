@@ -15,6 +15,13 @@ import { DateJump, WeekendToggle } from "./_components/toolbar-controls";
 
 export const metadata: Metadata = { title: "Schedule" };
 
+/** Shape returned by public.schedule_people() (jsonb). */
+type SchedulePeople = {
+  employees: { id: string; first_name: string; last_name: string; trade: string; colour: string; employment_status: string; working_hours: unknown; max_daily_hours: number | string; skills: string[] }[];
+  absences: { id: string; employee_id: string; type: string; status: string; starts_at: string; ends_at: string }[];
+  subcontractors: { id: string; company_name: string; status: string; insurance_expiry: string | null }[];
+};
+
 const QUEUE_CATEGORIES = ["intake", "pre_works", "ready"];
 const QUEUE_LIMIT = 150;
 
@@ -34,7 +41,8 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
   const priority = ["emergency", "urgent", "routine", "planned"].includes(str("priority") ?? "") ? str("priority") : undefined;
 
   const canEdit = ctx.can("schedule.write") && ctx.can("work_orders.assign");
-  const seesWorkforce = ctx.can("workforce.read");
+  const linkPeople = ctx.can("workforce.read");
+  const linkSubs = ctx.can("subcontractors.read");
   const weekStart = mondayOf(date);
   const weekDays = Array.from({ length: weekend ? 7 : 5 }, (_, i) => addDays(weekStart, i));
   const days = view === "day" ? [date] : weekDays;
@@ -44,16 +52,6 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
   const supabase = await createClient();
   const [statuses, lookups] = await Promise.all([getStatuses(t), getLookups(t)]);
   const queueKeys = statuses.list.filter((s) => QUEUE_CATEGORIES.includes(s.category)).map((s) => s.key);
-
-  let employeesQ = supabase
-    .from("employees")
-    .select("id, reference, first_name, last_name, trade, colour, working_hours, max_daily_hours, employment_status")
-    .eq("tenant_id", t)
-    .eq("is_field_operative", true)
-    .in("employment_status", ["active", "on_leave"])
-    .order("first_name")
-    .order("last_name");
-  if (trade) employeesQ = employeesQ.eq("trade", trade);
 
   let queueQ = supabase
     .from("work_orders")
@@ -68,9 +66,13 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
   if (priority) queueQ = queueQ.eq("priority", priority);
   if (q) queueQ = queueQ.or(`reference.ilike.%${q}%,title.ilike.%${q}%`);
 
+  // People on the schedule come from schedule_people(): gated on schedule.read and limited to
+  // what planning needs (no notes or personal data), so every schedule viewer sees the same board.
   const todayRange = dayBounds(today);
-  const [employeesRes, bookingsRes, absencesRes, queueRes, urgentRes, transitionsRes, todayAbsRes] = await Promise.all([
-    employeesQ,
+  const peopleFrom = new Date(Math.min(Date.parse(rangeStart), todayRange.start)).toISOString();
+  const peopleTo = new Date(Math.max(Date.parse(rangeEnd), todayRange.end)).toISOString();
+  const [peopleRes, bookingsRes, queueRes, urgentRes, transitionsRes] = await Promise.all([
+    supabase.rpc("schedule_people", { p_tenant: t, p_from: peopleFrom, p_to: peopleTo }),
     supabase
       .from("job_assignments")
       .select(
@@ -82,13 +84,6 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
       .gt("scheduled_end", rangeStart)
       .order("scheduled_start")
       .limit(3000),
-    supabase
-      .from("employee_absences")
-      .select("id, employee_id, type, status, starts_at, ends_at")
-      .eq("tenant_id", t)
-      .in("status", ["approved", "requested"])
-      .lt("starts_at", rangeEnd)
-      .gt("ends_at", rangeStart),
     queueQ,
     supabase
       .from("work_orders")
@@ -99,15 +94,9 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
       .not("job_assignments.status", "in", "(cancelled,no_access)")
       .is("job_assignments", null),
     supabase.from("job_status_transitions").select("from_key, required_permission").eq("tenant_id", t).eq("to_key", "scheduled"),
-    supabase
-      .from("employee_absences")
-      .select("employee_id")
-      .eq("tenant_id", t)
-      .eq("status", "approved")
-      .lt("starts_at", new Date(todayRange.end).toISOString())
-      .gt("ends_at", new Date(todayRange.start).toISOString()),
   ]);
-  const loadError = [employeesRes, bookingsRes, absencesRes, queueRes].find((r) => r.error)?.error;
+  const loadError = [peopleRes, bookingsRes, queueRes].find((r) => r.error)?.error;
+  const people = { employees: [], absences: [], subcontractors: [], ...((peopleRes.data ?? {}) as Partial<SchedulePeople>) } as SchedulePeople;
 
   /* ---------------------------------------------------------------- shape the data */
   const tradeLabel = (k: string) => lookups.label("trade", k);
@@ -138,33 +127,36 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
       },
     }));
 
-  let operatives: Operative[] = (employeesRes.data ?? []).map((e) => ({
-    id: e.id,
-    name: `${e.first_name} ${e.last_name}`,
-    reference: e.reference,
-    trade: e.trade,
-    tradeLabel: tradeLabel(e.trade),
-    colour: e.colour,
-    employmentStatus: e.employment_status,
-    hours: (e.working_hours ?? {}) as WorkingHours,
-    maxDaily: Number(e.max_daily_hours),
-  }));
-  if (!seesWorkforce) {
-    // RLS hides the workforce from this role: show bookings per operative without personal details
-    const ids = [...new Set(bookings.map((b) => b.employeeId).filter(Boolean) as string[])];
-    operatives = ids.map((id, i) => ({ id, name: `Operative ${i + 1}`, reference: "", trade: "", tradeLabel: "Details restricted", colour: "#5b6b8c", employmentStatus: "active", hours: null, maxDaily: 0, restricted: true }));
-  }
+  const operatives: Operative[] = people.employees
+    .filter((e) => !trade || e.trade === trade)
+    .map((e) => ({
+      id: e.id,
+      name: `${e.first_name} ${e.last_name}`,
+      trade: e.trade,
+      tradeLabel: tradeLabel(e.trade),
+      colour: e.colour,
+      employmentStatus: e.employment_status,
+      hours: (e.working_hours ?? {}) as WorkingHours,
+      maxDaily: Number(e.max_daily_hours),
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name));
   const opIds = new Set(operatives.map((o) => o.id));
 
+  // Subcontractor rows: those with bookings this week. Names from schedule_people(); reference and
+  // trades only when the viewer can read the subcontractor register.
+  const subNames = new Map(people.subcontractors.map((s) => [s.id, s.company_name]));
   const subMap = new Map<string, Sub>();
   for (const b of bookingsRes.data ?? []) {
     const s = b.subcontractor;
     if (!b.subcontractor_id || subMap.has(b.subcontractor_id)) continue;
-    subMap.set(b.subcontractor_id, { id: b.subcontractor_id, name: s?.company_name ?? "Subcontractor", reference: s?.reference ?? "", trades: s?.trades ?? [] });
+    subMap.set(b.subcontractor_id, { id: b.subcontractor_id, name: subNames.get(b.subcontractor_id) ?? s?.company_name ?? "Subcontractor", reference: s?.reference ?? "", trades: s?.trades ?? [] });
   }
-  const subs = [...subMap.values()].filter((s) => !trade || s.trades.includes(trade)).sort((a, b) => a.name.localeCompare(b.name));
+  const subs = [...subMap.values()]
+    .filter((s) => !trade || s.trades.includes(trade) || bookings.some((b) => b.subcontractorId === s.id && b.job.trade === trade))
+    .sort((a, b) => a.name.localeCompare(b.name));
+  const subOptions: Sub[] = people.subcontractors.filter((s) => s.status === "approved").map((s) => subMap.get(s.id) ?? { id: s.id, name: s.company_name, reference: "", trades: [] });
 
-  const absences: Absence[] = (absencesRes.data ?? []).map((a) => ({
+  const toAbsence = (a: SchedulePeople["absences"][number]): Absence => ({
     id: a.id,
     employeeId: a.employee_id,
     type: a.type,
@@ -172,7 +164,8 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
     status: a.status,
     start: a.starts_at,
     end: a.ends_at,
-  }));
+  });
+  const absences: Absence[] = people.absences.filter((a) => overlaps(Date.parse(a.starts_at), Date.parse(a.ends_at), Date.parse(rangeStart), Date.parse(rangeEnd))).map(toAbsence);
 
   const queue: QueueJob[] = (queueRes.data ?? [])
     .map((w) => ({
@@ -197,13 +190,14 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
     );
 
   /* ---------------------------------------------------------------- header summary */
-  const activeOps = operatives.filter((o) => o.employmentStatus === "active" && !o.restricted);
-  const absentToday = new Set((todayAbsRes.data ?? []).map((a) => a.employee_id));
+  const activeOps = operatives.filter((o) => o.employmentStatus === "active");
+  const absentToday = new Set(
+    people.absences.filter((a) => a.status === "approved" && overlaps(Date.parse(a.starts_at), Date.parse(a.ends_at), todayRange.start, todayRange.end)).map((a) => a.employee_id),
+  );
   const availableToday = activeOps.filter((o) => !absentToday.has(o.id)).length;
   const opBookings = bookings.filter((b) => b.employeeId && opIds.has(b.employeeId));
   let weekBooked = 0, weekCapacity = 0;
   for (const o of operatives) {
-    if (o.restricted) continue;
     const mine = opBookings.filter((b) => b.employeeId === o.id);
     for (const d of weekDays) {
       weekBooked += bookedHours(mine, d);
@@ -237,9 +231,14 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
         eyebrow="Operations · Workforce scheduling"
         title="Schedule"
         description={
-          canEdit
-            ? "Drag jobs from the queue onto an operative's day, or select a job and click a cell. Clashes are checked before anything is booked."
-            : "You can view the schedule. Booking work needs the Schedule (write) and Assign work orders permissions."
+          canEdit ? (
+            <>
+              <span className="hidden md:inline">Drag jobs from the queue onto an operative&apos;s day, or select a job and click a cell. Clashes are checked before anything is booked.</span>
+              <span className="md:hidden">Choose a job, a time and an operative. Clashes are checked before anything is booked.</span>
+            </>
+          ) : (
+            "You can view the schedule. Booking work needs the Schedule (write) and Assign work orders permissions."
+          )
         }
         actions={
           !canEdit ? (
@@ -258,21 +257,14 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
           </Notice>
         </div>
       )}
-      {!seesWorkforce && (
-        <div className="mb-4">
-          <Notice tone="warn" title="Operative details are hidden for your role">
-            Your role can see bookings but not the workforce register, so operatives appear without names, working hours or absences. Ask an administrator for the Workforce (read) permission.
-          </Notice>
-        </div>
-      )}
 
       <section aria-label="Schedule summary" className="mb-6 grid grid-cols-2 gap-3 xl:grid-cols-4">
         <Stat
           label={`Operatives available today${trade ? ` · ${tradeLabel(trade)}` : ""}`}
-          value={seesWorkforce ? `${availableToday} / ${activeOps.length}` : "-"}
-          hint={seesWorkforce ? (absentCount ? `${absentCount} absent today` : "Nobody absent today") : "Needs Workforce (read)"}
+          value={`${availableToday} / ${activeOps.length}`}
+          hint={absentCount ? `${absentCount} absent today` : "Nobody absent today"}
           tone={availableToday < activeOps.length ? "warn" : "ok"}
-          href={ctx.can("workforce.read") ? "/workforce" : undefined}
+          href={linkPeople ? "/workforce" : undefined}
         />
         <Stat
           label={view === "day" ? "Booked vs capacity this week" : "Booked vs capacity"}
@@ -297,21 +289,25 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <div className="flex items-center gap-1">
-          <ButtonLink href={href({ date: addDays(date, -step) })} size="sm" variant="secondary" className="px-2" aria-label={view === "day" ? "Previous day" : "Previous week"} scroll={false}>
-            <ChevronLeft className="size-4" />
-          </ButtonLink>
+          <span className="hidden md:contents">
+            <ButtonLink href={href({ date: addDays(date, -step) })} size="sm" variant="secondary" className="px-2" aria-label={view === "day" ? "Previous day" : "Previous week"} scroll={false}>
+              <ChevronLeft className="size-4" />
+            </ButtonLink>
+          </span>
           <ButtonLink href={href({ date: null })} size="sm" variant="secondary" scroll={false}>
             Today
           </ButtonLink>
-          <ButtonLink href={href({ date: addDays(date, step) })} size="sm" variant="secondary" className="px-2" aria-label={view === "day" ? "Next day" : "Next week"} scroll={false}>
-            <ChevronRight className="size-4" />
-          </ButtonLink>
+          <span className="hidden md:contents">
+            <ButtonLink href={href({ date: addDays(date, step) })} size="sm" variant="secondary" className="px-2" aria-label={view === "day" ? "Next day" : "Next week"} scroll={false}>
+              <ChevronRight className="size-4" />
+            </ButtonLink>
+          </span>
         </div>
-        <h2 className="flex min-w-0 items-center gap-2 px-1 text-[15px] font-semibold text-fg">
+        <h2 className="hidden min-w-0 items-center gap-2 px-1 text-[15px] font-semibold text-fg md:flex">
           <CalendarDays className="size-4 shrink-0 text-accent-hi" aria-hidden />
           <span className="truncate">{title}</span>
         </h2>
-        <div className="flex w-full flex-wrap items-center gap-2 sm:ml-auto sm:w-auto">
+        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2 md:ml-auto md:flex-none">
           <DateJump value={date} />
           <nav className="hidden h-8 items-center rounded-lg border border-line-strong bg-sunken p-0.5 md:flex" aria-label="View">
             {(["week", "day"] as const).map((v) => (
@@ -327,7 +323,7 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
             ))}
           </nav>
           {view === "week" && <WeekendToggle on={weekend} />}
-          <div className="w-full min-w-0 sm:w-48">
+          <div className="min-w-0 flex-1 md:w-48 md:flex-none">
             <FilterSelect param="trade" label="Operatives" options={lookups.options("trade")} className="h-8! w-full! min-w-0! rounded-lg text-[13px]" />
           </div>
         </div>
@@ -335,9 +331,10 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
 
       <Planner
         key={`${view}-${weekStart}`}
-        config={{ view, date, days, weekStart, today, nowIso: new Date().toISOString(), canEdit, seesWorkforce, focusDay }}
+        config={{ view, date, days, weekStart, today, nowIso: new Date().toISOString(), canEdit, linkPeople, linkSubs, focusDay }}
         operatives={operatives}
         subs={subs}
+        subOptions={subOptions}
         bookings={bookings}
         absences={absences}
         queue={queue}

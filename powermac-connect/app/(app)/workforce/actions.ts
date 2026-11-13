@@ -155,7 +155,7 @@ const privateSchema = z.object({
   ni_number: z
     .string()
     .transform((v) => v.replace(/\s+/g, "").toUpperCase())
-    .pipe(z.string().regex(/^[A-CEGHJ-PR-TW-Z]{2}[0-9]{6}[A-D]$/, "Enter a valid National Insurance number, e.g. QQ123456C"))
+    .pipe(z.string().regex(/^[A-CEGHJ-PR-TW-Z]{2}[0-9]{6}[A-D]$/, "Enter a valid National Insurance number, e.g. AB123456C"))
     .optional(),
   home_address: opt(500),
   personal_phone: opt(40),

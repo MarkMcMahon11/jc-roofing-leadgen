@@ -17,6 +17,8 @@ type Props = {
   today: string;
   operatives: Operative[];
   subs: Sub[];
+  /** subcontractors that can be booked (select menu) */
+  subOptions: Sub[];
   bookings: Booking[];
   absences: Absence[];
   clashes: Map<string, string[]>;
@@ -72,16 +74,14 @@ export function MobileAgenda(props: Props) {
                 )}
                 <div className="mt-2 grid gap-1.5">
                   {list.length === 0 ? (
-                    <p className="text-xs text-subtle">{workWindow(op, date) || op.restricted ? "Nothing booked" : "Day off"}</p>
+                    <p className="text-xs text-subtle">{workWindow(op, date) ? "Nothing booked" : "Day off"}</p>
                   ) : (
                     list.map((b) => <BookingBlock key={b.id} b={b} date={date} colour={op.colour} status={statuses[b.job.status]} clash={clashes.get(b.id)} api={api} variant="agenda" />)
                   )}
                 </div>
-                {!op.restricted && (
-                  <div className="mt-2">
-                    <LoadBar booked={bookedHours(list, date)} cap={capacityHours(op, date, absences)} maxDaily={op.maxDaily} working={Boolean(workWindow(op, date))} />
-                  </div>
-                )}
+                <div className="mt-2">
+                  <LoadBar booked={bookedHours(list, date)} cap={capacityHours(op, date, absences)} maxDaily={op.maxDaily} working={Boolean(workWindow(op, date))} absent={abs.some((a) => a.status === "approved") && capacityHours(op, date, absences) === 0} />
+                </div>
               </Card>
             </li>
           );
@@ -107,7 +107,7 @@ export function MobileAgenda(props: Props) {
   );
 }
 
-function AssignCard({ date, operatives, subs, queue, busy, tradeLabel, onBook, api }: Props) {
+function AssignCard({ date, operatives, subOptions, queue, busy, tradeLabel, onBook, api }: Props) {
   const [jobId, setJobId] = useState("");
   const [resource, setResource] = useState("");
   const [slot, setSlot] = useState<Slot>({ date, start: 8 * 60, minutes: 120 });
@@ -163,14 +163,13 @@ function AssignCard({ date, operatives, subs, queue, busy, tradeLabel, onBook, a
             <optgroup label="Operatives">
               {operatives.map((o) => (
                 <option key={o.id} value={`e:${o.id}`}>
-                  {o.name}
-                  {!o.restricted ? ` · ${o.tradeLabel}` : ""}
+                  {o.name} · {o.tradeLabel}
                 </option>
               ))}
             </optgroup>
-            {subs.length > 0 && (
+            {subOptions.length > 0 && (
               <optgroup label="Subcontractors">
-                {subs.map((s) => (
+                {subOptions.map((s) => (
                   <option key={s.id} value={`s:${s.id}`}>
                     {s.name}
                   </option>

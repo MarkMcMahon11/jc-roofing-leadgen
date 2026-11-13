@@ -5,15 +5,12 @@ export type WorkingHours = Partial<Record<string, [number, number]>>;
 export type Operative = {
   id: string;
   name: string;
-  reference: string;
   trade: string;
   tradeLabel: string;
   colour: string;
   employmentStatus: string;
-  /** null when the viewer's role cannot read the operative's record (no workforce.read) */
-  hours: WorkingHours | null;
+  hours: WorkingHours;
   maxDaily: number;
-  restricted?: boolean;
 };
 
 export type Sub = { id: string; name: string; reference: string; trades: string[] };
@@ -97,7 +94,9 @@ export type PlannerConfig = {
   today: string;
   nowIso: string;
   canEdit: boolean;
-  seesWorkforce: boolean;
+  /** link names to /workforce/[id] and /subcontractors/[id] only when the viewer can open them */
+  linkPeople: boolean;
+  linkSubs: boolean;
   /** day the recommendation panel and mobile agenda start on */
   focusDay: string;
 };

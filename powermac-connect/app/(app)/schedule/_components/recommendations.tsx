@@ -25,8 +25,8 @@ const LENGTHS = Array.from({ length: 24 }, (_, i) => (i + 1) * 30);
 
 export function SlotFields({ slot, onChange, idPrefix }: { slot: Slot; onChange: (s: Slot) => void; idPrefix: string }) {
   return (
-    <div className="grid grid-cols-[1.3fr_1fr_1fr] gap-2">
-      <div>
+    <div className="grid min-w-0 grid-cols-2 gap-2">
+      <div className="col-span-2 min-w-0">
         <label htmlFor={`${idPrefix}-date`} className="mb-1 block text-[11.5px] font-medium text-subtle">
           Day
         </label>
@@ -38,7 +38,7 @@ export function SlotFields({ slot, onChange, idPrefix }: { slot: Slot; onChange:
           className="h-9 w-full rounded-lg border border-line-strong bg-sunken px-2 text-[13px] text-fg [color-scheme:dark] focus:border-accent focus:ring-2 focus:ring-accent/30 focus:outline-none"
         />
       </div>
-      <div>
+      <div className="min-w-0">
         <label htmlFor={`${idPrefix}-start`} className="mb-1 block text-[11.5px] font-medium text-subtle">
           Start
         </label>
@@ -50,7 +50,7 @@ export function SlotFields({ slot, onChange, idPrefix }: { slot: Slot; onChange:
           ))}
         </Select>
       </div>
-      <div>
+      <div className="min-w-0">
         <label htmlFor={`${idPrefix}-len`} className="mb-1 block text-[11.5px] font-medium text-subtle">
           Length
         </label>
