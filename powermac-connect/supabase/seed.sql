@@ -55,7 +55,7 @@ declare
   o record; v_org uuid; v_con uuid; v_prop uuid; v_occ uuid; v_emp uuid; v_wo uuid; v_quo uuid; v_inv uuid; v_po uuid; v_sup uuid; v_loc uuid; v_mat uuid; v_veh uuid; v_rc uuid;
   orgs uuid[] := '{}'; contracts uuid[] := '{}'; props uuid[] := '{}'; emps uuid[] := '{}'; subs uuid[] := '{}'; sups uuid[] := '{}'; mats uuid[] := '{}'; locs uuid[] := '{}'; vans uuid[] := '{}';
   i int; j int; n int; d date; h numeric; v_status text; v_pri text; v_cat text; v_trade text; v_title text; v_rep timestamptz; v_due timestamptz; v_hours numeric; v_cost numeric;
-  v_start timestamptz; v_end timestamptz; v_done timestamptz; v_amt numeric;
+  v_start timestamptz; v_end timestamptz; v_done timestamptz; v_amt numeric; v_use_sub boolean;
   streets text[] := array['Rowan Drive','Birch Grove','Thistle Street','Heather Avenue','Burnside Road','Glen Terrace','Mill Lane','Station Road','Park View','Castle Wynd','Hawthorn Court','Kirk Brae','Loch Place','Ashgrove Gardens','Bracken Way','Craigmore Road','Elder Street','Fernbank Avenue','Juniper Close','Moss Side Road'];
   wo_templates text[][] := array[
     array['Leaking kitchen tap','plumbing','plumber'], array['Front door not locking','windows_doors','joiner'], array['Replace failed extractor fan','electrical','electrician'],
@@ -337,7 +337,8 @@ begin
     v_status := statuses[1 + floor(seed.r() * array_length(statuses, 1))::int];
     -- age by status: closed/invoiced are older, open newer
     v_rep := now() - make_interval(days => case
-      when v_status in ('closed','invoiced','cancelled') then 25 + floor(seed.r() * 120)::int
+      when v_status = 'invoiced' then 6 + floor(seed.r() * 30)::int
+      when v_status in ('closed','cancelled') then 25 + floor(seed.r() * 120)::int
       when v_status = 'completed' then 3 + floor(seed.r() * 20)::int
       when v_status in ('new','under_review') then floor(seed.r() * 3)::int
       else 2 + floor(seed.r() * 25)::int end, hours => floor(seed.r() * 9)::int);
@@ -392,8 +393,10 @@ begin
       h := 8 + floor(seed.r() * 6);
       v_start := seed.at_hour(d, h);
       v_end := v_start + make_interval(mins => (least(v_hours, 8) * 60)::int);
-      insert into public.job_assignments (tenant_id, work_order_id, employee_id, scheduled_start, scheduled_end, status, arrived_at, started_at)
-      values (t, v_wo, v_emp, v_start, v_end,
+      v_use_sub := v_trade in ('electrician','roofer') and seed.r() < 0.6;
+      insert into public.job_assignments (tenant_id, work_order_id, employee_id, subcontractor_id, scheduled_start, scheduled_end, status, arrived_at, started_at)
+      values (t, v_wo, case when v_use_sub then null else v_emp end,
+              case when v_use_sub then case when v_trade = 'electrician' then subs[1] else subs[2] end end, v_start, v_end,
               case when v_status = 'in_progress' then 'on_site' when v_status = 'scheduled' then 'scheduled' else 'paused' end,
               case when v_status <> 'scheduled' then v_start end, case when v_status <> 'scheduled' then v_start + interval '5 minutes' end);
       if v_status <> 'scheduled' then update public.work_orders set actual_start = v_start where id = v_wo; end if;

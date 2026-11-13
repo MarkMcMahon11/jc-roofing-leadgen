@@ -456,6 +456,13 @@ export type Database = {
             foreignKeyName: "certificates_tenant_id_work_order_id_fkey"
             columns: ["tenant_id", "work_order_id"]
             isOneToOne: false
+            referencedRelation: "v_job_financials"
+            referencedColumns: ["tenant_id", "work_order_id"]
+          },
+          {
+            foreignKeyName: "certificates_tenant_id_work_order_id_fkey"
+            columns: ["tenant_id", "work_order_id"]
+            isOneToOne: false
             referencedRelation: "work_orders"
             referencedColumns: ["tenant_id", "id"]
           },
@@ -625,6 +632,13 @@ export type Database = {
             foreignKeyName: "communications_tenant_id_work_order_id_fkey"
             columns: ["tenant_id", "work_order_id"]
             isOneToOne: false
+            referencedRelation: "v_job_financials"
+            referencedColumns: ["tenant_id", "work_order_id"]
+          },
+          {
+            foreignKeyName: "communications_tenant_id_work_order_id_fkey"
+            columns: ["tenant_id", "work_order_id"]
+            isOneToOne: false
             referencedRelation: "work_orders"
             referencedColumns: ["tenant_id", "id"]
           },
@@ -771,6 +785,13 @@ export type Database = {
             referencedColumns: ["tenant_id", "id"]
           },
           {
+            foreignKeyName: "contract_kpis_tenant_id_contract_id_fkey"
+            columns: ["tenant_id", "contract_id"]
+            isOneToOne: false
+            referencedRelation: "v_contract_performance"
+            referencedColumns: ["tenant_id", "contract_id"]
+          },
+          {
             foreignKeyName: "contract_kpis_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
@@ -805,6 +826,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "contracts"
             referencedColumns: ["tenant_id", "id"]
+          },
+          {
+            foreignKeyName: "contract_properties_tenant_id_contract_id_fkey"
+            columns: ["tenant_id", "contract_id"]
+            isOneToOne: false
+            referencedRelation: "v_contract_performance"
+            referencedColumns: ["tenant_id", "contract_id"]
           },
           {
             foreignKeyName: "contract_properties_tenant_id_fkey"
@@ -876,6 +904,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "contracts"
             referencedColumns: ["tenant_id", "id"]
+          },
+          {
+            foreignKeyName: "contract_slas_tenant_id_contract_id_fkey"
+            columns: ["tenant_id", "contract_id"]
+            isOneToOne: false
+            referencedRelation: "v_contract_performance"
+            referencedColumns: ["tenant_id", "contract_id"]
           },
           {
             foreignKeyName: "contract_slas_tenant_id_fkey"
@@ -953,6 +988,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "contracts"
             referencedColumns: ["tenant_id", "id"]
+          },
+          {
+            foreignKeyName: "contract_variations_tenant_id_contract_id_fkey"
+            columns: ["tenant_id", "contract_id"]
+            isOneToOne: false
+            referencedRelation: "v_contract_performance"
+            referencedColumns: ["tenant_id", "contract_id"]
           },
           {
             foreignKeyName: "contract_variations_tenant_id_fkey"
@@ -1169,6 +1211,13 @@ export type Database = {
             referencedColumns: ["tenant_id", "id"]
           },
           {
+            foreignKeyName: "costs_tenant_id_contract_id_fkey"
+            columns: ["tenant_id", "contract_id"]
+            isOneToOne: false
+            referencedRelation: "v_contract_performance"
+            referencedColumns: ["tenant_id", "contract_id"]
+          },
+          {
             foreignKeyName: "costs_tenant_id_employee_id_fkey"
             columns: ["tenant_id", "employee_id"]
             isOneToOne: false
@@ -1223,6 +1272,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vehicles"
             referencedColumns: ["tenant_id", "id"]
+          },
+          {
+            foreignKeyName: "costs_tenant_id_work_order_id_fkey"
+            columns: ["tenant_id", "work_order_id"]
+            isOneToOne: false
+            referencedRelation: "v_job_financials"
+            referencedColumns: ["tenant_id", "work_order_id"]
           },
           {
             foreignKeyName: "costs_tenant_id_work_order_id_fkey"
@@ -1421,6 +1477,13 @@ export type Database = {
             referencedColumns: ["tenant_id", "id"]
           },
           {
+            foreignKeyName: "crm_opportunities_tenant_id_contract_id_fkey"
+            columns: ["tenant_id", "contract_id"]
+            isOneToOne: false
+            referencedRelation: "v_contract_performance"
+            referencedColumns: ["tenant_id", "contract_id"]
+          },
+          {
             foreignKeyName: "crm_opportunities_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
@@ -1522,6 +1585,13 @@ export type Database = {
             referencedColumns: ["tenant_id", "id"]
           },
           {
+            foreignKeyName: "documents_tenant_id_contract_id_fkey"
+            columns: ["tenant_id", "contract_id"]
+            isOneToOne: false
+            referencedRelation: "v_contract_performance"
+            referencedColumns: ["tenant_id", "contract_id"]
+          },
+          {
             foreignKeyName: "documents_tenant_id_employee_id_fkey"
             columns: ["tenant_id", "employee_id"]
             isOneToOne: false
@@ -1562,6 +1632,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "suppliers"
             referencedColumns: ["tenant_id", "id"]
+          },
+          {
+            foreignKeyName: "documents_tenant_id_work_order_id_fkey"
+            columns: ["tenant_id", "work_order_id"]
+            isOneToOne: false
+            referencedRelation: "v_job_financials"
+            referencedColumns: ["tenant_id", "work_order_id"]
           },
           {
             foreignKeyName: "documents_tenant_id_work_order_id_fkey"
@@ -2072,6 +2149,13 @@ export type Database = {
             foreignKeyName: "inbound_messages_tenant_id_work_order_id_fkey"
             columns: ["tenant_id", "work_order_id"]
             isOneToOne: false
+            referencedRelation: "v_job_financials"
+            referencedColumns: ["tenant_id", "work_order_id"]
+          },
+          {
+            foreignKeyName: "inbound_messages_tenant_id_work_order_id_fkey"
+            columns: ["tenant_id", "work_order_id"]
+            isOneToOne: false
             referencedRelation: "work_orders"
             referencedColumns: ["tenant_id", "id"]
           },
@@ -2165,6 +2249,13 @@ export type Database = {
             foreignKeyName: "inspections_tenant_id_work_order_id_fkey"
             columns: ["tenant_id", "work_order_id"]
             isOneToOne: false
+            referencedRelation: "v_job_financials"
+            referencedColumns: ["tenant_id", "work_order_id"]
+          },
+          {
+            foreignKeyName: "inspections_tenant_id_work_order_id_fkey"
+            columns: ["tenant_id", "work_order_id"]
+            isOneToOne: false
             referencedRelation: "work_orders"
             referencedColumns: ["tenant_id", "id"]
           },
@@ -2218,6 +2309,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "contracts"
             referencedColumns: ["tenant_id", "id"]
+          },
+          {
+            foreignKeyName: "intake_senders_tenant_id_default_contract_id_fkey"
+            columns: ["tenant_id", "default_contract_id"]
+            isOneToOne: false
+            referencedRelation: "v_contract_performance"
+            referencedColumns: ["tenant_id", "contract_id"]
           },
           {
             foreignKeyName: "intake_senders_tenant_id_fkey"
@@ -2367,6 +2465,13 @@ export type Database = {
             foreignKeyName: "invoice_lines_tenant_id_work_order_id_fkey"
             columns: ["tenant_id", "work_order_id"]
             isOneToOne: false
+            referencedRelation: "v_job_financials"
+            referencedColumns: ["tenant_id", "work_order_id"]
+          },
+          {
+            foreignKeyName: "invoice_lines_tenant_id_work_order_id_fkey"
+            columns: ["tenant_id", "work_order_id"]
+            isOneToOne: false
             referencedRelation: "work_orders"
             referencedColumns: ["tenant_id", "id"]
           },
@@ -2464,6 +2569,13 @@ export type Database = {
             referencedColumns: ["tenant_id", "id"]
           },
           {
+            foreignKeyName: "invoices_tenant_id_contract_id_fkey"
+            columns: ["tenant_id", "contract_id"]
+            isOneToOne: false
+            referencedRelation: "v_contract_performance"
+            referencedColumns: ["tenant_id", "contract_id"]
+          },
+          {
             foreignKeyName: "invoices_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
@@ -2483,6 +2595,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "quotations"
             referencedColumns: ["tenant_id", "id"]
+          },
+          {
+            foreignKeyName: "invoices_tenant_id_work_order_id_fkey"
+            columns: ["tenant_id", "work_order_id"]
+            isOneToOne: false
+            referencedRelation: "v_job_financials"
+            referencedColumns: ["tenant_id", "work_order_id"]
           },
           {
             foreignKeyName: "invoices_tenant_id_work_order_id_fkey"
@@ -2581,6 +2700,13 @@ export type Database = {
             foreignKeyName: "job_assignments_tenant_id_work_order_id_fkey"
             columns: ["tenant_id", "work_order_id"]
             isOneToOne: false
+            referencedRelation: "v_job_financials"
+            referencedColumns: ["tenant_id", "work_order_id"]
+          },
+          {
+            foreignKeyName: "job_assignments_tenant_id_work_order_id_fkey"
+            columns: ["tenant_id", "work_order_id"]
+            isOneToOne: false
             referencedRelation: "work_orders"
             referencedColumns: ["tenant_id", "id"]
           },
@@ -2654,6 +2780,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "checklist_templates"
             referencedColumns: ["tenant_id", "id"]
+          },
+          {
+            foreignKeyName: "job_checklists_tenant_id_work_order_id_fkey"
+            columns: ["tenant_id", "work_order_id"]
+            isOneToOne: false
+            referencedRelation: "v_job_financials"
+            referencedColumns: ["tenant_id", "work_order_id"]
           },
           {
             foreignKeyName: "job_checklists_tenant_id_work_order_id_fkey"
@@ -2748,6 +2881,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "stock_movements"
             referencedColumns: ["tenant_id", "id"]
+          },
+          {
+            foreignKeyName: "job_materials_tenant_id_work_order_id_fkey"
+            columns: ["tenant_id", "work_order_id"]
+            isOneToOne: false
+            referencedRelation: "v_job_financials"
+            referencedColumns: ["tenant_id", "work_order_id"]
           },
           {
             foreignKeyName: "job_materials_tenant_id_work_order_id_fkey"
@@ -2969,6 +3109,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "tenants"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_updates_tenant_id_work_order_id_fkey"
+            columns: ["tenant_id", "work_order_id"]
+            isOneToOne: false
+            referencedRelation: "v_job_financials"
+            referencedColumns: ["tenant_id", "work_order_id"]
           },
           {
             foreignKeyName: "job_updates_tenant_id_work_order_id_fkey"
@@ -3686,6 +3833,13 @@ export type Database = {
             foreignKeyName: "photos_tenant_id_work_order_id_fkey"
             columns: ["tenant_id", "work_order_id"]
             isOneToOne: false
+            referencedRelation: "v_job_financials"
+            referencedColumns: ["tenant_id", "work_order_id"]
+          },
+          {
+            foreignKeyName: "photos_tenant_id_work_order_id_fkey"
+            columns: ["tenant_id", "work_order_id"]
+            isOneToOne: false
             referencedRelation: "work_orders"
             referencedColumns: ["tenant_id", "id"]
           },
@@ -3904,6 +4058,13 @@ export type Database = {
             referencedColumns: ["tenant_id", "id"]
           },
           {
+            foreignKeyName: "projects_tenant_id_contract_id_fkey"
+            columns: ["tenant_id", "contract_id"]
+            isOneToOne: false
+            referencedRelation: "v_contract_performance"
+            referencedColumns: ["tenant_id", "contract_id"]
+          },
+          {
             foreignKeyName: "projects_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
@@ -4116,6 +4277,13 @@ export type Database = {
             foreignKeyName: "purchase_order_lines_tenant_id_work_order_id_fkey"
             columns: ["tenant_id", "work_order_id"]
             isOneToOne: false
+            referencedRelation: "v_job_financials"
+            referencedColumns: ["tenant_id", "work_order_id"]
+          },
+          {
+            foreignKeyName: "purchase_order_lines_tenant_id_work_order_id_fkey"
+            columns: ["tenant_id", "work_order_id"]
+            isOneToOne: false
             referencedRelation: "work_orders"
             referencedColumns: ["tenant_id", "id"]
           },
@@ -4229,6 +4397,13 @@ export type Database = {
             referencedColumns: ["tenant_id", "id"]
           },
           {
+            foreignKeyName: "purchase_orders_tenant_id_contract_id_fkey"
+            columns: ["tenant_id", "contract_id"]
+            isOneToOne: false
+            referencedRelation: "v_contract_performance"
+            referencedColumns: ["tenant_id", "contract_id"]
+          },
+          {
             foreignKeyName: "purchase_orders_tenant_id_delivery_location_id_fkey"
             columns: ["tenant_id", "delivery_location_id"]
             isOneToOne: false
@@ -4262,6 +4437,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "suppliers"
             referencedColumns: ["tenant_id", "id"]
+          },
+          {
+            foreignKeyName: "purchase_orders_tenant_id_work_order_id_fkey"
+            columns: ["tenant_id", "work_order_id"]
+            isOneToOne: false
+            referencedRelation: "v_job_financials"
+            referencedColumns: ["tenant_id", "work_order_id"]
           },
           {
             foreignKeyName: "purchase_orders_tenant_id_work_order_id_fkey"
@@ -4422,11 +4604,25 @@ export type Database = {
             referencedColumns: ["tenant_id", "id"]
           },
           {
+            foreignKeyName: "purchase_requisitions_tenant_id_contract_id_fkey"
+            columns: ["tenant_id", "contract_id"]
+            isOneToOne: false
+            referencedRelation: "v_contract_performance"
+            referencedColumns: ["tenant_id", "contract_id"]
+          },
+          {
             foreignKeyName: "purchase_requisitions_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchase_requisitions_tenant_id_work_order_id_fkey"
+            columns: ["tenant_id", "work_order_id"]
+            isOneToOne: false
+            referencedRelation: "v_job_financials"
+            referencedColumns: ["tenant_id", "work_order_id"]
           },
           {
             foreignKeyName: "purchase_requisitions_tenant_id_work_order_id_fkey"
@@ -4725,6 +4921,13 @@ export type Database = {
             referencedColumns: ["tenant_id", "id"]
           },
           {
+            foreignKeyName: "quotations_tenant_id_contract_id_fkey"
+            columns: ["tenant_id", "contract_id"]
+            isOneToOne: false
+            referencedRelation: "v_contract_performance"
+            referencedColumns: ["tenant_id", "contract_id"]
+          },
+          {
             foreignKeyName: "quotations_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
@@ -4744,6 +4947,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "properties"
             referencedColumns: ["tenant_id", "id"]
+          },
+          {
+            foreignKeyName: "quotations_tenant_id_work_order_id_fkey"
+            columns: ["tenant_id", "work_order_id"]
+            isOneToOne: false
+            referencedRelation: "v_job_financials"
+            referencedColumns: ["tenant_id", "work_order_id"]
           },
           {
             foreignKeyName: "quotations_tenant_id_work_order_id_fkey"
@@ -4875,6 +5085,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "contracts"
             referencedColumns: ["tenant_id", "id"]
+          },
+          {
+            foreignKeyName: "rate_cards_tenant_id_contract_id_fkey"
+            columns: ["tenant_id", "contract_id"]
+            isOneToOne: false
+            referencedRelation: "v_contract_performance"
+            referencedColumns: ["tenant_id", "contract_id"]
           },
           {
             foreignKeyName: "rate_cards_tenant_id_fkey"
@@ -5214,6 +5431,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "purchase_orders"
             referencedColumns: ["tenant_id", "id"]
+          },
+          {
+            foreignKeyName: "stock_movements_tenant_id_work_order_id_fkey"
+            columns: ["tenant_id", "work_order_id"]
+            isOneToOne: false
+            referencedRelation: "v_job_financials"
+            referencedColumns: ["tenant_id", "work_order_id"]
           },
           {
             foreignKeyName: "stock_movements_tenant_id_work_order_id_fkey"
@@ -5741,6 +5965,13 @@ export type Database = {
             foreignKeyName: "timesheets_tenant_id_work_order_id_fkey"
             columns: ["tenant_id", "work_order_id"]
             isOneToOne: false
+            referencedRelation: "v_job_financials"
+            referencedColumns: ["tenant_id", "work_order_id"]
+          },
+          {
+            foreignKeyName: "timesheets_tenant_id_work_order_id_fkey"
+            columns: ["tenant_id", "work_order_id"]
+            isOneToOne: false
             referencedRelation: "work_orders"
             referencedColumns: ["tenant_id", "id"]
           },
@@ -5984,6 +6215,13 @@ export type Database = {
             referencedColumns: ["tenant_id", "id"]
           },
           {
+            foreignKeyName: "work_orders_tenant_id_contract_id_fkey"
+            columns: ["tenant_id", "contract_id"]
+            isOneToOne: false
+            referencedRelation: "v_contract_performance"
+            referencedColumns: ["tenant_id", "contract_id"]
+          },
+          {
             foreignKeyName: "work_orders_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
@@ -6003,6 +6241,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "organisations"
             referencedColumns: ["tenant_id", "id"]
+          },
+          {
+            foreignKeyName: "work_orders_tenant_id_parent_id_fkey"
+            columns: ["tenant_id", "parent_id"]
+            isOneToOne: false
+            referencedRelation: "v_job_financials"
+            referencedColumns: ["tenant_id", "work_order_id"]
           },
           {
             foreignKeyName: "work_orders_tenant_id_parent_id_fkey"
@@ -6036,58 +6281,427 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      v_contract_performance: {
+        Row: {
+          annual_budget: number | null
+          avg_satisfaction: number | null
+          contract_id: string | null
+          cost: number | null
+          cost_last_12m: number | null
+          first_time_fix_pct: number | null
+          jobs_completed: number | null
+          jobs_open: number | null
+          jobs_overdue: number | null
+          jobs_total: number | null
+          margin: number | null
+          on_time_pct: number | null
+          organisation_id: string | null
+          properties: number | null
+          revenue: number | null
+          tenant_id: string | null
+          value: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contracts_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contracts_tenant_id_organisation_id_fkey"
+            columns: ["tenant_id", "organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["tenant_id", "id"]
+          },
+        ]
+      }
+      v_job_financials: {
+        Row: {
+          contract_id: string | null
+          estimated_cost: number | null
+          invoiced_net: number | null
+          labour_cost: number | null
+          margin: number | null
+          materials_cost: number | null
+          organisation_id: string | null
+          other_cost: number | null
+          subcontractor_cost: number | null
+          tenant_id: string | null
+          total_cost: number | null
+          work_order_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "work_orders_tenant_id_contract_id_fkey"
+            columns: ["tenant_id", "contract_id"]
+            isOneToOne: false
+            referencedRelation: "contracts"
+            referencedColumns: ["tenant_id", "id"]
+          },
+          {
+            foreignKeyName: "work_orders_tenant_id_contract_id_fkey"
+            columns: ["tenant_id", "contract_id"]
+            isOneToOne: false
+            referencedRelation: "v_contract_performance"
+            referencedColumns: ["tenant_id", "contract_id"]
+          },
+          {
+            foreignKeyName: "work_orders_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "work_orders_tenant_id_organisation_id_fkey"
+            columns: ["tenant_id", "organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["tenant_id", "id"]
+          },
+        ]
+      }
     }
     Functions: {
       accept_my_invitations: {
         Args: Record<PropertyKey, never>
         Returns: number
       }
-      log_audit_event: {
+      assignment_conflicts: {
         Args: {
-          p_details?: Json
-          p_entity_id?: string
-          p_entity: string
+          p_exclude?: string
+          p_end: string
+          p_start: string
+          p_employee: string
+        }
+        Returns: {
+          starts_at: string
+          ref_id: string
+          kind: string
+          ends_at: string
+          label: string
+        }[]
+      }
+      dashboard_summary: {
+        Args: { p_tenant: string }
+        Returns: Json
+      }
+      field_add_material: {
+        Args: {
+          p_unit?: string
           p_tenant: string
-          p_action: string
-          p_summary?: string
+          p_assignment: string
+          p_description: string
+          p_quantity: number
+          p_client_ref?: string
         }
         Returns: undefined
       }
+      field_add_photo: {
+        Args: {
+          p_path: string
+          p_stage: string
+          p_caption?: string
+          p_tenant: string
+          p_assignment: string
+        }
+        Returns: undefined
+      }
+      field_checklist: {
+        Args: {
+          p_items: Json
+          p_checklist: string
+          p_assignment: string
+          p_tenant: string
+        }
+        Returns: undefined
+      }
+      field_job: {
+        Args: { p_assignment: string; p_tenant: string }
+        Returns: Json
+      }
+      field_my_jobs: {
+        Args: { p_to: string; p_from: string; p_tenant: string }
+        Returns: {
+          job_status_label: string
+          trade: string
+          hazards: string[]
+          access_notes: string
+          longitude: number
+          latitude: number
+          postcode: string
+          town: string
+          address: string
+          scheduled_end: string
+          scheduled_start: string
+          assignment_status: string
+          status_colour: string
+          job_status: string
+          priority: string
+          title: string
+          reference: string
+          work_order_id: string
+          assignment_id: string
+        }[]
+      }
+      field_signoff: {
+        Args: {
+          p_assignment: string
+          p_satisfaction?: number
+          p_signature_path?: string
+          p_tenant: string
+          p_name: string
+        }
+        Returns: undefined
+      }
+      field_submit_timesheet: {
+        Args: {
+          p_client_ref?: string
+          p_tenant: string
+          p_assignment: string
+          p_date: string
+          p_hours: number
+          p_type?: string
+          p_notes?: string
+        }
+        Returns: undefined
+      }
+      field_update: {
+        Args: {
+          p_assignment: string
+          p_action: string
+          p_note?: string
+          p_client_ref?: string
+          p_tenant: string
+        }
+        Returns: Json
+      }
+      finance_monthly: {
+        Args: { p_months?: number; p_tenant: string }
+        Returns: {
+          month: string
+          revenue: number
+          labour: number
+          materials: number
+          vehicle: number
+          overhead: number
+          other: number
+          subcontractor: number
+        }[]
+      }
+      job_throughput: {
+        Args: { p_weeks?: number; p_tenant: string }
+        Returns: {
+          week: string
+          created: number
+          completed: number
+        }[]
+      }
+      log_audit_event: {
+        Args: {
+          p_action: string
+          p_tenant: string
+          p_summary?: string
+          p_details?: Json
+          p_entity_id?: string
+          p_entity: string
+        }
+        Returns: undefined
+      }
+      management_alerts: {
+        Args: { p_tenant: string }
+        Returns: {
+          link: string
+          detail: string
+          title: string
+          kind: string
+          severity: string
+          due: string
+        }[]
+      }
       platform_create_tenant: {
         Args: {
+          p_prefix?: string
           p_slug: string
+          p_is_demo?: boolean
           p_name: string
           p_plan?: string
-          p_is_demo?: boolean
-          p_prefix?: string
         }
         Returns: string
       }
       platform_tenant_overview: {
         Args: Record<PropertyKey, never>
         Returns: {
-          slug: string
-          id: string
           name: string
-          is_demo: boolean
-          seats: number
-          subscription_status: string
+          id: string
+          slug: string
           plan_key: string
-          properties: number
-          work_orders: number
-          active_users: number
+          subscription_status: string
+          seats: number
+          is_demo: boolean
           created_at: string
+          active_users: number
+          work_orders: number
+          properties: number
         }[]
       }
       platform_update_subscription: {
         Args: {
+          p_tenant: string
           p_plan: string
           p_status: string
-          p_tenant: string
           p_seats: number
         }
         Returns: undefined
+      }
+      portal_add_message: {
+        Args: { p_job: string; p_tenant: string; p_body: string }
+        Returns: undefined
+      }
+      portal_can_view_photo: {
+        Args: { p_tenant: string; p_path: string }
+        Returns: boolean
+      }
+      portal_contracts: {
+        Args: { p_tenant: string }
+        Returns: {
+          start_date: string
+          id: string
+          jobs_completed: number
+          jobs_open: number
+          title: string
+          contract_type: string
+          on_time_pct: number
+          avg_satisfaction: number
+          reference: string
+          end_date: string
+          status: string
+        }[]
+      }
+      portal_decide_quote: {
+        Args: {
+          p_approve: boolean
+          p_quote: string
+          p_tenant: string
+          p_reason?: string
+          p_name: string
+        }
+        Returns: undefined
+      }
+      portal_invoices: {
+        Args: { p_tenant: string }
+        Returns: {
+          subtotal: number
+          due_date: string
+          issue_date: string
+          status: string
+          reference: string
+          id: string
+          purchase_order_ref: string
+          job_reference: string
+          amount_paid: number
+          total: number
+          vat_total: number
+        }[]
+      }
+      portal_job: {
+        Args: { p_tenant: string; p_job: string }
+        Returns: Json
+      }
+      portal_jobs: {
+        Args: {
+          p_limit?: number
+          p_search?: string
+          p_open_only?: boolean
+          p_tenant: string
+        }
+        Returns: {
+          status_colour: string
+          status_label: string
+          client_reference: string
+          reference: string
+          id: string
+          title: string
+          completed_at: string
+          scheduled_start: string
+          target_completion_at: string
+          reported_at: string
+          postcode: string
+          address: string
+          property_id: string
+          priority: string
+          is_open: boolean
+        }[]
+      }
+      portal_overview: {
+        Args: { p_tenant: string }
+        Returns: Json
+      }
+      portal_properties: {
+        Args: { p_tenant: string; p_search?: string }
+        Returns: {
+          open_jobs: number
+          id: string
+          reference: string
+          postcode: string
+          client_reference: string
+          address: string
+          town: string
+          status: string
+          property_type: string
+        }[]
+      }
+      portal_quotes: {
+        Args: { p_tenant: string }
+        Returns: {
+          id: string
+          total: number
+          status: string
+          title: string
+          reference: string
+          lines: Json
+          address: string
+          job_reference: string
+          vat_total: number
+          subtotal: number
+          valid_until: string
+          sent_at: string
+          decided_at: string
+          job_id: string
+        }[]
+      }
+      portal_submit_request: {
+        Args: {
+          p_tenant: string
+          p_description: string
+          p_title: string
+          p_property: string
+          p_client_reference?: string
+          p_priority: string
+        }
+        Returns: string
+      }
+      recommend_operatives: {
+        Args: { p_end: string; p_start: string; p_work_order: string }
+        Returns: {
+          employee_id: string
+          reasons: string[]
+          conflicts: number
+          total_score: number
+          workload_score: number
+          distance_score: number
+          availability_score: number
+          trade_score: number
+          booked_hours_day: number
+          distance_km: number
+          colour: string
+          skills: string[]
+          trade: string
+          name: string
+        }[]
       }
       run_retention: {
         Args: Record<PropertyKey, never>
@@ -6095,6 +6709,16 @@ export type Database = {
           affected: number
           tenant_id: string
           entity: string
+        }[]
+      }
+      search_everything: {
+        Args: { p_limit?: number; p_query: string; p_tenant: string }
+        Returns: {
+          subtitle: string
+          id: string
+          title: string
+          kind: string
+          link: string
         }[]
       }
     }

@@ -15,7 +15,8 @@
     "stack:down": "node scripts/stack.mjs down",
     "db:migrate": "node scripts/stack.mjs migrate",
     "db:seed": "node scripts/stack.mjs seed",
-    "test:db": "node scripts/test-db.mjs"
+    "test:db": "node scripts/test-db.mjs",
+    "test:e2e": "node tests/e2e/roles.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

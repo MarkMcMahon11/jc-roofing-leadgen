@@ -67,7 +67,7 @@ export function PageHeader({
 
 export function Card({ className, children, ...rest }: ComponentProps<"section">) {
   return (
-    <section className={cx("pm-card", className)} {...rest}>
+    <section className={cx("pm-card min-w-0", className)} {...rest}>
       {children}
     </section>
   );

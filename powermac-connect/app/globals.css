@@ -11,7 +11,7 @@
   --font-mono: var(--font-plex-mono), ui-monospace, "SFMono-Regular", monospace;
 
   --color-canvas: #060a14;     /* app background */
-  --color-base: #0a101e;       /* sidebar, top bar */
+  --color-chrome: #0a101e;     /* sidebar, top bar (not "base": it would collide with text-base) */
   --color-surface: #0f1729;    /* cards */
   --color-raised: #152038;     /* hover, inputs, nested panels */
   --color-sunken: #0b1222;     /* table heads, wells */
@@ -93,12 +93,12 @@ body {
 }
 
 /* Leaflet in dark UI */
-.leaflet-container {
+.leaflet-container.leaflet-container {
   background: #0b1222;
   font-family: var(--font-sans);
 }
 .leaflet-tile-pane {
-  filter: brightness(0.62) invert(1) contrast(0.9) hue-rotate(200deg) saturate(0.35) brightness(0.85);
+  filter: invert(1) hue-rotate(185deg) brightness(0.88) contrast(0.88) saturate(0.4);
 }
 .leaflet-popup-content-wrapper,
 .leaflet-popup-tip {

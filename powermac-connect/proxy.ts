@@ -7,5 +7,5 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   // everything except static assets, images, the service worker and API webhooks that authenticate themselves
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|icon.svg|robots.txt|api/public|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|icon.svg|robots.txt|sw.js|manifest.webmanifest|api/public|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)"],
 };

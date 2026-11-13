@@ -75,3 +75,10 @@ export function label(key: string | null | undefined) {
   if (!key) return "-";
   return key.replace(/_/g, " ").replace(/^\w/, (c) => c.toUpperCase());
 }
+
+/** YYYY-MM-DD plus n days. */
+export function addDaysISO(iso: string, n: number) {
+  const d = new Date(iso + "T12:00:00Z");
+  d.setUTCDate(d.getUTCDate() + n);
+  return d.toISOString().slice(0, 10);
+}

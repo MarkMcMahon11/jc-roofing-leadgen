@@ -9,6 +9,7 @@ import { Icon } from "@/components/ui/icons";
 import { cx } from "@/components/ui/primitives";
 import { Logo } from "./logo";
 import { markNotificationsRead, signOut, switchTenant } from "./actions";
+import { GlobalSearch } from "./search";
 
 export type ShellUser = { name: string; email: string; role: string; initials: string };
 export type ShellTenant = { id: string; name: string; isDemo: boolean };
@@ -51,7 +52,7 @@ export function Shell({
 
       <aside
         className={cx(
-          "fixed bottom-0 left-0 z-50 flex w-[264px] flex-col border-r border-line bg-base/95 backdrop-blur transition-transform lg:translate-x-0",
+          "fixed bottom-0 left-0 z-50 flex w-[264px] flex-col border-r border-line bg-chrome/95 backdrop-blur transition-transform lg:translate-x-0",
           tenant.isDemo ? "top-8" : "top-0",
           open ? "translate-x-0" : "-translate-x-full",
         )}
@@ -129,6 +130,9 @@ export function Shell({
           </button>
           <div className="lg:hidden">
             <Logo compact />
+          </div>
+          <div className="ml-2 hidden min-w-0 flex-1 md:block lg:ml-0">
+            <GlobalSearch />
           </div>
           <div className="ml-auto flex items-center gap-2">
             <Notifications items={notifications} />

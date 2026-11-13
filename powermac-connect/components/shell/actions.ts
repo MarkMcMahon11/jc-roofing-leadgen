@@ -36,3 +36,15 @@ export async function markNotificationsRead() {
   await supabase.from("notifications").update({ read_at: new Date().toISOString() }).eq("user_id", ctx.userId).is("read_at", null);
   revalidatePath("/", "layout");
 }
+
+export type SearchHit = { kind: string; id: string; title: string; subtitle: string | null; link: string };
+
+/** Global search across jobs, properties, clients, contracts and people - limited to what the user can see. */
+export async function globalSearch(query: string): Promise<SearchHit[]> {
+  const ctx = await requireUser();
+  const q = query.trim().slice(0, 80);
+  if (!ctx.active || q.length < 2) return [];
+  const supabase = await createClient();
+  const { data } = await supabase.rpc("search_everything", { p_tenant: ctx.active.tenant.id, p_query: q, p_limit: 5 });
+  return (data ?? []).map((r) => ({ kind: r.kind, id: r.id, title: r.title, subtitle: r.subtitle, link: r.link }));
+}

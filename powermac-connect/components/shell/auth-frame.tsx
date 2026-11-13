@@ -5,7 +5,7 @@ import { Logo } from "./logo";
 export function AuthFrame({ title, subtitle, children }: { title: string; subtitle?: ReactNode; children: ReactNode }) {
   return (
     <div className="grid min-h-dvh lg:grid-cols-[1fr_minmax(420px,520px)]">
-      <section className="relative hidden overflow-hidden border-r border-line bg-base lg:flex lg:flex-col lg:justify-between lg:p-12">
+      <section className="relative hidden overflow-hidden border-r border-line bg-chrome lg:flex lg:flex-col lg:justify-between lg:p-12">
         <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(600px_400px_at_20%_20%,rgb(47_125_255/0.18),transparent_70%)]" />
         <Logo />
         <div className="relative max-w-lg">

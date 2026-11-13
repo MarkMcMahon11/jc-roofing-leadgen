@@ -54,7 +54,7 @@ export function RolesMatrix({ roles, permissions }: { roles: Role[]; permissions
               {modules.map((mod) => (
                 <Fragment key={mod}>
                   <tr>
-                    <td colSpan={optimistic.length + 1} className="sticky left-0 bg-base/60 px-4 pt-4 pb-1.5 text-[11px] font-semibold tracking-wider text-accent-hi uppercase">{mod.replace(/_/g, " ")}</td>
+                    <td colSpan={optimistic.length + 1} className="sticky left-0 bg-chrome/60 px-4 pt-4 pb-1.5 text-[11px] font-semibold tracking-wider text-accent-hi uppercase">{mod.replace(/_/g, " ")}</td>
                   </tr>
                   {permissions.filter((p) => p.module === mod).map((p) => (
                     <tr key={p.key} className="border-b border-line/60 hover:bg-raised/40">
