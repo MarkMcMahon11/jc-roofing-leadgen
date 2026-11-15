@@ -45,7 +45,7 @@ export function UploadForm({ endpoint, kind = "document", categories = [], maxMb
   return (
     <form ref={form} onSubmit={onSubmit} className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4" aria-label={kind === "photo" ? "Upload photo" : "Upload document"}>
       {result && (
-        <div role={result.ok ? "status" : "alert"} className={cx("rounded-xl border px-4 py-2.5 text-sm sm:col-span-2 lg:col-span-4", result.ok ? "border-[#18492f] bg-ok-lo/70 text-[#9be8bd]" : "border-[#5a1f1d] bg-bad-lo/70 text-[#ffb3b1]")}>
+        <div role={result.ok ? "status" : "alert"} className={cx("rounded-xl border px-4 py-2.5 text-sm sm:col-span-2 lg:col-span-4", result.ok ? "border-[#145049] bg-ok-lo/70 text-[#a6efe7]" : "border-[#5a1f1d] bg-bad-lo/70 text-[#ffb3b1]")}>
           {result.message}
         </div>
       )}
@@ -57,7 +57,7 @@ export function UploadForm({ endpoint, kind = "document", categories = [], maxMb
           type="file"
           required
           accept={kind === "photo" ? "image/jpeg,image/png,image/webp,image/heic,image/heif" : undefined}
-          className="block w-full rounded-[10px] border border-line-strong bg-sunken text-sm text-muted file:mr-3 file:h-10 file:border-0 file:border-r file:border-line-strong file:bg-raised file:px-3 file:text-sm file:text-fg hover:file:bg-[#1a2643]"
+          className="block w-full rounded-[10px] border border-line-strong bg-sunken text-sm text-muted file:mr-3 file:h-10 file:border-0 file:border-r file:border-line-strong file:bg-raised file:px-3 file:text-sm file:text-fg hover:file:bg-[#18211a]"
         />
         <p className="mt-1.5 text-xs text-subtle">Up to {maxMb} MB.</p>
       </div>

@@ -75,7 +75,7 @@ export function ContactsPanel({ orgId, contacts, canWrite }: { orgId: string; co
 function ContactCard({ c, canWrite, onEdit }: { c: ContactRow; canWrite: boolean; onEdit: () => void }) {
   const channel = PREFERRED_CHANNELS.find((p) => p.value === c.preferred_channel)?.label ?? c.preferred_channel;
   return (
-    <li className={`flex flex-col rounded-xl border px-4 py-3.5 ${c.is_primary ? "border-[#1d3d78] bg-accent-lo/30" : "border-line bg-sunken/60"} ${c.archived_at ? "opacity-70" : ""}`}>
+    <li className={`flex flex-col rounded-xl border px-4 py-3.5 ${c.is_primary ? "border-[#2f5a12] bg-accent-lo/30" : "border-line bg-sunken/60"} ${c.archived_at ? "opacity-70" : ""}`}>
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <p className="truncate font-medium text-fg">{`${c.first_name} ${c.last_name}`.trim()}</p>

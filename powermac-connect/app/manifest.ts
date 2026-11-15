@@ -7,8 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "One Connected Operation. Complete Business Intelligence.",
     start_url: "/",
     display: "standalone",
-    background_color: "#060a14",
-    theme_color: "#060a14",
-    icons: [{ src: "/icon.svg", sizes: "any", type: "image/svg+xml" }],
+    background_color: "#020302",
+    theme_color: "#020302",
+    icons: [{ src: "/brand/pmj-icon.png", sizes: "256x256", type: "image/png" }],
   };
 }

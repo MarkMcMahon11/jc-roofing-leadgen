@@ -103,7 +103,7 @@ function ChecklistCard({ c, canWrite }: { c: Checklist; canWrite: boolean }) {
         {items.map((it, i) => (
           <li key={i}>
             <label className={cx("flex items-start gap-3 px-5 py-3", canWrite ? "cursor-pointer hover:bg-raised/40" : "")}>
-              <input type="checkbox" className="mt-0.5 size-4 shrink-0 accent-[#2fbf71]" checked={it.done} disabled={!canWrite || pending} onChange={(e) => toggle(i, e.target.checked)} />
+              <input type="checkbox" className="mt-0.5 size-4 shrink-0 accent-[#22c7b8]" checked={it.done} disabled={!canWrite || pending} onChange={(e) => toggle(i, e.target.checked)} />
               <span className="min-w-0 flex-1">
                 <span className={cx("text-sm", it.done ? "text-muted line-through decoration-subtle" : "text-fg")}>{it.label}</span>
                 {it.required && !it.done && <span className="ml-2 text-[11px] font-medium text-[#ffc56b]">Required</span>}

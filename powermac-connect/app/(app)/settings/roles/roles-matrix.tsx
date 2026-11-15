@@ -75,7 +75,7 @@ export function RolesMatrix({ roles, permissions }: { roles: Role[]; permissions
                               <label className={cx("inline-flex size-8 items-center justify-center rounded-md", !locked && "cursor-pointer hover:bg-raised")} title={r.isMine ? "You cannot edit your own role" : !p.mine ? "You do not hold this permission" : undefined}>
                                 <input
                                   type="checkbox"
-                                  className="size-4 accent-[#2f7dff] disabled:opacity-40"
+                                  className="size-4 accent-[#5ee000] disabled:opacity-40"
                                   checked={checked}
                                   disabled={locked || pending}
                                   onChange={(e) => onToggle(r, p, e.target.checked)}

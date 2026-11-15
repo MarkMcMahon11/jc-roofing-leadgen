@@ -62,18 +62,18 @@ export function FieldJob({ data, assignmentId, tenantId, isOperative, today, pho
         <a href={navUrl} target="_blank" rel="noopener" className="mt-4 flex items-center gap-3 rounded-xl border border-line bg-sunken p-3 active:bg-raised">
           <MapPin className="size-5 shrink-0 text-accent-hi" aria-hidden />
           <span className="min-w-0 flex-1 text-[15px]">{data.property.address}<span className="block text-sm text-muted">{data.property.town} {data.property.postcode}</span></span>
-          <span className="flex items-center gap-1 rounded-lg bg-accent px-3 py-2 text-sm font-semibold text-white"><Navigation className="size-4" aria-hidden />Go</span>
+          <span className="flex items-center gap-1 rounded-lg bg-accent px-3 py-2 text-sm font-semibold text-[#061003]"><Navigation className="size-4" aria-hidden />Go</span>
         </a>
       </section>
 
       {flash && (
-        <div role="status" className={cx("rounded-xl border px-4 py-3 text-sm", flash.ok ? "border-[#18492f] bg-ok-lo text-[#9be8bd]" : "border-[#5a1f1d] bg-bad-lo text-[#ffb3b1]")}>{flash.text}</div>
+        <div role="status" className={cx("rounded-xl border px-4 py-3 text-sm", flash.ok ? "border-[#145049] bg-ok-lo text-[#a6efe7]" : "border-[#5a1f1d] bg-bad-lo text-[#ffb3b1]")}>{flash.text}</div>
       )}
 
       {/* the one big button: what to do next */}
       <section className="space-y-2.5">
         {status === "completed" ? (
-          <div className="flex items-center justify-center gap-2 rounded-2xl border border-[#18492f] bg-ok-lo p-4 font-semibold text-[#9be8bd]"><CheckCircle2 className="size-5" />Finished {t(a.finished_at)}</div>
+          <div className="flex items-center justify-center gap-2 rounded-2xl border border-[#145049] bg-ok-lo p-4 font-semibold text-[#a6efe7]"><CheckCircle2 className="size-5" />Finished {t(a.finished_at)}</div>
         ) : status === "no_access" ? (
           <div className="rounded-2xl border border-[#57400f] bg-warn-lo p-4 text-center font-semibold text-[#ffd79a]">Marked as no access</div>
         ) : (
@@ -117,7 +117,7 @@ export function FieldJob({ data, assignmentId, tenantId, isOperative, today, pho
               <div className="text-[15px] font-medium">{data.occupant.name}</div>
               {data.occupant.access_needs && <div className="text-sm text-[#ffd79a]">{data.occupant.access_needs}</div>}
             </div>
-            {data.occupant.phone && <a href={`tel:${data.occupant.phone.replace(/\s/g, "")}`} className="flex items-center gap-2 rounded-xl bg-accent px-4 py-3 text-sm font-semibold text-white"><Phone className="size-4" />Call</a>}
+            {data.occupant.phone && <a href={`tel:${data.occupant.phone.replace(/\s/g, "")}`} className="flex items-center gap-2 rounded-xl bg-accent px-4 py-3 text-sm font-semibold text-[#061003]"><Phone className="size-4" />Call</a>}
           </div>
         ) : (
           <p className="mb-2 text-sm text-muted">No occupant contact on this job.</p>
@@ -229,8 +229,8 @@ function BigButton({ children, onClick, disabled, icon, tone = "secondary" }: { 
       disabled={disabled}
       className={cx(
         "flex h-16 w-full items-center justify-center gap-3 rounded-2xl text-lg font-semibold transition-transform active:scale-[0.98] disabled:opacity-60",
-        tone === "primary" && "bg-accent text-white shadow-[0_8px_24px_-8px_rgb(47_125_255/0.8)]",
-        tone === "ok" && "bg-ok text-[#04150c]",
+        tone === "primary" && "bg-accent text-[#061003] shadow-[0_8px_24px_-8px_rgb(94_224_0/0.8)]",
+        tone === "ok" && "bg-ok text-[#021614]",
         tone === "secondary" && "border border-line-strong bg-raised text-fg",
       )}
     >
@@ -261,13 +261,13 @@ function Checklist({ checklist, onSave, pending }: { checklist: FieldJobData["ch
         {items.map((it, i) => (
           <li key={i}>
             <label className="flex min-h-12 cursor-pointer items-center gap-3 rounded-xl px-2 active:bg-raised">
-              <input type="checkbox" checked={Boolean(it.done)} onChange={(e) => setItems(items.map((x, j) => (j === i ? { ...x, done: e.target.checked } : x)))} className="size-6 accent-[#2f7dff]" />
+              <input type="checkbox" checked={Boolean(it.done)} onChange={(e) => setItems(items.map((x, j) => (j === i ? { ...x, done: e.target.checked } : x)))} className="size-6 accent-[#5ee000]" />
               <span className="text-[15px]">{it.label}{it.required && <span className="ml-1 text-accent-hi">*</span>}</span>
             </label>
           </li>
         ))}
       </ul>
-      <button onClick={() => onSave(items)} disabled={pending} className="mt-3 w-full rounded-xl bg-accent py-3 text-sm font-semibold text-white">Save checklist</button>
+      <button onClick={() => onSave(items)} disabled={pending} className="mt-3 w-full rounded-xl bg-accent py-3 text-sm font-semibold text-[#061003]">Save checklist</button>
     </Panel>
   );
 }
@@ -308,7 +308,7 @@ function Photos({ jobId, tenantId, existing, urls, onAdded }: { jobId: string; t
       )}
       <div className="grid grid-cols-4 gap-1.5">
         {["before", "during", "after", "issue"].map((s) => (
-          <button key={s} onClick={() => setStage(s)} className={cx("rounded-lg py-2.5 text-sm capitalize", stage === s ? "bg-accent text-white" : "bg-raised text-muted")} aria-pressed={stage === s}>{s}</button>
+          <button key={s} onClick={() => setStage(s)} className={cx("rounded-lg py-2.5 text-sm capitalize", stage === s ? "bg-accent text-[#061003]" : "bg-raised text-muted")} aria-pressed={stage === s}>{s}</button>
         ))}
       </div>
       <input ref={input} type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) upload(f); e.target.value = ""; }} />
@@ -325,7 +325,7 @@ function SignOff({ data, tenantId, onSign, pending }: { data: FieldJobData; tena
   const [rating, setRating] = useState<number | undefined>();
   const [err, setErr] = useState<string | null>(null);
   if (data.job.signoff_at) {
-    return <Panel title="Customer sign-off"><p className="flex items-center gap-2 text-sm text-[#9be8bd]"><CheckCircle2 className="size-4" />Signed by {data.job.signoff_name}</p></Panel>;
+    return <Panel title="Customer sign-off"><p className="flex items-center gap-2 text-sm text-[#a6efe7]"><CheckCircle2 className="size-4" />Signed by {data.job.signoff_name}</p></Panel>;
   }
   const pos = (e: React.PointerEvent<HTMLCanvasElement>) => {
     const r = e.currentTarget.getBoundingClientRect();
@@ -357,7 +357,7 @@ function SignOff({ data, tenantId, onSign, pending }: { data: FieldJobData; tena
             height={200}
             className="h-32 w-full touch-none rounded-xl border border-line-strong bg-white"
             aria-label="Signature pad"
-            onPointerDown={(e) => { drawing.current = true; const c = e.currentTarget.getContext("2d")!; const [x, y] = pos(e); c.lineWidth = 3; c.lineCap = "round"; c.strokeStyle = "#0a101e"; c.beginPath(); c.moveTo(x, y); }}
+            onPointerDown={(e) => { drawing.current = true; const c = e.currentTarget.getContext("2d")!; const [x, y] = pos(e); c.lineWidth = 3; c.lineCap = "round"; c.strokeStyle = "#060907"; c.beginPath(); c.moveTo(x, y); }}
             onPointerMove={(e) => { if (!drawing.current) return; const c = e.currentTarget.getContext("2d")!; const [x, y] = pos(e); c.lineTo(x, y); c.stroke(); setDrawn(true); }}
             onPointerUp={() => { drawing.current = false; }}
           />
@@ -367,12 +367,12 @@ function SignOff({ data, tenantId, onSign, pending }: { data: FieldJobData; tena
           <div className="mb-1 text-xs text-muted">How happy is the customer?</div>
           <div className="grid grid-cols-5 gap-1.5">
             {[1, 2, 3, 4, 5].map((n) => (
-              <button type="button" key={n} onClick={() => setRating(n)} aria-pressed={rating === n} className={cx("rounded-lg py-3 text-base font-semibold", rating === n ? "bg-accent text-white" : "bg-raised text-muted")}>{n}</button>
+              <button type="button" key={n} onClick={() => setRating(n)} aria-pressed={rating === n} className={cx("rounded-lg py-3 text-base font-semibold", rating === n ? "bg-accent text-[#061003]" : "bg-raised text-muted")}>{n}</button>
             ))}
           </div>
         </div>
         {err && <p className="text-sm text-[#ffb3b1]">{err}</p>}
-        <button className="h-14 w-full rounded-xl bg-accent text-base font-semibold text-white" disabled={pending}>Record sign-off</button>
+        <button className="h-14 w-full rounded-xl bg-accent text-base font-semibold text-[#061003]" disabled={pending}>Record sign-off</button>
       </form>
     </Panel>
   );

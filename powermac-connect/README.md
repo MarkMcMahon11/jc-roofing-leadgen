@@ -7,6 +7,9 @@ PowerMac Joinery & Construction (Scotland), and designed to be licensed to other
 - Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS 4
 - Supabase: PostgreSQL 17 with Row Level Security, Auth, Storage
 - No unnecessary dependencies: charts, drag-and-drop, maps (Leaflet + OpenStreetMap) and forms are built in
+- PowerMac brand theme (black, PMJ lime green, brushed silver): glass panels, pointer-lit cards with 3D tilt,
+  and an animated three.js construction scene behind the app (`components/three/brand-scene.tsx`). It is
+  skipped on phones and frozen to one still frame when the device asks for reduced motion
 
 ## What is in the box
 
@@ -23,6 +26,7 @@ PowerMac Joinery & Construction (Scotland), and designed to be licensed to other
 | Workforce | Employees, skills & certifications with expiry, absences, vehicles, subcontractors with insurance/CIS compliance |
 | Field app `/field` | Mobile, one-handed: today's jobs, navigate, arrive/start/pause/finish, checklist, photos, materials, issues & approval requests, timesheets, customer sign-off with signature - works offline and syncs when signal returns |
 | Client portal `/portal` | Corporate clients see only their own data: jobs and progress, photos, repair requests, quotation approval, invoices, contract performance, messages |
+| Brand & motion | PMJ logo and colours throughout, Exo 2 display type, glass navigation, 3D tilt on KPI tiles, staggered page entrances, colour-blind-checked chart palette |
 
 Later stages (schema already in place): procurement & stock screens, quotation/invoice builders and finance
 module (Stage 5), PowerMac AI and the automation engine (Stage 6), accounting/WhatsApp integrations and

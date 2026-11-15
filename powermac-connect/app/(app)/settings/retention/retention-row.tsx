@@ -18,7 +18,7 @@ export function RetentionRow({ policy, description }: { policy: { id: string; en
         <label className="flex items-center gap-2 text-xs text-muted">
           <Input name="retain_months" type="number" min={1} max={240} defaultValue={policy.retain_months} className="h-9 w-20" aria-label="Months to keep" /> months
         </label>
-        <label className="flex items-center gap-1.5 text-xs text-muted"><input type="checkbox" name="is_active" defaultChecked={policy.is_active} className="accent-[#2f7dff]" /> On</label>
+        <label className="flex items-center gap-1.5 text-xs text-muted"><input type="checkbox" name="is_active" defaultChecked={policy.is_active} className="accent-[#5ee000]" /> On</label>
         <SubmitButton size="sm" variant="secondary">Save</SubmitButton>
       </div>
     </ActionForm>

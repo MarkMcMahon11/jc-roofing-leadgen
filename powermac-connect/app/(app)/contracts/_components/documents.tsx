@@ -174,7 +174,7 @@ function UploadForm({ contractId, categories }: { contractId: string; categories
               const f = e.target.files?.[0];
               if (f && !name) setName(f.name.replace(/\.[^.]+$/, ""));
             }}
-            className="block h-10 w-full rounded-[10px] border border-line-strong bg-sunken text-sm text-muted file:mr-3 file:h-full file:border-0 file:border-r file:border-line-strong file:bg-raised file:px-3 file:text-sm file:text-fg hover:file:bg-[#1a2643]"
+            className="block h-10 w-full rounded-[10px] border border-line-strong bg-sunken text-sm text-muted file:mr-3 file:h-full file:border-0 file:border-r file:border-line-strong file:bg-raised file:px-3 file:text-sm file:text-fg hover:file:bg-[#18211a]"
           />
         </div>
         <div className="min-w-0">

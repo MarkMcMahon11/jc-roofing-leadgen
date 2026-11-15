@@ -46,6 +46,7 @@ const landing = {
 };
 for (const [email, home] of Object.entries(landing)) {
   const s = await session(email);
+  await s.page.waitForURL((u) => u.pathname === home, { timeout: 10000 }).catch(() => {});
   ok(new URL(s.page.url()).pathname === home, `${email} lands on ${home}`);
   await s.ctx.close();
 }

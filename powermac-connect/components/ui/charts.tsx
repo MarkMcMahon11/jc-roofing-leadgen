@@ -7,11 +7,13 @@ import { count as countFmt, money } from "@/lib/format";
 
 /*
  * Charts follow one system: categorical slots in fixed order (validated for colour-vision
- * deficiency against the dark card surface #0f1729), thin marks with 4px rounded data
+ * deficiency against the dark glass surface #0c110d), thin marks with 4px rounded data
  * ends, 2px gaps, recessive grid, legend for 2+ series, hover tooltips and a table view.
  * Text always uses text colours - never the series colour.
  */
-export const SERIES = ["#3987e5", "#d95926", "#199e70", "#c98500", "#d55181", "#008300", "#9085e9", "#e66767"] as const;
+// Validated (scripts/validate_palette, dark surface #0c110d): all checks pass incl. colour-blind separation.
+// Brand green leads; it sits next to blue, never orange (green/orange merge for deuteranopes).
+export const SERIES = ["#47a612", "#3987e5", "#d95926", "#9085e9", "#c98500", "#d55181"] as const;
 
 type Series = { key: string; label: string; values: number[] };
 /** Formats are names so Server Components can pass them (functions cannot cross to the client). */
@@ -111,8 +113,8 @@ function YAxis({ max, format }: { max: number; format: Fmt }) {
         const y = PAD.top + ih - t * ih;
         return (
           <g key={t}>
-            <line x1={PAD.left} x2={W - PAD.right} y1={y} y2={y} stroke="#1f2a42" strokeWidth={1} />
-            <text x={PAD.left - 8} y={y + 3.5} textAnchor="end" fontSize={10.5} fill="#8090ab" className="tabular">{format(max * t)}</text>
+            <line x1={PAD.left} x2={W - PAD.right} y1={y} y2={y} stroke="#1c251f" strokeWidth={1} />
+            <text x={PAD.left - 8} y={y + 3.5} textAnchor="end" fontSize={10.5} fill="#86918a" className="tabular">{format(max * t)}</text>
           </g>
         );
       })}
@@ -152,13 +154,13 @@ export function GroupedBarChart({ title, categories, series, format: formatProp,
                   const r = Math.min(4, barW / 2, h);
                   return <path key={s.key} d={`M${x},${PAD.top + ih}V${y + r}Q${x},${y} ${x + r},${y}H${x + barW - r}Q${x + barW},${y} ${x + barW},${y + r}V${PAD.top + ih}Z`} fill={SERIES[si]} />;
                 })}
-                <text x={PAD.left + ci * band + band / 2} y={H - 8} textAnchor="middle" fontSize={10.5} fill="#8090ab">{c}</text>
+                <text x={PAD.left + ci * band + band / 2} y={H - 8} textAnchor="middle" fontSize={10.5} fill="#86918a">{c}</text>
                 {/* hit target larger than the marks */}
                 <rect x={PAD.left + ci * band} y={PAD.top} width={band} height={ih + 14} fill="transparent" onMouseEnter={() => setHover(ci)} onFocus={() => setHover(ci)} tabIndex={0} aria-label={`${c}: ${series.map((s) => `${s.label} ${format(s.values[ci] ?? 0)}`).join(", ")}`} />
               </g>
             );
           })}
-          <line x1={PAD.left} x2={W - PAD.right} y1={PAD.top + ih} y2={PAD.top + ih} stroke="#2c3a58" />
+          <line x1={PAD.left} x2={W - PAD.right} y1={PAD.top + ih} y2={PAD.top + ih} stroke="#2d3a31" />
         </svg>
         {hover !== null && (
           <Tooltip
@@ -197,19 +199,19 @@ export function LineChart({ title, categories, series, format: formatProp, axisF
           <YAxis max={max} format={axisFormat ?? format} />
           {categories.map((c, i) =>
             i % Math.ceil(categories.length / 8) === 0 || i === categories.length - 1 ? (
-              <text key={c} x={X(i)} y={H - 8} textAnchor="middle" fontSize={10.5} fill="#8090ab">{c}</text>
+              <text key={c} x={X(i)} y={H - 8} textAnchor="middle" fontSize={10.5} fill="#86918a">{c}</text>
             ) : null,
           )}
-          {hover !== null && <line x1={X(hover)} x2={X(hover)} y1={PAD.top} y2={PAD.top + ih} stroke="#3d4f74" strokeDasharray="3 3" />}
+          {hover !== null && <line x1={X(hover)} x2={X(hover)} y1={PAD.top} y2={PAD.top + ih} stroke="#3d4b41" strokeDasharray="3 3" />}
           {series.map((s, si) => {
             const d = s.values.map((v, i) => `${i ? "L" : "M"}${X(i)},${Y(v)}`).join("");
             const last = s.values.length - 1;
             return (
               <g key={s.key}>
                 <path d={d} fill="none" stroke={SERIES[si]} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
-                {hover !== null && <circle cx={X(hover)} cy={Y(s.values[hover] ?? 0)} r={4.5} fill={SERIES[si]} stroke="#0f1729" strokeWidth={2} />}
+                {hover !== null && <circle cx={X(hover)} cy={Y(s.values[hover] ?? 0)} r={4.5} fill={SERIES[si]} stroke="#0b100c" strokeWidth={2} />}
                 {last >= 0 && (
-                  <text x={X(last) + 8} y={Y(s.values[last] ?? 0) + 4 + si * 2} fontSize={11} fill="#a3aec4">{s.label}</text>
+                  <text x={X(last) + 8} y={Y(s.values[last] ?? 0) + 4 + si * 2} fontSize={11} fill="#a8b3aa">{s.label}</text>
                 )}
               </g>
             );
@@ -260,7 +262,7 @@ export function BarList({ items, format: formatProp, colour = SERIES[0] }: { ite
 /** Single-value meter (utilisation, budget used). Tone carries status only with a label. */
 export function Meter({ value, max, label, tone = "accent" }: { value: number; max: number; label?: string; tone?: "accent" | "ok" | "warn" | "bad" }) {
   const pct = max > 0 ? Math.min(100, (value / max) * 100) : 0;
-  const colour = { accent: "#3987e5", ok: "#2fbf71", warn: "#f2a93b", bad: "#f0524f" }[tone];
+  const colour = { accent: "#5ee000", ok: "#22c7b8", warn: "#f2a93b", bad: "#f0524f" }[tone];
   return (
     <div>
       {label && <div className="mb-1 flex justify-between text-xs text-muted"><span>{label}</span><span className="tabular text-fg">{pct.toFixed(0)}%</span></div>}

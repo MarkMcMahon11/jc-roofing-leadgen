@@ -7,7 +7,7 @@ import { signOut } from "@/components/shell/actions";
 import { OfflineBar } from "./offline";
 
 export const metadata: Metadata = { title: "My jobs", manifest: "/manifest.webmanifest" };
-export const viewport: Viewport = { themeColor: "#060a14", width: "device-width", initialScale: 1, viewportFit: "cover" };
+export const viewport: Viewport = { themeColor: "#020302", width: "device-width", initialScale: 1, viewportFit: "cover" };
 
 // Mobile app for operatives and subcontractors: one hand, big targets, works with poor signal.
 export default async function FieldLayout({ children }: { children: React.ReactNode }) {

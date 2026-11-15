@@ -339,7 +339,7 @@ export function Planner({ config, operatives, subs, subOptions, bookings, absenc
             </div>
           </div>
           {pick && pickLabel && (
-            <div className="flex flex-wrap items-center gap-2 border-b border-[#1d3d78] bg-accent-lo/60 px-4 py-2 text-[13px] text-[#b5d1ff]" role="status">
+            <div className="flex flex-wrap items-center gap-2 border-b border-[#2f5a12] bg-accent-lo/60 px-4 py-2 text-[13px] text-[#c8f7a8]" role="status">
               <MousePointerClick className="size-4 shrink-0 text-accent-hi" aria-hidden />
               <span>
                 Placing <span className="font-mono text-accent-hi">{pickLabel}</span>: click {config.view === "week" ? "an operative's day" : "a time slot"} to {movingBooking ? "move it" : "book it"}. Press Esc to cancel.
@@ -418,7 +418,7 @@ export function Planner({ config, operatives, subs, subOptions, bookings, absenc
             </div>
           )}
           {notice && (
-            <div role="status" data-testid="planner-notice" className="pointer-events-auto flex w-full items-start gap-3 rounded-xl border border-[#18492f] bg-[#0b2219] px-4 py-3 text-sm text-[#9be8bd] shadow-[var(--shadow-pop)]">
+            <div role="status" data-testid="planner-notice" className="pointer-events-auto flex w-full items-start gap-3 rounded-xl border border-[#145049] bg-[#06201d] px-4 py-3 text-sm text-[#a6efe7] shadow-[var(--shadow-pop)]">
               <CheckCircle2 className="mt-0.5 size-4 shrink-0" aria-hidden />
               <span className="min-w-0 flex-1">{notice}</span>
               <button type="button" onClick={() => setNotice(null)} className="rounded p-1 hover:bg-ok-lo" aria-label="Dismiss">

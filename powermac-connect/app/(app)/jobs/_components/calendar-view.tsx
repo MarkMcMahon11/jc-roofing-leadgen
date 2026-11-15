@@ -154,7 +154,7 @@ export async function CalendarView({
                     href={`/schedule?date=${d}`}
                     className={cx(
                       "flex size-6 items-center justify-center rounded-full text-xs tabular hover:bg-raised",
-                      d === today ? "bg-accent font-semibold text-white hover:bg-accent" : inMonth ? "text-fg" : "text-subtle",
+                      d === today ? "bg-accent font-semibold text-[#061003] hover:bg-accent" : inMonth ? "text-fg" : "text-subtle",
                     )}
                     title={`Open the schedule for ${d}`}
                   >

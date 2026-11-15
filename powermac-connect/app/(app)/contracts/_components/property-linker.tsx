@@ -125,7 +125,7 @@ function AddProperties({ contractId, unlinkedCount }: { contractId: string; unli
             }}
             placeholder="Find the client's properties by address, postcode or reference…"
             aria-label="Find properties to link"
-            className="h-10 w-full rounded-[10px] border border-line-strong bg-sunken pr-3 pl-9 text-sm text-fg placeholder:text-subtle hover:border-[#3d4f74] focus:border-accent focus:ring-2 focus:ring-accent/30 focus:outline-none"
+            className="h-10 w-full rounded-[10px] border border-line-strong bg-sunken pr-3 pl-9 text-sm text-fg placeholder:text-subtle hover:border-[#3d4b41] focus:border-accent focus:ring-2 focus:ring-accent/30 focus:outline-none"
           />
         </div>
         {unlinkedCount > 0 && (
@@ -155,7 +155,7 @@ function AddProperties({ contractId, unlinkedCount }: { contractId: string; unli
                   <li key={p.id} className="flex items-center gap-3 px-3 py-2">
                     <input
                       type="checkbox"
-                      className="size-4 shrink-0 accent-[#2f7dff]"
+                      className="size-4 shrink-0 accent-[#5ee000]"
                       checked={selected.has(p.id)}
                       onChange={(e) =>
                         setSelected((s) => {

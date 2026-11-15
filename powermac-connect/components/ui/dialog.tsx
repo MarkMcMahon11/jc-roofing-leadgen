@@ -19,7 +19,7 @@ export function Modal({ open, onClose, title, description, children, size = "md"
       onClose={onClose}
       onClick={(e) => { if (e.target === ref.current) onClose(); }}
       className={cx(
-        "m-auto w-[calc(100%-24px)] rounded-2xl border border-line bg-surface p-0 text-fg shadow-[var(--shadow-pop)] backdrop:bg-[#02050c]/75 backdrop:backdrop-blur-sm",
+        "m-auto w-[calc(100%-24px)] rounded-2xl border border-line bg-surface p-0 text-fg shadow-[var(--shadow-pop)] backdrop:bg-[#010201]/75 backdrop:backdrop-blur-sm",
         size === "md" && "max-w-lg",
         size === "lg" && "max-w-2xl",
         size === "xl" && "max-w-4xl",

@@ -119,7 +119,7 @@ export function Board({
                   drag && !target && !isSource && "opacity-40",
                   target && !target.locked && "border-dashed border-accent/70",
                   target?.locked && "border-dashed border-[#57400f]",
-                  over === col.key && !target?.locked && "shadow-[0_0_0_2px_rgb(47_125_255/0.6)]",
+                  over === col.key && !target?.locked && "shadow-[0_0_0_2px_rgb(94_224_0/0.6)]",
                   over === col.key && target?.locked && "shadow-[0_0_0_2px_rgb(242_169_59/0.6)]",
                   !drag && "border-line",
                 )}

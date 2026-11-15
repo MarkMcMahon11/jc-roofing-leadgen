@@ -111,7 +111,7 @@ export function BookingBlock({
         done && "opacity-70",
         className,
       )}
-      style={{ backgroundColor: colour + "24", boxShadow: `inset 3px 0 0 ${PRIORITY_COLOUR[b.job.priority] ?? "#8090ab"}`, ...style }}
+      style={{ backgroundColor: colour + "24", boxShadow: `inset 3px 0 0 ${PRIORITY_COLOUR[b.job.priority] ?? "#86918a"}`, ...style }}
     >
       {variant === "day" ? (
         <>
@@ -167,7 +167,7 @@ export function loadTone(booked: number, cap: number, maxDaily: number) {
   if (cap > 0 && booked / cap >= 0.85) return "warn" as const;
   return "ok" as const;
 }
-const toneColour = { ok: "#2fbf71", warn: "#f2a93b", bad: "#f0524f" };
+const toneColour = { ok: "#22c7b8", warn: "#f2a93b", bad: "#f0524f" };
 
 /** Per-cell load: hours booked against that day's bookable hours. */
 export function LoadBar({ booked, cap, maxDaily, working, absent }: { booked: number; cap: number; maxDaily: number; working: boolean; absent?: boolean }) {

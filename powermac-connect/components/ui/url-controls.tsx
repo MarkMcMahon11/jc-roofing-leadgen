@@ -44,7 +44,7 @@ export function SearchBox({ placeholder = "Search…", param = "q", className }:
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder={placeholder}
-        className="h-10 w-full rounded-[10px] border border-line-strong bg-sunken pr-9 pl-9 text-sm text-fg placeholder:text-subtle hover:border-[#3d4f74] focus:border-accent focus:ring-2 focus:ring-accent/30 focus:outline-none [&::-webkit-search-cancel-button]:hidden"
+        className="h-10 w-full rounded-[10px] border border-line-strong bg-sunken pr-9 pl-9 text-sm text-fg placeholder:text-subtle hover:border-[#3d4b41] focus:border-accent focus:ring-2 focus:ring-accent/30 focus:outline-none [&::-webkit-search-cancel-button]:hidden"
       />
       {value && (
         <button type="button" onClick={() => setValue("")} className="absolute top-1/2 right-2 -translate-y-1/2 rounded p-1 text-subtle hover:text-fg" aria-label="Clear search">

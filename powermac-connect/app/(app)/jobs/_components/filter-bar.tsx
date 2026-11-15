@@ -46,7 +46,7 @@ export function FilterBar({
           aria-controls="job-filters"
           className={cx(
             "inline-flex h-10 shrink-0 items-center gap-1.5 rounded-[10px] border px-3 text-sm",
-            selects ? "border-[#1d3d78] bg-accent-lo text-accent-hi" : "border-line-strong bg-raised text-muted",
+            selects ? "border-[#2f5a12] bg-accent-lo text-accent-hi" : "border-line-strong bg-raised text-muted",
           )}
         >
           <SlidersHorizontal className="size-4" aria-hidden />

@@ -87,10 +87,10 @@ export function QueuePanel({
                 className={cx(
                   "group relative rounded-xl border py-2.5 pr-3 pl-3.5 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-accent-hi",
                   api.canEdit ? "cursor-grab active:cursor-grabbing" : "cursor-pointer",
-                  selected ? "border-accent bg-accent-lo/50 shadow-[0_0_0_1px_rgb(47_125_255/0.5)]" : "border-line bg-sunken/60 hover:border-line-strong hover:bg-raised/60",
+                  selected ? "border-accent bg-accent-lo/50 shadow-[0_0_0_1px_rgb(94_224_0/0.5)]" : "border-line bg-sunken/60 hover:border-line-strong hover:bg-raised/60",
                   dragging && "opacity-50",
                 )}
-                style={{ boxShadow: `inset 3px 0 0 ${PRIORITY_COLOUR[j.priority] ?? "#8090ab"}${selected ? ", 0 0 0 1px rgb(47 125 255 / 0.5)" : ""}` }}
+                style={{ boxShadow: `inset 3px 0 0 ${PRIORITY_COLOUR[j.priority] ?? "#86918a"}${selected ? ", 0 0 0 1px rgb(94 224 0 / 0.5)" : ""}` }}
               >
                 <div className="flex items-center justify-between gap-2">
                   <span className="flex min-w-0 items-center gap-1">
@@ -124,7 +124,7 @@ export function QueuePanel({
                   {st && <ColourBadge colour={st.colour}>{st.label}</ColourBadge>}
                 </div>
               </div>
-              {selected && <div className="mt-1.5 mb-2 min-w-0 overflow-hidden rounded-xl border border-[#1d3d78] bg-chrome/70 p-3">{renderSelected(j)}</div>}
+              {selected && <div className="mt-1.5 mb-2 min-w-0 overflow-hidden rounded-xl border border-[#2f5a12] bg-chrome/70 p-3">{renderSelected(j)}</div>}
             </li>
           );
         })}

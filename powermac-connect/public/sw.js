@@ -35,7 +35,7 @@ self.addEventListener("fetch", (event) => {
           return res;
         })
         .catch(() => caches.match(req).then((hit) => hit || caches.match("/field")).then((hit) => hit || new Response(
-          "<!doctype html><meta name=viewport content='width=device-width'><body style='font-family:sans-serif;background:#060a14;color:#e8edf7;padding:24px'><h1>No signal</h1><p>This page has not been opened on this phone yet. Open it again when you have signal.</p>",
+          "<!doctype html><meta name=viewport content='width=device-width'><body style='font-family:sans-serif;background:#020302;color:#eef2ee;padding:24px'><h1>No signal</h1><p>This page has not been opened on this phone yet. Open it again when you have signal.</p>",
           { headers: { "Content-Type": "text/html" } },
         ))),
     );

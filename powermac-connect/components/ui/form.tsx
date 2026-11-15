@@ -54,7 +54,7 @@ export function ActionForm<R extends ActionResult = ActionResult>({
               role={state.ok ? "status" : "alert"}
               className={cx(
                 "mb-4 rounded-xl border px-4 py-2.5 text-sm",
-                state.ok ? "border-[#18492f] bg-ok-lo/70 text-[#9be8bd]" : "border-[#5a1f1d] bg-bad-lo/70 text-[#ffb3b1]",
+                state.ok ? "border-[#145049] bg-ok-lo/70 text-[#a6efe7]" : "border-[#5a1f1d] bg-bad-lo/70 text-[#ffb3b1]",
               )}
             >
               {state.message}
@@ -173,7 +173,7 @@ export function CheckboxField({ name, label, defaultChecked, hint, value = "on" 
   const id = useId();
   return (
     <div className="flex items-start gap-2.5">
-      <input id={id} type="checkbox" name={name} value={value} defaultChecked={defaultChecked} className="mt-0.5 size-4 rounded border-line-strong bg-sunken accent-[#2f7dff]" />
+      <input id={id} type="checkbox" name={name} value={value} defaultChecked={defaultChecked} className="mt-0.5 size-4 rounded border-line-strong bg-sunken accent-[#5ee000]" />
       <div>
         <label htmlFor={id} className="text-sm text-fg">
           {label}

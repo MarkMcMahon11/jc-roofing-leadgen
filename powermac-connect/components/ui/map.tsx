@@ -46,7 +46,7 @@ export function MapView({ points, height = 420, className, emptyLabel = "No loca
         bounds.push([p.lat, p.lng]);
         const marker = L.circleMarker([p.lat, p.lng], {
           radius: p.size ?? 7,
-          color: "#0a101e",
+          color: "#060907",
           weight: 2,
           fillColor: p.colour,
           fillOpacity: 0.95,
@@ -59,13 +59,13 @@ export function MapView({ points, height = 420, className, emptyLabel = "No loca
         box.appendChild(t);
         if (p.subtitle) {
           const s = document.createElement("div");
-          s.style.color = "#a3aec4";
+          s.style.color = "#a8b3aa";
           s.textContent = p.subtitle;
           box.appendChild(s);
         }
         if (p.meta) {
           const s = document.createElement("div");
-          s.style.cssText = "color:#8090ab;font-size:12px;margin-top:2px";
+          s.style.cssText = "color:#86918a;font-size:12px;margin-top:2px";
           s.textContent = p.meta;
           box.appendChild(s);
         }
@@ -73,7 +73,7 @@ export function MapView({ points, height = 420, className, emptyLabel = "No loca
           const a = document.createElement("a");
           a.href = p.href;
           a.textContent = "Open record →";
-          a.style.cssText = "display:inline-block;margin-top:6px;color:#66a3ff;font-weight:500";
+          a.style.cssText = "display:inline-block;margin-top:6px;color:#8af04a;font-weight:500";
           box.appendChild(a);
         }
         marker.bindPopup(box);

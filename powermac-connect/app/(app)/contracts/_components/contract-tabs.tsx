@@ -397,7 +397,7 @@ export function AlertsTab({ alerts }: { alerts: Alert[] }) {
         <ul className="divide-y divide-line/70">
           {alerts.map((a, i) => (
             <li key={i} className="flex items-start gap-3 px-5 py-3.5">
-              <span className={cx("mt-0.5", a.severity === "critical" ? "text-[#ff8a87]" : a.severity === "warning" ? "text-[#ffc56b]" : "text-[#7fdcf5]")} aria-hidden>
+              <span className={cx("mt-0.5", a.severity === "critical" ? "text-[#ff8a87]" : a.severity === "warning" ? "text-[#ffc56b]" : "text-[#8cc8ff]")} aria-hidden>
                 {a.severity === "info" ? <Info className="size-4" /> : <AlertTriangle className="size-4" />}
               </span>
               <div className="min-w-0 flex-1">

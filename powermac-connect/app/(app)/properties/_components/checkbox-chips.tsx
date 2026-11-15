@@ -36,11 +36,11 @@ export function CheckboxChips({
               <input type="checkbox" name={name} value={o.value} defaultChecked={defaultValues.includes(o.value)} className="peer sr-only" />
               <span
                 className={cx(
-                  "inline-flex h-8 items-center rounded-full border border-line-strong bg-sunken px-3 text-[13px] text-muted transition-colors select-none hover:border-[#3d4f74] hover:text-fg",
+                  "inline-flex h-8 items-center rounded-full border border-line-strong bg-sunken px-3 text-[13px] text-muted transition-colors select-none hover:border-[#3d4b41] hover:text-fg",
                   "peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent-hi",
                   tone === "warn"
                     ? "peer-checked:border-[#57400f] peer-checked:bg-warn-lo peer-checked:text-[#ffc56b]"
-                    : "peer-checked:border-[#1d3d78] peer-checked:bg-accent-lo peer-checked:text-accent-hi",
+                    : "peer-checked:border-[#2f5a12] peer-checked:bg-accent-lo peer-checked:text-accent-hi",
                 )}
               >
                 {o.label}

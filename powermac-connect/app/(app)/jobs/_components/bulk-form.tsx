@@ -178,7 +178,7 @@ export function BulkForm({ clients, categories, trades, statuses }: { clients: O
                     <div className="mb-3 flex flex-wrap items-center gap-3">
                       <Input type="search" placeholder="Search address, postcode or reference…" value={filter} onChange={(e) => setFilter(e.target.value)} className="max-w-sm" aria-label="Search properties" />
                       <label className="flex items-center gap-2 text-sm text-muted">
-                        <input type="checkbox" className="size-4 accent-[#2f7dff]" checked={allVisiblePicked} onChange={toggleAll} />
+                        <input type="checkbox" className="size-4 accent-[#5ee000]" checked={allVisiblePicked} onChange={toggleAll} />
                         Select all{filter ? " shown" : ""} ({visible.length})
                       </label>
                       <span className="ml-auto text-sm text-fg tabular" aria-live="polite">
@@ -193,7 +193,7 @@ export function BulkForm({ clients, categories, trades, statuses }: { clients: O
                               type="checkbox"
                               name="property_id"
                               value={p.id}
-                              className="size-4 shrink-0 accent-[#2f7dff]"
+                              className="size-4 shrink-0 accent-[#5ee000]"
                               checked={picked.has(p.id)}
                               onChange={(e) => {
                                 const next = new Set(picked);

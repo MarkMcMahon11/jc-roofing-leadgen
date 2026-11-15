@@ -10,6 +10,8 @@ import { cx } from "@/components/ui/primitives";
 import { Logo } from "./logo";
 import { markNotificationsRead, signOut, switchTenant } from "./actions";
 import { GlobalSearch } from "./search";
+import { Interactions } from "@/components/ui/interactions";
+import { BrandScene } from "@/components/three/brand-scene";
 
 export type ShellUser = { name: string; email: string; role: string; initials: string };
 export type ShellTenant = { id: string; name: string; isDemo: boolean };
@@ -40,6 +42,8 @@ export function Shell({
 
   return (
     <div className="min-h-dvh">
+      <BrandScene variant="ambient" />
+      <Interactions />
       {tenant.isDemo && (
         <div className="sticky top-0 z-40 flex h-8 items-center justify-center gap-2 border-b border-[#57400f] bg-[#2a1f0a] px-3 text-center text-[12px] font-medium text-[#ffcf7d]">
           <FlaskConical className="size-3.5 shrink-0" aria-hidden />
@@ -48,11 +52,11 @@ export function Shell({
       )}
 
       {/* mobile drawer backdrop */}
-      {open && <button className="fixed inset-0 z-40 bg-[#02050c]/70 backdrop-blur-sm lg:hidden" aria-label="Close menu" onClick={() => setOpen(false)} />}
+      {open && <button className="fixed inset-0 z-40 bg-[#010201]/70 backdrop-blur-sm lg:hidden" aria-label="Close menu" onClick={() => setOpen(false)} />}
 
       <aside
         className={cx(
-          "fixed bottom-0 left-0 z-50 flex w-[264px] flex-col border-r border-line bg-chrome/95 backdrop-blur transition-transform lg:translate-x-0",
+          "fixed bottom-0 left-0 z-50 flex w-[264px] flex-col border-r border-white/[0.07] bg-chrome/70 shadow-[inset_-1px_0_0_rgb(94_224_0/0.08)] backdrop-blur-2xl backdrop-saturate-150 transition-transform lg:translate-x-0",
           tenant.isDemo ? "top-8" : "top-0",
           open ? "translate-x-0" : "-translate-x-full",
         )}
@@ -83,10 +87,10 @@ export function Shell({
                         aria-current={active ? "page" : undefined}
                         className={cx(
                           "group relative flex h-9 items-center gap-3 rounded-lg px-3 text-[13.5px] transition-colors",
-                          active ? "bg-accent-lo/80 font-medium text-fg" : "text-muted hover:bg-raised hover:text-fg",
+                          active ? "bg-gradient-to-r from-accent/20 via-accent/[0.07] to-transparent font-medium text-fg ring-1 ring-accent/25 ring-inset" : "text-muted hover:bg-white/[0.05] hover:text-fg",
                         )}
                       >
-                        {active && <span className="absolute top-2 bottom-2 left-0 w-[3px] rounded-r-full bg-accent shadow-[0_0_12px_rgb(47_125_255/0.9)]" aria-hidden />}
+                        {active && <span className="absolute top-2 bottom-2 left-0 w-[3px] rounded-r-full bg-accent shadow-[0_0_12px_rgb(94_224_0/0.9)]" aria-hidden />}
                         <Icon name={item.icon} className={cx("size-[17px] shrink-0", active ? "text-accent-hi" : "text-subtle group-hover:text-muted")} />
                         {item.label}
                       </Link>
@@ -109,7 +113,7 @@ export function Shell({
 
         <div className="border-t border-line p-3">
           <div className="flex items-center gap-3 rounded-lg px-2 py-1.5">
-            <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#2f7dff] to-[#1c3f80] text-xs font-semibold text-white">{user.initials}</div>
+            <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#8af04a] to-[#2a6a06] text-xs font-bold text-[#061003] shadow-[0_0_14px_rgb(94_224_0/0.45)]">{user.initials}</div>
             <div className="min-w-0 flex-1">
               <div className="truncate text-[13px] font-medium text-fg">{user.name}</div>
               <div className="truncate text-[11.5px] text-subtle">{user.role}</div>
@@ -124,7 +128,7 @@ export function Shell({
       </aside>
 
       <div className="lg:pl-[264px]">
-        <header className={cx("sticky z-30 flex h-16 items-center gap-3 border-b border-line bg-canvas/80 px-4 backdrop-blur-md md:px-8", tenant.isDemo ? "top-8" : "top-0")}>
+        <header className={cx("sticky z-30 flex h-16 items-center gap-3 border-b border-white/[0.07] bg-canvas/55 px-4 backdrop-blur-2xl backdrop-saturate-150 md:px-8", tenant.isDemo ? "top-8" : "top-0")}>
           <button className="-ml-1 rounded-lg p-2 text-muted hover:bg-raised lg:hidden" onClick={() => setOpen(true)} aria-label="Open menu">
             <Menu className="size-5" />
           </button>
@@ -143,7 +147,7 @@ export function Shell({
             </Link>
           </div>
         </header>
-        <main className="mx-auto w-full max-w-[1480px] px-4 py-6 md:px-8 md:py-8">{children}</main>
+        <main key={pathname} className="pm-rise mx-auto w-full max-w-[1480px] px-4 py-6 md:px-8 md:py-8">{children}</main>
       </div>
     </div>
   );
@@ -180,7 +184,7 @@ function TenantSwitcher({ tenant, tenants }: { tenant: ShellTenant; tenants: She
           {tenants.map((t) => (
             <form key={t.id} action={switchTenant}>
               <input type="hidden" name="tenantId" value={t.id} />
-              <button className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-[13px] text-fg hover:bg-[#1c2944]" role="option" aria-selected={t.id === tenant.id}>
+              <button className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-[13px] text-fg hover:bg-[#1a241c]" role="option" aria-selected={t.id === tenant.id}>
                 <span className="flex-1 truncate">{t.name}</span>
                 {t.id === tenant.id && <Check className="size-4 text-accent-hi" />}
               </button>
@@ -206,7 +210,7 @@ function Notifications({ items }: { items: ShellNotification[] }) {
       <button onClick={() => setOpen((o) => !o)} className="relative rounded-lg p-2 text-muted hover:bg-raised hover:text-fg" aria-label={`Notifications (${items.length} unread)`} aria-expanded={open}>
         <Bell className="size-[18px]" />
         {items.length > 0 && (
-          <span className="absolute top-1 right-1 flex min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] leading-4 font-semibold text-white tabular">{items.length}</span>
+          <span className="absolute top-1 right-1 flex min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] leading-4 font-semibold text-[#061003] tabular">{items.length}</span>
         )}
       </button>
       {open && (
@@ -225,7 +229,7 @@ function Notifications({ items }: { items: ShellNotification[] }) {
             <ul className="max-h-96 overflow-y-auto py-1">
               {items.map((n) => (
                 <li key={n.id}>
-                  <Link href={n.link ?? "#"} onClick={() => setOpen(false)} className="flex gap-3 px-4 py-3 hover:bg-[#1c2944]">
+                  <Link href={n.link ?? "#"} onClick={() => setOpen(false)} className="flex gap-3 px-4 py-3 hover:bg-[#1a241c]">
                     <span className={cx("mt-1.5 size-2 shrink-0 rounded-full", dot[n.severity] ?? "bg-accent")} aria-hidden />
                     <span className="min-w-0">
                       <span className="block text-[13px] font-medium text-fg">{n.title}</span>

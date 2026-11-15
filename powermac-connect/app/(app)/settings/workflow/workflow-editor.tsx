@@ -56,9 +56,9 @@ export function WorkflowEditor({ statuses, transitions }: { statuses: JobStatus[
                 {statuses.filter((t) => t.key !== from.key).map((to) => {
                   const rule = find(from.key, to.key);
                   return (
-                    <div key={to.key} className={cx("flex items-center gap-1.5 rounded-lg border px-2 py-1", rule ? "border-[#1d3d78] bg-accent-lo/50" : "border-line bg-sunken")}>
+                    <div key={to.key} className={cx("flex items-center gap-1.5 rounded-lg border px-2 py-1", rule ? "border-[#2f5a12] bg-accent-lo/50" : "border-line bg-sunken")}>
                       <label className="flex cursor-pointer items-center gap-1.5 text-xs">
-                        <input type="checkbox" className="accent-[#2f7dff]" checked={Boolean(rule)} onChange={(e) => change(from.key, to.key, e.target.checked, rule?.required_permission ?? null)} disabled={pending} />
+                        <input type="checkbox" className="accent-[#5ee000]" checked={Boolean(rule)} onChange={(e) => change(from.key, to.key, e.target.checked, rule?.required_permission ?? null)} disabled={pending} />
                         <span className={rule ? "text-fg" : "text-subtle"}>{to.label}</span>
                       </label>
                       {rule && (

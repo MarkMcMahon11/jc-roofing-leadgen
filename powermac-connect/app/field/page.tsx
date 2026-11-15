@@ -37,7 +37,7 @@ export default async function FieldHome({ searchParams }: PageProps<"/field">) {
             <Link href={`/field/${j.assignment_id}`} className={cx("block rounded-2xl border bg-surface p-4 active:bg-raised", j.priority === "emergency" ? "border-[#5a1f1d]" : "border-line", j.assignment_status === "completed" && "opacity-60")}>
               <div className="flex items-center justify-between text-xs">
                 <span className="font-semibold text-accent-hi tabular">{time(j.scheduled_start)} – {time(j.scheduled_end)}</span>
-                <span className={cx("rounded-full px-2 py-0.5 font-medium", j.assignment_status === "on_site" ? "bg-accent text-white" : "bg-raised text-muted")}>{ASSIGNMENT[j.assignment_status] ?? j.assignment_status}</span>
+                <span className={cx("rounded-full px-2 py-0.5 font-medium", j.assignment_status === "on_site" ? "bg-accent text-[#061003]" : "bg-raised text-muted")}>{ASSIGNMENT[j.assignment_status] ?? j.assignment_status}</span>
               </div>
               <div className="mt-2 flex items-start justify-between gap-3">
                 <div className="min-w-0">

@@ -116,5 +116,5 @@ export const ASSIGNMENT_STATUSES: { value: string; label: string }[] = [
   { value: "no_access", label: "No access" },
 ];
 
-export const PRIORITY_COLOUR: Record<string, string> = { emergency: "#f0524f", urgent: "#f2a93b", routine: "#3ec1e6", planned: "#8090ab" };
+export const PRIORITY_COLOUR: Record<string, string> = { emergency: "#f0524f", urgent: "#f2a93b", routine: "#4aa8ff", planned: "#86918a" };
 export const PRIORITY_RANK: Record<string, number> = { emergency: 0, urgent: 1, routine: 2, planned: 3 };

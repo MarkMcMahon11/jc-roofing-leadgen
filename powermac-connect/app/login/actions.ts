@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { fromZod, type ActionResult } from "@/lib/actions";
 import { env } from "@/lib/env";
 import { logEvent } from "@/lib/audit";
+import { getContext, homeFor } from "@/lib/auth/context";
 
 const schema = z.object({
   email: z.string().trim().toLowerCase().email("Enter a valid email address"),
@@ -25,7 +26,10 @@ export async function signIn(_: ActionResult, formData: FormData): Promise<Actio
   const { data: m } = await supabase.from("memberships").select("tenant_id").eq("status", "active").limit(1).maybeSingle();
   await logEvent(supabase, m?.tenant_id ?? null, "login", "session");
   const next = parsed.data.next;
-  redirect(next && next.startsWith("/") && !next.startsWith("//") ? next : "/");
+  if (next && next.startsWith("/") && !next.startsWith("//")) redirect(next);
+  // straight to the role's home page (saves a hop through "/")
+  const ctx = await getContext();
+  redirect(ctx ? homeFor(ctx) : "/");
 }
 
 const resetSchema = z.object({ email: z.string().trim().toLowerCase().email("Enter a valid email address") });

@@ -91,7 +91,7 @@ export default async function JobsPage({ searchParams }: PageProps<"/jobs">) {
       {view === "board" && requestCount > 0 && canWrite && (
         <Link
           href="/jobs?view=requests"
-          className="mb-4 flex items-center gap-3 rounded-xl border border-[#1d3d78] bg-accent-lo/50 px-4 py-2.5 text-sm text-[#b5d1ff] transition-colors hover:bg-accent-lo"
+          className="mb-4 flex items-center gap-3 rounded-xl border border-[#2f5a12] bg-accent-lo/50 px-4 py-2.5 text-sm text-[#c8f7a8] transition-colors hover:bg-accent-lo"
         >
           <Inbox className="size-4 shrink-0" aria-hidden />
           <span>

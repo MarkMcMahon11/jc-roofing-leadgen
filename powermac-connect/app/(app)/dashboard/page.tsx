@@ -96,7 +96,7 @@ export default async function DashboardPage() {
     if (!crew.has(key))
       crew.set(key, {
         name: a.employee ? `${a.employee.first_name} ${a.employee.last_name}` : (a.subcontractor?.company_name ?? "Subcontractor"),
-        colour: a.employee?.colour ?? "#8090ab",
+        colour: a.employee?.colour ?? "#86918a",
         trade: a.employee?.trade ?? "subcontractor",
         href: a.employee ? `/workforce/${a.employee.id}` : "/subcontractors",
         jobs: [],

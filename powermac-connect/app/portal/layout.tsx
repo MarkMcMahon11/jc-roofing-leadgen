@@ -4,6 +4,8 @@ import { homeFor, requireTenant } from "@/lib/auth/context";
 import { Logo } from "@/components/shell/logo";
 import { signOut } from "@/components/shell/actions";
 import { PortalNav } from "./portal-nav";
+import { BrandScene } from "@/components/three/brand-scene";
+import { Interactions } from "@/components/ui/interactions";
 
 export default async function PortalLayout({ children }: { children: React.ReactNode }) {
   const ctx = await requireTenant();
@@ -20,15 +22,17 @@ export default async function PortalLayout({ children }: { children: React.React
   ].filter((l) => !l.perm || ctx.can(l.perm));
   return (
     <div className="min-h-dvh">
+      <BrandScene variant="ambient" />
+      <Interactions />
       {ctx.active.tenant.is_demo && (
         <div className="flex h-8 items-center justify-center gap-2 border-b border-[#57400f] bg-[#2a1f0a] text-[12px] font-medium text-[#ffcf7d]">
           <FlaskConical className="size-3.5" aria-hidden />DEMO ENVIRONMENT · sample data
         </div>
       )}
-      <header className="border-b border-line bg-chrome/90 backdrop-blur">
+      <header className="sticky top-0 z-30 border-b border-white/[0.07] bg-chrome/60 backdrop-blur-2xl backdrop-saturate-150">
         <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 md:px-8">
           <Logo />
-          <span className="hidden rounded-full border border-[#1d3d78] bg-accent-lo px-2.5 py-0.5 text-[11px] font-medium text-accent-hi sm:inline">Client portal</span>
+          <span className="hidden rounded-full border border-[#2f5a12] bg-accent-lo px-2.5 py-0.5 text-[11px] font-medium text-accent-hi sm:inline">Client portal</span>
           <div className="ml-auto flex items-center gap-3">
             <div className="hidden text-right sm:block">
               <div className="text-[13px] font-medium">{ctx.fullName}</div>
@@ -39,7 +43,7 @@ export default async function PortalLayout({ children }: { children: React.React
         </div>
         {scope === "client" && <PortalNav links={links} />}
       </header>
-      <main className="mx-auto max-w-6xl px-4 py-6 md:px-8 md:py-8">
+      <main className="pm-rise mx-auto max-w-6xl px-4 py-6 md:px-8 md:py-8">
         {scope === "client" ? children : (
           <div className="pm-card mx-auto max-w-lg p-8 text-center">
             <h1 className="text-xl font-semibold">Repair updates</h1>

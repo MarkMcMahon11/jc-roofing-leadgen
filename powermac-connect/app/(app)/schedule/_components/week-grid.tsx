@@ -141,7 +141,7 @@ export function WeekGrid({ days, today, operatives, subs, bookings, absences, cl
             { employeeId: null, subcontractorId: s.id, date: d },
             <>
               {list.map((b) => (
-                <BookingBlock key={b.id} b={b} date={d} colour="#8090ab" status={statuses[b.job.status]} api={api} />
+                <BookingBlock key={b.id} b={b} date={d} colour="#86918a" status={statuses[b.job.status]} api={api} />
               ))}
             </>,
             { label: `${s.name}, ${fmtDay(d)}: ${list.length} booking${list.length === 1 ? "" : "s"}`, className: cx("min-h-[84px]", d === today && "bg-accent-lo/[0.12]") },
@@ -166,13 +166,13 @@ export function WeekGrid({ days, today, operatives, subs, bookings, absences, cl
               <>
                 <span className="flex items-center justify-between gap-1">
                   <span className={cx("text-[11px] font-medium tracking-wide uppercase", isToday ? "text-accent-hi" : "text-subtle")}>{fmtDay(d, { weekday: "short" })}</span>
-                  {isToday && <span className="rounded-full bg-accent px-1.5 text-[10px] font-semibold text-white">Today</span>}
+                  {isToday && <span className="rounded-full bg-accent px-1.5 text-[10px] font-semibold text-[#061003]">Today</span>}
                 </span>
                 <span className={cx("block text-[15px] font-semibold tabular", isToday ? "text-fg" : weekendDay ? "text-muted" : "text-fg")}>{fmtDay(d, { day: "numeric", month: "short" })}</span>
               </>
             );
             return (
-              <div key={d} role="columnheader" className={cx("sticky top-0 z-20 border-b border-l border-line bg-sunken", isToday && "bg-[#0f2147]")}>
+              <div key={d} role="columnheader" className={cx("sticky top-0 z-20 border-b border-l border-line bg-sunken", isToday && "bg-[#11240a]")}>
                 {href ? (
                   <Link href={href} scroll={false} className="block px-3 py-2 hover:bg-raised" title={`Open ${fmtDay(d)} in the day view`}>
                     {body}

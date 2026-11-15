@@ -6,6 +6,8 @@ import { createClient } from "@/lib/supabase/server";
 import { Badge, ButtonLink, Card, CardHeader, PageHeader, Stat, Table, TD, TH, THead, TR } from "@/components/ui/primitives";
 import { Logo } from "@/components/shell/logo";
 import { signOut } from "@/components/shell/actions";
+import { BrandScene } from "@/components/three/brand-scene";
+import { Interactions } from "@/components/ui/interactions";
 import { count, date } from "@/lib/format";
 import { CreateTenantForm, SubscriptionForm } from "./platform-forms";
 
@@ -19,7 +21,9 @@ export default async function PlatformPage() {
   const list = tenants ?? [];
   const mrr = { trial: 0, professional: 799, enterprise: 1999 } as Record<string, number>;
   return (
-    <div className="mx-auto max-w-[1280px] px-4 py-8 md:px-8">
+    <div className="pm-rise mx-auto max-w-[1280px] px-4 py-8 md:px-8">
+      <BrandScene variant="ambient" />
+      <Interactions />
       <div className="mb-8 flex items-center justify-between">
         <Logo />
         <div className="flex items-center gap-2">

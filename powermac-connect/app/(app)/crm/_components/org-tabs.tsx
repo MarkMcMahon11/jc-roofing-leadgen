@@ -564,7 +564,7 @@ export async function ActivityTab({ ctx, orgId }: { ctx: TenantContext; orgId: s
             <ol className="relative px-5 py-4">
               {items.map((it) => (
                 <li key={`${it.kind}-${it.id}`} className="relative border-l border-line pb-5 pl-6 last:pb-0">
-                  <span className={cx("absolute top-0.5 -left-[9px] grid size-[18px] place-items-center rounded-full border", it.kind === "comm" ? "border-[#164556] bg-info-lo text-[#7fdcf5]" : "border-[#1d3d78] bg-accent-lo text-accent-hi")} aria-hidden>
+                  <span className={cx("absolute top-0.5 -left-[9px] grid size-[18px] place-items-center rounded-full border", it.kind === "comm" ? "border-[#1b3d63] bg-info-lo text-[#8cc8ff]" : "border-[#2f5a12] bg-accent-lo text-accent-hi")} aria-hidden>
                     {it.kind === "comm" ? <MessageSquare className="size-2.5" /> : it.type === "follow_up" || it.type === "task" ? <CalendarClock className="size-2.5" /> : it.type === "call" ? <Phone className="size-2.5" /> : it.type === "email" ? <Mail className="size-2.5" /> : <span className="size-1.5 rounded-full bg-current" />}
                   </span>
                   <div className="flex flex-wrap items-center gap-x-2 gap-y-1">

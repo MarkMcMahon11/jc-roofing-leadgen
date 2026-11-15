@@ -45,12 +45,12 @@ export function SlaCountdown({
     tone = diff < 0 ? "bad" : diff < 86_400_000 ? "warn" : "fine";
     text = diff < 0 ? `Overdue by ${durationLabel(diff)}` : `Due in ${durationLabel(diff)}`;
   }
-  const textTone = tone === "bad" ? "text-[#ff8a87]" : tone === "warn" ? "text-[#ffc56b]" : tone === "ok" ? "text-[#5fdc98]" : "text-fg";
+  const textTone = tone === "bad" ? "text-[#ff8a87]" : tone === "warn" ? "text-[#ffc56b]" : tone === "ok" ? "text-[#5fe0d2]" : "text-fg";
   return (
     <div
       className={cx(
         "flex min-w-0 items-center gap-2.5 rounded-xl border px-3 py-2",
-        tone === "ok" && "border-[#18492f] bg-ok-lo/60",
+        tone === "ok" && "border-[#145049] bg-ok-lo/60",
         tone === "bad" && "border-[#5a1f1d] bg-bad-lo/60",
         tone === "warn" && "border-[#57400f] bg-warn-lo/60",
         tone === "fine" && "border-line bg-raised/60",

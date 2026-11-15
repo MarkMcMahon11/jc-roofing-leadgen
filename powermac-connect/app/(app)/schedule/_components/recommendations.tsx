@@ -116,7 +116,7 @@ export function Recommendations({
       <ol className={cx("space-y-2", loading && "opacity-50")} aria-busy={loading}>
         {items.map((r, i) => {
           const score = Math.max(0, Math.min(100, r.totalScore));
-          const tone = r.conflicts > 0 ? "#f0524f" : score >= 70 ? "#2fbf71" : score >= 45 ? "#3987e5" : "#f2a93b";
+          const tone = r.conflicts > 0 ? "#f0524f" : score >= 70 ? "#22c7b8" : score >= 45 ? "#5ee000" : "#f2a93b";
           return (
             <li key={r.employeeId} className="rounded-lg border border-line bg-sunken/70 p-2.5" data-rec={r.name}>
               <div className="flex items-center gap-2">

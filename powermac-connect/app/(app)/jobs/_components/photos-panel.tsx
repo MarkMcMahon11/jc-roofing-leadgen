@@ -79,7 +79,7 @@ export function PhotosPanel({ jobId, photos, canWrite }: { jobId: string; photos
                 type="file"
                 accept={ACCEPT}
                 multiple
-                className="block w-full text-sm text-muted file:mr-3 file:h-10 file:rounded-[10px] file:border file:border-line-strong file:bg-raised file:px-3 file:text-sm file:font-medium file:text-fg hover:file:bg-[#1a2643]"
+                className="block w-full text-sm text-muted file:mr-3 file:h-10 file:rounded-[10px] file:border file:border-line-strong file:bg-raised file:px-3 file:text-sm file:font-medium file:text-fg hover:file:bg-[#18211a]"
               />
             </div>
             <div>
@@ -101,7 +101,7 @@ export function PhotosPanel({ jobId, photos, canWrite }: { jobId: string; photos
               Upload
             </button>
             <label className="flex items-center gap-2 text-sm text-muted md:col-span-4">
-              <input type="checkbox" className="size-4 accent-[#2f7dff]" checked={share} onChange={(e) => setShare(e.target.checked)} />
+              <input type="checkbox" className="size-4 accent-[#5ee000]" checked={share} onChange={(e) => setShare(e.target.checked)} />
               Client can see these photos
             </label>
           </div>

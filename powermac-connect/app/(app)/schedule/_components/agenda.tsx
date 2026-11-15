@@ -46,7 +46,7 @@ export function MobileAgenda(props: Props) {
         </Link>
         <h2 className="text-center text-[15px] font-semibold text-fg">
           {fmtDay(date, { weekday: "long", day: "numeric", month: "long" })}
-          {date === today && <span className="ml-2 rounded-full bg-accent px-1.5 py-px align-middle text-[10px] font-semibold text-white">Today</span>}
+          {date === today && <span className="ml-2 rounded-full bg-accent px-1.5 py-px align-middle text-[10px] font-semibold text-[#061003]">Today</span>}
         </h2>
         <Link href={links.next} scroll={false} className={buttonClass("secondary", "sm", "px-2")} aria-label="Next day">
           <ChevronRight className="size-4" />
@@ -95,7 +95,7 @@ export function MobileAgenda(props: Props) {
                 <SubLabel sub={s} linkable={linkSubs} />
                 <div className="mt-2 grid gap-1.5">
                   {list.map((b) => (
-                    <BookingBlock key={b.id} b={b} date={date} colour="#8090ab" status={statuses[b.job.status]} api={api} variant="agenda" />
+                    <BookingBlock key={b.id} b={b} date={date} colour="#86918a" status={statuses[b.job.status]} api={api} variant="agenda" />
                   ))}
                 </div>
               </Card>

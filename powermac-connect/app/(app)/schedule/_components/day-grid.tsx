@@ -107,7 +107,7 @@ export function DayGrid({ date, today, nowIso, operatives, subs, bookings, absen
         })}
 
         {nowMin !== null && (
-          <div className="pointer-events-none absolute inset-y-0 z-[1] w-px bg-accent-hi shadow-[0_0_8px_rgb(102_163_255/0.9)]" style={{ left: `${pct(nowMin)}%` }} aria-hidden>
+          <div className="pointer-events-none absolute inset-y-0 z-[1] w-px bg-accent-hi shadow-[0_0_8px_rgb(138_240_74/0.9)]" style={{ left: `${pct(nowMin)}%` }} aria-hidden>
             <span className="absolute -top-0.5 -left-[3px] size-[7px] rounded-full bg-accent-hi" />
           </div>
         )}
@@ -212,7 +212,7 @@ export function DayGrid({ date, today, nowIso, operatives, subs, bookings, absen
             <div role="rowheader" className="sticky left-0 z-10 flex items-center border-b border-line/70 bg-surface px-3 py-2">
               <SubLabel sub={s} linkable={linkSubs} />
             </div>
-            {timeline(`s:${s.id}`, s.name, { employeeId: null, subcontractorId: s.id, date }, bookingsOn(bookings, date, (b) => b.subcontractorId === s.id), "#8090ab", {})}
+            {timeline(`s:${s.id}`, s.name, { employeeId: null, subcontractorId: s.id, date }, bookingsOn(bookings, date, (b) => b.subcontractorId === s.id), "#86918a", {})}
           </div>
         ))}
       </div>

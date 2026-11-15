@@ -1,7 +1,7 @@
 // Marker colours for property maps (shared by the server page that builds points and the legend).
 export const MAP_COLOURS = {
   emergency: "#f0524f",
-  open: "#3987e5",
+  open: "#5ee000",
   void: "#f2a93b",
   none: "#64748b",
 } as const;

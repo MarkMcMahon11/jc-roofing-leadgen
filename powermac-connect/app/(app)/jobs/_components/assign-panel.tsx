@@ -187,7 +187,7 @@ export function AssignPanel({
                       <div className="flex items-center gap-3">
                         <span className="w-5 text-right text-xs text-subtle tabular">{i + 1}</span>
                         <span
-                          className={cx("flex size-11 flex-col items-center justify-center rounded-xl border text-center leading-none", clash ? "border-[#5a1f1d] text-[#ff8a87]" : r.total_score >= 70 ? "border-[#18492f] text-[#5fdc98]" : "border-line-strong text-fg")}
+                          className={cx("flex size-11 flex-col items-center justify-center rounded-xl border text-center leading-none", clash ? "border-[#5a1f1d] text-[#ff8a87]" : r.total_score >= 70 ? "border-[#145049] text-[#5fe0d2]" : "border-line-strong text-fg")}
                           title="Total score"
                         >
                           <span className="text-base font-semibold tabular">{r.total_score}</span>

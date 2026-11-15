@@ -88,7 +88,7 @@ export function OfflineBar() {
 
   if (online && pending === 0 && !synced) return null;
   return (
-    <div role="status" className={`flex items-center gap-2 px-4 py-2 text-[13px] ${online ? "bg-accent-lo text-[#b5d1ff]" : "bg-warn-lo text-[#ffd79a]"}`}>
+    <div role="status" className={`flex items-center gap-2 px-4 py-2 text-[13px] ${online ? "bg-accent-lo text-[#c8f7a8]" : "bg-warn-lo text-[#ffd79a]"}`}>
       {!online ? <CloudOff className="size-4" aria-hidden /> : synced ? <CheckCircle2 className="size-4 text-ok" aria-hidden /> : <RefreshCw className="size-4 animate-spin" aria-hidden />}
       {!online
         ? `Offline. ${pending ? `${pending} update${pending === 1 ? "" : "s"} saved on this phone - ` : ""}will send when you have signal.`

@@ -50,7 +50,7 @@ export function StatusActions({ jobId, current, moves }: { jobId: string; curren
         ))}
       </div>
       {done && (
-        <p role="status" className="mt-2 text-xs text-[#9be8bd]">
+        <p role="status" className="mt-2 text-xs text-[#a6efe7]">
           {done}
         </p>
       )}
